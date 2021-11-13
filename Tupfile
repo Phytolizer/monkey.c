@@ -1,0 +1,7 @@
+include_rules
+
+: src/libmonkey/*.o |> !ar |> libmonkey.a
+
+LIBS = -lmonkey
+: src/monkey_repl/*.o |> !ld |> monkey_repl.exe
+: src/monkey_test/*.o |> !ld |> monkey_test.exe
