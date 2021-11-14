@@ -14,5 +14,5 @@ jobs:
           cp tup ../tup.exe
           git clean -xf
           popd
-      - run: ./tup/tup
+      - run: ./tup.exe
       - run: ./monkey_test.exe
