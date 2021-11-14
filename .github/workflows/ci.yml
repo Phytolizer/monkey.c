@@ -7,6 +7,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
-      - run: sudo apt-get install ccache libfuse3-dev build-essential tup
-      - run: tup
+      - run: sudo apt-get install ccache libfuse3-dev build-essential flex bison gperf libncurses5-dev libncursesw5-dev gawk libmpfr-dev libgpm-dev zlib1g-dev yasm graphviz
+      - run: ./tup/bootstrap.sh
+      - run: ./tup/tup
       - run: ./monkey_test.exe
