@@ -16,5 +16,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
+      - uses: ilammy/msvc-dev-cmd@v1
       - run: ./build.bat
       - run: ./monkey_test.exe
