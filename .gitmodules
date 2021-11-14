@@ -1,0 +1,6 @@
+[submodule "src/sds"]
+	path = src/sds
+	url = https://github.com/antirez/sds.git
+[submodule "src/vec"]
+	path = src/vec
+	url = https://github.com/rxi/vec.git

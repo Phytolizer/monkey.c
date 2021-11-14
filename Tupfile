@@ -1,7 +1,9 @@
 include_rules
 
 : src/libmonkey/*.o |> !ar |> libmonkey.a
+: src/sds/*.o |> !ar |> libsds.a
+: src/vec/src/*.o |> !ar |> libvec.a
 
-LIBS = -lmonkey
+LIBS = -lmonkey -lsds -lvec
 : src/monkey_repl/*.o |> !ld |> monkey_repl.exe
 : src/monkey_test/*.o |> !ld |> monkey_test.exe
