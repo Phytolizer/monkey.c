@@ -8,6 +8,9 @@ jobs:
         with:
           submodules: true
       - run: sudo apt-get install ccache libfuse3-dev build-essential flex bison gperf libncurses5-dev libncursesw5-dev gawk libmpfr-dev libgpm-dev zlib1g-dev yasm graphviz
-      - run: ./tup/bootstrap.sh
+      - run: |
+          pushd tup
+          ./bootstrap.sh
+          popd
       - run: ./tup/tup
       - run: ./monkey_test.exe
