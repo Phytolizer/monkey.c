@@ -2,9 +2,10 @@
 
 #include "sds.h"
 
-typedef const char *TokenType;
+typedef const char* TokenType;
 
-typedef struct {
-  TokenType type;
-  sds literal;
+typedef struct
+{
+    TokenType type;
+    sds literal;
 } Token;
