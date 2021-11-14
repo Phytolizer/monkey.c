@@ -1,0 +1,25 @@
+= monkey.c
+
+The Monkey programming language, implemented in pure C.
+
+== Quickstart
+
+Ensure you have a C compiler.
+
+=== Linux
+
+----
+./build.sh
+----
+
+Alternatively, install https://github.com/gittup/tup[tup] and run:
+
+----
+tup
+----
+
+=== Windows
+
+----
+./build.bat
+----
