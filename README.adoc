@@ -20,6 +20,8 @@ tup
 
 === Windows
 
+In a Visual Studio developer command prompt:
+
 ----
 ./build.bat
 ----
