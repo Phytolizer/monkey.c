@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include "monkey/lexer.h"
 #include "monkey/token.h"
 #include "sds.h"
