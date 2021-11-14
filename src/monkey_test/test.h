@@ -4,13 +4,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define test_assert(test, ...)                                                                                         \
+#define test_assert(test, cleanup, ...)                                                                                \
     do                                                                                                                 \
     {                                                                                                                  \
         if (!(test))                                                                                                   \
         {                                                                                                              \
             char* message;                                                                                             \
             asprintf(&message, __VA_ARGS__);                                                                           \
+            cleanup;                                                                                                   \
             return message;                                                                                            \
         }                                                                                                              \
     } while (false)
