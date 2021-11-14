@@ -4,6 +4,3 @@
 [submodule "src/vec"]
 	path = src/vec
 	url = https://github.com/rxi/vec.git
-[submodule "tup"]
-	path = tup
-	url = https://github.com/gittup/tup.git
