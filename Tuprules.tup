@@ -2,18 +2,30 @@
 
 &INCDIR = inc
 
+ifeq (@(TUP_PLATFORM),win32)
+CC = cl
+CFLAGS += -W3
+OFLAG = -Fo
+else
 CC = gcc
-
 CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -Wpedantic
 CFLAGS += -Werror=implicit-function-declaration
+CFLAGS += -fsanitize=address,undefined
+LDFLAGS += -fsanitize=address,undefined
 CFLAGS += -std=c99
 CFLAGS += -g3
-CFLAGS += -fsanitize=address,undefined
+OFLAG = -o
+endif
 
-LDFLAGS += -fsanitize=address,undefined
 
-!cc = |> ^j^ $(CC) $(CFLAGS) -I &(INCDIR) -c %f -o %o |> %B.o
+!cc = |> ^j^ $(CC) $(CFLAGS) -I &(INCDIR) -c %f $(OFLAG)%o |> %B.o
+
+ifeq (@(TUP_PLATFORM),win32)
+!ld = |> link %f /OUT:%o /LIBPATH:. $(LIBS) |>
+!ar = |> lib /OUT:%o %f |>
+else
 !ld = |> $(CC) $(LDFLAGS) %f -o %o -L. $(LIBS) |>
 !ar = |> ar rcs %o %f |>
+endif

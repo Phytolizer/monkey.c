@@ -3,6 +3,10 @@
 #define _GNU_SOURCE
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+#define test_asprintf_(dest, ...) \
+    do { int len = vsnprintf(NULL, 0, __VA_ARGS__); *dest = malloc(len + 1); vsnprintf(*dest, len + 1, __VA_ARGS__); } while (false)
 
 #define test_assert(test, cleanup, ...)                                                                                \
     do                                                                                                                 \
@@ -10,7 +14,7 @@
         if (!(test))                                                                                                   \
         {                                                                                                              \
             char* message;                                                                                             \
-            asprintf(&message, __VA_ARGS__);                                                                           \
+            test_asprintf_(&message, __VA_ARGS__);                                                                           \
             cleanup;                                                                                                   \
             return message;                                                                                            \
         }                                                                                                              \

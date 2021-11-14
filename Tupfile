@@ -4,6 +4,10 @@ include_rules
 : src/sds/*.o |> !ar |> libsds.a
 : src/vec/src/*.o |> !ar |> libvec.a
 
+ifeq (@(TUP_PLATFORM),win32)
+LIBS = libmonkey.a libsds.a libvec.a
+else
 LIBS = -lmonkey -lsds -lvec
+endif
 : src/monkey_repl/*.o | libmonkey.a libsds.a libvec.a |> !ld |> monkey_repl.exe
 : src/monkey_test/*.o | libmonkey.a libsds.a libvec.a |> !ld |> monkey_test.exe
