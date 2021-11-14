@@ -1,12 +1,16 @@
 #pragma once
 
+#define _GNU_SOURCE
 #include <stdbool.h>
+#include <stdio.h>
 
-#define test_assert(test, message)                                                                                     \
+#define test_assert(test, ...)                                                                                         \
     do                                                                                                                 \
     {                                                                                                                  \
         if (!(test))                                                                                                   \
         {                                                                                                              \
+            char* message;                                                                                             \
+            asprintf(&message, __VA_ARGS__);                                                                           \
             return message;                                                                                            \
         }                                                                                                              \
     } while (false)
