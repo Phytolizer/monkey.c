@@ -10,3 +10,11 @@ jobs:
       - run: sudo apt-get install build-essential
       - run: ./build.sh
       - run: ./monkey_test.exe
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - run: ./build.bat
+      - run: ./monkey_test.exe
