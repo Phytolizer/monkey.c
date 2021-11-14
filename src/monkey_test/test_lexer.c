@@ -27,10 +27,20 @@ char* test_next_token(void)
     {
         Token tok = Lexer_next_token(&l);
 
-        test_assert(strcmp(tok.type, tests[i].expected_type) == 0, Token_deinit(&tok),
-                    "tests[%zu] -- tokentype wrong. expected=%s, got=%s", i, tests[i].expected_type, tok.type);
-        test_assert(strcmp(tok.literal, tests[i].expected_literal) == 0, Token_deinit(&tok),
-                    "tests[%zu] -- literal wrong. expected=%s, got=%s", i, tests[i].expected_literal, tok.literal);
+        test_assert(
+            strcmp(tok.type, tests[i].expected_type) == 0,
+            do {
+                Token_deinit(&tok);
+                Lexer_deinit(&l);
+            } while (false),
+            "tests[%zu] -- tokentype wrong. expected=%s, got=%s", i, tests[i].expected_type, tok.type);
+        test_assert(
+            strcmp(tok.literal, tests[i].expected_literal) == 0,
+            do {
+                Token_deinit(&tok);
+                Lexer_deinit(&l);
+            } while (false),
+            "tests[%zu] -- literal wrong. expected=%s, got=%s", i, tests[i].expected_literal, tok.literal);
 
         Token_deinit(&tok);
     }
