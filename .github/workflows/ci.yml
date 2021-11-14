@@ -11,6 +11,7 @@ jobs:
       - run: |
           pushd tup
           ./bootstrap.sh
+          cp tup ../tup.exe
           git clean -xf
           popd
       - run: ./tup/tup
