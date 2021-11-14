@@ -1,0 +1,10 @@
+name: CI
+on: [push]
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get install ccache libfuse3-dev build-essential tup
+      - run: tup
+      - run: ./monkey_test.exe
