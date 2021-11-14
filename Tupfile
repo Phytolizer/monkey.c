@@ -5,5 +5,5 @@ include_rules
 : src/vec/src/*.o |> !ar |> libvec.a
 
 LIBS = -lmonkey -lsds -lvec
-: src/monkey_repl/*.o |> !ld |> monkey_repl.exe
-: src/monkey_test/*.o |> !ld |> monkey_test.exe
+: src/monkey_repl/*.o | libmonkey.a libsds.a libvec.a |> !ld |> monkey_repl.exe
+: src/monkey_test/*.o | libmonkey.a libsds.a libvec.a |> !ld |> monkey_test.exe
