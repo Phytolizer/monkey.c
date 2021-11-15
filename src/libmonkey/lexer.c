@@ -5,6 +5,7 @@ void Lexer_read_char(Lexer* l);
 sds Lexer_read_identifier(Lexer* l);
 Token Token_new(TokenType type, char ch);
 bool is_letter(char ch);
+TokenType Lexer_lookup_ident(Lexer* l, const sds ident);
 
 void Lexer_init(Lexer* l, const char* input)
 {
@@ -13,11 +14,15 @@ void Lexer_init(Lexer* l, const char* input)
     l->read_position = 0;
     l->ch = '\0';
     Lexer_read_char(l);
+    Hash_init(&l->keywords);
+    Hash_insert(&l->keywords, "fn", sizeof("fn"), T_FUNCTION, sizeof(T_FUNCTION));
+    Hash_insert(&l->keywords, "let", sizeof("let"), T_LET, sizeof(T_LET));
 }
 
 void Lexer_deinit(Lexer* l)
 {
     sdsfree(l->input);
+    Hash_deinit(&l->keywords);
 }
 
 Token Lexer_next_token(Lexer* l)
@@ -58,6 +63,7 @@ Token Lexer_next_token(Lexer* l)
         if (is_letter(l->ch))
         {
             tok.literal = Lexer_read_identifier(l);
+            tok.type = Lexer_lookup_ident(l, tok.literal);
             return tok;
         }
         else
@@ -105,4 +111,14 @@ Token Token_new(TokenType type, char ch)
 bool is_letter(char ch)
 {
     return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_';
+}
+
+TokenType Lexer_lookup_ident(Lexer* l, const sds ident)
+{
+    TokenType* type = (TokenType*)Hash_lookup(&l->keywords, ident, sdslen(ident) + 1);
+    if (type == NULL)
+    {
+        return T_IDENT;
+    }
+    return *type;
 }

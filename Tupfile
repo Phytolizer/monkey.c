@@ -1,14 +1,10 @@
 include_rules
 
-: src/libmonkey/*.o |> !ar |> libmonkey.a
-: src/sds/*.o |> !ar |> libsds.a
-: src/vec/src/*.o |> !ar |> libvec.a
-: src/libhash/*.o |> !ar |> libhash.a
+: src/libmonkey/*.o |> !ar |> libmonkey.a {libs}
+: src/sds/*.o |> !ar |> libsds.a {libs}
+: src/vec/src/*.o |> !ar |> libvec.a {libs}
+: src/libhash/*.o |> !ar |> libhash.a {libs}
 
-ifeq (@(TUP_PLATFORM),win32)
 LIBS = libmonkey.a libsds.a libvec.a libhash.a
-else
-LIBS = -lmonkey -lsds -lvec -lhash
-endif
-: src/monkey_repl/*.o | libmonkey.a libsds.a libvec.a libhash.a |> !ld |> monkey_repl.exe
-: src/monkey_test/*.o | libmonkey.a libsds.a libvec.a libhash.a |> !ld |> monkey_test.exe
+: src/monkey_repl/*.o | {libs} |> !ld |> monkey_repl.exe
+: src/monkey_test/*.o | {libs} |> !ld |> monkey_test.exe

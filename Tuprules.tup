@@ -3,12 +3,12 @@
 &INCDIR = inc
 
 ifeq (@(TUP_PLATFORM),win32)
-CC = cl
-CFLAGS += -W3
-CFLAGS += -DEBUG
-OFLAG = -Fo
+CC = clang
+AR = llvm-ar
 else
 CC = gcc
+AR = ar
+endif
 CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -Wpedantic
@@ -17,16 +17,7 @@ CFLAGS += -fsanitize=address,undefined
 LDFLAGS += -fsanitize=address,undefined
 CFLAGS += -std=c99
 CFLAGS += -g3
-OFLAG = -o
-endif
 
-
-!cc = |> ^j^ $(CC) $(CFLAGS) -I &(INCDIR) -c %f $(OFLAG)%o |> %B.o
-
-ifeq (@(TUP_PLATFORM),win32)
-!ld = |> link %f /OUT:%o /LIBPATH:. $(LIBS) |>
-!ar = |> lib /OUT:%o %f |>
-else
-!ld = |> $(CC) $(LDFLAGS) %f -o %o -L. $(LIBS) |>
-!ar = |> ar rcs %o %f |>
-endif
+!cc = |> ^j^ $(CC) $(CFLAGS) -I &(INCDIR) -c %f -o %o |> %B.o
+!ld = |> $(CC) $(LDFLAGS) %f -o %o $(LIBS) |>
+!ar = |> $(AR) rcs %o %f |>

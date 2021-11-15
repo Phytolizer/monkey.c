@@ -56,10 +56,10 @@ void Hash_insert(Hash* h, void* key, size_t key_len, void* value, size_t value_l
     HashBucket* bucket = find_bucket(h->buckets, h->capacity, key, key_len);
     bucket->key = malloc(key_len);
     bucket->key_len = key_len;
-    memcpy(bucket->key, key_len, key, key_len);
+    memcpy(bucket->key, key, key_len);
     bucket->value = malloc(value_len);
     bucket->value_len = value_len;
-    memcpy(bucket->value, value_len, value, value_len);
+    memcpy(bucket->value, value, value_len);
     ++h->count;
 }
 
