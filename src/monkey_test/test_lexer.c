@@ -8,15 +8,28 @@
 
 char* test_next_token(void)
 {
-    const char* input = "=+(){},;";
+    const char* input = "let five = 5;\n"
+                        "let ten = 10;\n"
+                        "\n"
+                        "let add = fn(x, y) {\n"
+                        "  x + y;\n"
+                        "};\n"
+                        "\n"
+                        "let result = add(five, ten);\n";
 
     struct
     {
         TokenType expected_type;
         const char* expected_literal;
     } tests[] = {
-        {T_ASSIGN, "="}, {T_PLUS, "+"},  {T_LPAREN, "("},    {T_RPAREN, ")"}, {T_LBRACE, "{"},
-        {T_RBRACE, "}"}, {T_COMMA, ","}, {T_SEMICOLON, ";"}, {T_EOF, ""},
+        {T_LET, "let"},     {T_IDENT, "five"}, {T_ASSIGN, "="},     {T_INT, "5"},       {T_SEMICOLON, ";"},
+        {T_LET, "let"},     {T_IDENT, "ten"},  {T_ASSIGN, "="},     {T_INT, "10"},      {T_SEMICOLON, ";"},
+        {T_LET, "let"},     {T_IDENT, "add"},  {T_ASSIGN, "="},     {T_FUNCTION, "fn"}, {T_LPAREN, "("},
+        {T_IDENT, "x"},     {T_COMMA, ","},    {T_IDENT, "y"},      {T_RPAREN, ")"},    {T_LBRACE, "{"},
+        {T_IDENT, "x"},     {T_PLUS, "+"},     {T_IDENT, "y"},      {T_SEMICOLON, ";"}, {T_RBRACE, "}"},
+        {T_SEMICOLON, ";"}, {T_LET, "let"},    {T_IDENT, "result"}, {T_ASSIGN, "="},    {T_IDENT, "add"},
+        {T_LPAREN, "("},    {T_IDENT, "five"}, {T_COMMA, ","},      {T_IDENT, "ten"},   {T_RPAREN, ")"},
+        {T_SEMICOLON, ";"}, {T_EOF, ""},
     };
 
     Lexer l;
@@ -60,7 +73,7 @@ int main(void)
     char* message = all_tests(&test_count);
     if (message != NULL)
     {
-        printf("%s\n", message);
+        fprintf(stderr, "%s\n", message);
         free(message);
     }
     else

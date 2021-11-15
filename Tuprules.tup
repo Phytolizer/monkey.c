@@ -5,6 +5,7 @@
 ifeq (@(TUP_PLATFORM),win32)
 CC = cl
 CFLAGS += -W3
+CFLAGS += -DEBUG
 OFLAG = -Fo
 else
 CC = gcc

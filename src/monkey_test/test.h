@@ -4,8 +4,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define test_asprintf_(dest, ...) \
-    do { int len = snprintf(NULL, 0, __VA_ARGS__); *dest = malloc(len + 1); snprintf(*dest, len + 1, __VA_ARGS__); } while (false)
+#define test_asprintf_(dest, ...)                                                                                      \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        int len = snprintf(NULL, 0, __VA_ARGS__);                                                                      \
+        *dest = malloc(len + 1);                                                                                       \
+        snprintf(*dest, len + 1, __VA_ARGS__);                                                                         \
+        (*dest)[len] = '\0';                                                                                           \
+    } while (false)
 
 #define test_assert(test, cleanup, ...)                                                                                \
     do                                                                                                                 \
@@ -13,7 +19,7 @@
         if (!(test))                                                                                                   \
         {                                                                                                              \
             char* message;                                                                                             \
-            test_asprintf_(&message, __VA_ARGS__);                                                                           \
+            test_asprintf_(&message, __VA_ARGS__);                                                                     \
             cleanup;                                                                                                   \
             return message;                                                                                            \
         }                                                                                                              \

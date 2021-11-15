@@ -1,7 +1,10 @@
 #include "monkey/lexer.h"
+#include <stdbool.h>
 
 void Lexer_read_char(Lexer* l);
+sds Lexer_read_identifier(Lexer* l);
 Token Token_new(TokenType type, char ch);
+bool is_letter(char ch);
 
 void Lexer_init(Lexer* l, const char* input)
 {
@@ -52,7 +55,15 @@ Token Lexer_next_token(Lexer* l)
         tok.type = T_EOF;
         break;
     default:
-        break;
+        if (is_letter(l->ch))
+        {
+            tok.literal = Lexer_read_identifier(l);
+            return tok;
+        }
+        else
+        {
+            tok = Token_new(T_ILLEGAL, l->ch);
+        }
     }
 
     Lexer_read_char(l);
@@ -73,10 +84,25 @@ void Lexer_read_char(Lexer* l)
     ++l->read_position;
 }
 
+sds Lexer_read_identifier(Lexer* l)
+{
+    size_t pos = l->position;
+    while (is_letter(l->ch))
+    {
+        Lexer_read_char(l);
+    }
+    return sdsnewlen(&l->input[pos], l->position - pos);
+}
+
 Token Token_new(TokenType type, char ch)
 {
     return (Token){
         .type = type,
         .literal = sdsnewlen(&ch, 1),
     };
+}
+
+bool is_letter(char ch)
+{
+    return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_';
 }
