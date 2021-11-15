@@ -5,8 +5,10 @@ void Lexer_read_char(Lexer* l);
 sds Lexer_read_identifier(Lexer* l);
 Token Token_new(TokenType type, char ch);
 bool is_letter(char ch);
+bool is_digit(char ch);
 TokenType Lexer_lookup_ident(Lexer* l, const sds ident);
 void Lexer_skip_whitespace(Lexer* l);
+sds Lexer_read_number(Lexer* l);
 
 void Lexer_init(Lexer* l, const char* input)
 {
@@ -69,6 +71,12 @@ Token Lexer_next_token(Lexer* l)
             tok.type = Lexer_lookup_ident(l, tok.literal);
             return tok;
         }
+        else if (is_digit(l->ch))
+        {
+            tok.literal = Lexer_read_number(l);
+            tok.type = T_INT;
+            return tok;
+        }
         else
         {
             tok = Token_new(T_ILLEGAL, l->ch);
@@ -116,6 +124,11 @@ bool is_letter(char ch)
     return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_';
 }
 
+bool is_digit(char ch)
+{
+    return ch >= '0' && ch <= '9';
+}
+
 TokenType Lexer_lookup_ident(Lexer* l, const sds ident)
 {
     TokenType* type = (TokenType*)Hash_lookup(&l->keywords, ident, sdslen(ident) + 1);
@@ -132,4 +145,14 @@ void Lexer_skip_whitespace(Lexer* l)
     {
         Lexer_read_char(l);
     }
+}
+
+sds Lexer_read_number(Lexer* l)
+{
+    size_t pos = l->position;
+    while (is_digit(l->ch))
+    {
+        Lexer_read_char(l);
+    }
+    return sdsnewlen(&l->input[pos], l->position - pos);
 }
