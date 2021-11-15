@@ -6,6 +6,7 @@ sds Lexer_read_identifier(Lexer* l);
 Token Token_new(TokenType type, char ch);
 bool is_letter(char ch);
 TokenType Lexer_lookup_ident(Lexer* l, const sds ident);
+void Lexer_skip_whitespace(Lexer* l);
 
 void Lexer_init(Lexer* l, const char* input)
 {
@@ -28,6 +29,8 @@ void Lexer_deinit(Lexer* l)
 Token Lexer_next_token(Lexer* l)
 {
     Token tok;
+
+    Lexer_skip_whitespace(l);
 
     switch (l->ch)
     {
@@ -121,4 +124,12 @@ TokenType Lexer_lookup_ident(Lexer* l, const sds ident)
         return T_IDENT;
     }
     return *type;
+}
+
+void Lexer_skip_whitespace(Lexer* l)
+{
+    while (l->ch == ' ' || l->ch == '\t' || l->ch == '\n' || l->ch == '\r')
+    {
+        Lexer_read_char(l);
+    }
 }

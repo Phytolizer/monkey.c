@@ -81,7 +81,8 @@ HashBucket* find_bucket(HashBucket* buckets, size_t capacity, void* key, size_t 
     }
     uint64_t hash = hash_fnv(key, key_len);
     hash %= capacity;
-    while (buckets[hash].key != NULL && memcmp(buckets[hash].key, key, key_len) != 0)
+    while (buckets[hash].key != NULL && buckets[hash].key_len == key_len &&
+           memcmp(buckets[hash].key, key, key_len) != 0)
     {
         hash = (hash + 1) % capacity;
     }
