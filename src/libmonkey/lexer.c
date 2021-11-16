@@ -54,6 +54,24 @@ Token Lexer_next_token(Lexer* l)
     case '+':
         tok = Token_new(T_PLUS, l->ch);
         break;
+    case '!':
+        tok = Token_new(T_BANG, l->ch);
+        break;
+    case '-':
+        tok = Token_new(T_MINUS, l->ch);
+        break;
+    case '/':
+        tok = Token_new(T_SLASH, l->ch);
+        break;
+    case '*':
+        tok = Token_new(T_ASTERISK, l->ch);
+        break;
+    case '<':
+        tok = Token_new(T_LT, l->ch);
+        break;
+    case '>':
+        tok = Token_new(T_GT, l->ch);
+        break;
     case '{':
         tok = Token_new(T_LBRACE, l->ch);
         break;

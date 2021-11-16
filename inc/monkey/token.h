@@ -20,6 +20,13 @@ void Token_deinit(Token* t);
 
 #define T_ASSIGN "="
 #define T_PLUS "+"
+#define T_BANG "!"
+#define T_MINUS "-"
+#define T_SLASH "/"
+#define T_ASTERISK "*"
+
+#define T_LT "<"
+#define T_GT ">"
 
 #define T_COMMA ","
 #define T_SEMICOLON ";"

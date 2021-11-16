@@ -15,21 +15,25 @@ char* test_next_token(void)
                         "  x + y;\n"
                         "};\n"
                         "\n"
-                        "let result = add(five, ten);\n";
+                        "let result = add(five, ten);\n"
+                        "!-/*5;\n"
+                        "5 < 10 > 5;\n";
 
     struct
     {
         TokenType expected_type;
         const char* expected_literal;
     } tests[] = {
-        {T_LET, "let"},     {T_IDENT, "five"}, {T_ASSIGN, "="},     {T_INT, "5"},       {T_SEMICOLON, ";"},
-        {T_LET, "let"},     {T_IDENT, "ten"},  {T_ASSIGN, "="},     {T_INT, "10"},      {T_SEMICOLON, ";"},
-        {T_LET, "let"},     {T_IDENT, "add"},  {T_ASSIGN, "="},     {T_FUNCTION, "fn"}, {T_LPAREN, "("},
-        {T_IDENT, "x"},     {T_COMMA, ","},    {T_IDENT, "y"},      {T_RPAREN, ")"},    {T_LBRACE, "{"},
-        {T_IDENT, "x"},     {T_PLUS, "+"},     {T_IDENT, "y"},      {T_SEMICOLON, ";"}, {T_RBRACE, "}"},
-        {T_SEMICOLON, ";"}, {T_LET, "let"},    {T_IDENT, "result"}, {T_ASSIGN, "="},    {T_IDENT, "add"},
-        {T_LPAREN, "("},    {T_IDENT, "five"}, {T_COMMA, ","},      {T_IDENT, "ten"},   {T_RPAREN, ")"},
-        {T_SEMICOLON, ";"}, {T_EOF, ""},
+        {T_LET, "let"},     {T_IDENT, "five"},  {T_ASSIGN, "="},     {T_INT, "5"},       {T_SEMICOLON, ";"},
+        {T_LET, "let"},     {T_IDENT, "ten"},   {T_ASSIGN, "="},     {T_INT, "10"},      {T_SEMICOLON, ";"},
+        {T_LET, "let"},     {T_IDENT, "add"},   {T_ASSIGN, "="},     {T_FUNCTION, "fn"}, {T_LPAREN, "("},
+        {T_IDENT, "x"},     {T_COMMA, ","},     {T_IDENT, "y"},      {T_RPAREN, ")"},    {T_LBRACE, "{"},
+        {T_IDENT, "x"},     {T_PLUS, "+"},      {T_IDENT, "y"},      {T_SEMICOLON, ";"}, {T_RBRACE, "}"},
+        {T_SEMICOLON, ";"}, {T_LET, "let"},     {T_IDENT, "result"}, {T_ASSIGN, "="},    {T_IDENT, "add"},
+        {T_LPAREN, "("},    {T_IDENT, "five"},  {T_COMMA, ","},      {T_IDENT, "ten"},   {T_RPAREN, ")"},
+        {T_SEMICOLON, ";"}, {T_BANG, "!"},      {T_MINUS, "-"},      {T_SLASH, "/"},     {T_ASTERISK, "*"},
+        {T_INT, "5"},       {T_SEMICOLON, ";"}, {T_INT, "5"},        {T_LT, "<"},        {T_INT, "10"},
+        {T_GT, ">"},        {T_INT, "5"},       {T_SEMICOLON, ";"},  {T_EOF, ""},
     };
 
     Lexer l;
