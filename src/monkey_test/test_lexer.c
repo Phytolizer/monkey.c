@@ -59,14 +59,14 @@ char* test_next_token(void)
                 Token_deinit(&tok);
                 Lexer_deinit(&l);
             } while (false),
-            "tests[%zu] -- tokentype wrong. expected=%s, got=%s", i, tests[i].expected_type, tok.type);
+            "tests[%zu] -- tokentype wrong. expected=\"%s\", got=\"%s\"", i, tests[i].expected_type, tok.type);
         test_assert(
             strcmp(tok.literal, tests[i].expected_literal) == 0,
             do {
                 Token_deinit(&tok);
                 Lexer_deinit(&l);
             } while (false),
-            "tests[%zu] -- literal wrong. expected=%s, got=%s", i, tests[i].expected_literal, tok.literal);
+            "tests[%zu] -- literal wrong. expected=\"%s\", got=\"%s\"", i, tests[i].expected_literal, tok.literal);
 
         Token_deinit(&tok);
     }
