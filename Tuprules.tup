@@ -8,6 +8,7 @@ CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -Wpedantic
 CFLAGS += -Werror=implicit-function-declaration
+CFLAGS += -Werror=return-type
 CFLAGS += -std=c99
 CFLAGS += -g3
 
