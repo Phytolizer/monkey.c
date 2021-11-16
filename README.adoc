@@ -6,9 +6,9 @@ The Monkey programming language, implemented in pure C.
 
 == Quickstart
 
-Ensure you have a C compiler.
+Ensure you have the Clang compiler.
 
-=== Linux
+=== All platforms
 
 ----
 ./build.sh
@@ -18,12 +18,4 @@ Alternatively, install https://github.com/gittup/tup[tup] and run:
 
 ----
 tup
-----
-
-=== Windows
-
-In a Visual Studio developer command prompt:
-
-----
-./build.bat
 ----
