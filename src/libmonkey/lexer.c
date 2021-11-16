@@ -1,5 +1,5 @@
-#include "monkey/lexer.h"
 #include "hash/hash.h"
+#include "monkey/lexer.h"
 #include <stdbool.h>
 
 void Lexer_read_char(Lexer* l);
