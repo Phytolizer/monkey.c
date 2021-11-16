@@ -27,6 +27,8 @@ void Token_deinit(Token* t);
 
 #define T_LT "<"
 #define T_GT ">"
+#define T_EQ "=="
+#define T_NOT_EQ "!="
 
 #define T_COMMA ","
 #define T_SEMICOLON ";"

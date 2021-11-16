@@ -23,7 +23,10 @@ char* test_next_token(void)
                         "  return true;\n"
                         "} else {\n"
                         "  return false;\n"
-                        "}\n";
+                        "}\n"
+                        "\n"
+                        "10 == 10;\n"
+                        "10 != 9;\n";
 
     struct
     {
@@ -43,7 +46,8 @@ char* test_next_token(void)
         {T_INT, "5"},         {T_LT, "<"},          {T_INT, "10"},       {T_RPAREN, ")"},    {T_LBRACE, "{"},
         {T_RETURN, "return"}, {T_TRUE, "true"},     {T_SEMICOLON, ";"},  {T_RBRACE, "}"},    {T_ELSE, "else"},
         {T_LBRACE, "{"},      {T_RETURN, "return"}, {T_FALSE, "false"},  {T_SEMICOLON, ";"}, {T_RBRACE, "}"},
-        {T_EOF, ""},
+        {T_INT, "10"},        {T_EQ, "=="},         {T_INT, "10"},       {T_SEMICOLON, ";"}, {T_INT, "10"},
+        {T_NOT_EQ, "!="},     {T_INT, "9"},         {T_SEMICOLON, ";"},  {T_EOF, ""},
     };
 
     Lexer l;
