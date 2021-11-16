@@ -10,6 +10,7 @@ bool is_digit(char ch);
 TokenType Lexer_lookup_ident(Lexer* l, const sds ident);
 void Lexer_skip_whitespace(Lexer* l);
 sds Lexer_read_number(Lexer* l);
+char Lexer_peek_char(Lexer* l);
 
 void Lexer_init(Lexer* l, const char* input)
 {
@@ -43,7 +44,16 @@ Token Lexer_next_token(Lexer* l)
     switch (l->ch)
     {
     case '=':
-        tok = Token_new(T_ASSIGN, l->ch);
+        if (Lexer_peek_char(l) == '=')
+        {
+            Lexer_read_char(l);
+            tok.type = T_EQ;
+            tok.literal = sdsnew("==");
+        }
+        else
+        {
+            tok = Token_new(T_ASSIGN, l->ch);
+        }
         break;
     case ';':
         tok = Token_new(T_SEMICOLON, l->ch);
@@ -61,7 +71,16 @@ Token Lexer_next_token(Lexer* l)
         tok = Token_new(T_PLUS, l->ch);
         break;
     case '!':
-        tok = Token_new(T_BANG, l->ch);
+        if (Lexer_peek_char(l) == '=')
+        {
+            Lexer_read_char(l);
+            tok.type = T_NOT_EQ;
+            tok.literal = sdsnew("!=");
+        }
+        else
+        {
+            tok = Token_new(T_BANG, l->ch);
+        }
         break;
     case '-':
         tok = Token_new(T_MINUS, l->ch);
@@ -179,4 +198,13 @@ sds Lexer_read_number(Lexer* l)
         Lexer_read_char(l);
     }
     return sdsnewlen(&l->input[pos], l->position - pos);
+}
+
+char Lexer_peek_char(Lexer* l)
+{
+    if (l->read_position >= sdslen(l->input))
+    {
+        return '\0';
+    }
+    return l->input[l->read_position];
 }
