@@ -1,6 +1,8 @@
 [submodule "src/sds"]
 	path = src/sds
 	url = https://github.com/Phytolizer/sds.git
+	branch = tup
 [submodule "src/vec"]
 	path = src/vec
-	url = https://github.com/rxi/vec.git
+	url = https://github.com/Phytolizer/vec.git
+	branch = tup
