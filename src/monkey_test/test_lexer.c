@@ -2,6 +2,7 @@
 #include "monkey/token.h"
 #include "sds.h"
 #include "test.h"
+#include "test_lexer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -79,26 +80,8 @@ char* test_next_token(void)
     return NULL;
 }
 
-char* all_tests(size_t* test_count)
+char* lexer_tests(size_t* test_count)
 {
     test_run(test_next_token);
     return NULL;
-}
-
-int main(void)
-{
-    size_t test_count = 0;
-    char* message = all_tests(&test_count);
-    if (message != NULL)
-    {
-        fprintf(stderr, "%s\n", message);
-        free(message);
-    }
-    else
-    {
-        printf("== ALL PASSED ==\n");
-    }
-    printf("Tests run: %zu\n", test_count);
-
-    return message != NULL;
 }

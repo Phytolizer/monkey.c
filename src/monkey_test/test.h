@@ -25,6 +25,16 @@
         }                                                                                                              \
     } while (false)
 
+#define test_suite(suite)                                                                                              \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        char* message = suite(test_count);                                                                             \
+        if (message != NULL)                                                                                           \
+        {                                                                                                              \
+            return message;                                                                                            \
+        }                                                                                                              \
+    } while (false)
+
 #define test_run(test)                                                                                                 \
     do                                                                                                                 \
     {                                                                                                                  \
