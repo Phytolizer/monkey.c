@@ -19,4 +19,5 @@ jobs:
       - name: Setup Clang
         uses: egor-tensin/setup-clang@v1
       - run: ./build.sh
+        shell: bash
       - run: ./monkey_test.exe
