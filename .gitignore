@@ -9,4 +9,5 @@
 /libmonkey.a
 /libsds.a
 /libvec.a
+/monkey_repl.exe
 /monkey_test.exe
