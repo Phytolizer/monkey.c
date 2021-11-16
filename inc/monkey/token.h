@@ -38,3 +38,8 @@ void Token_deinit(Token* t);
 
 #define T_FUNCTION "FUNCTION"
 #define T_LET "LET"
+#define T_IF "IF"
+#define T_ELSE "ELSE"
+#define T_RETURN "RETURN"
+#define T_TRUE "TRUE"
+#define T_FALSE "FALSE"

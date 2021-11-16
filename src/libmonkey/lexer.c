@@ -1,4 +1,5 @@
 #include "monkey/lexer.h"
+#include "hash/hash.h"
 #include <stdbool.h>
 
 void Lexer_read_char(Lexer* l);
@@ -20,6 +21,11 @@ void Lexer_init(Lexer* l, const char* input)
     Hash_init(&l->keywords);
     Hash_insert(&l->keywords, "fn", sizeof("fn"), T_FUNCTION, sizeof(T_FUNCTION));
     Hash_insert(&l->keywords, "let", sizeof("let"), T_LET, sizeof(T_LET));
+    Hash_insert(&l->keywords, "if", sizeof("if"), T_IF, sizeof(T_IF));
+    Hash_insert(&l->keywords, "else", sizeof("else"), T_ELSE, sizeof(T_ELSE));
+    Hash_insert(&l->keywords, "return", sizeof("return"), T_RETURN, sizeof(T_RETURN));
+    Hash_insert(&l->keywords, "true", sizeof("true"), T_TRUE, sizeof(T_TRUE));
+    Hash_insert(&l->keywords, "false", sizeof("false"), T_FALSE, sizeof(T_FALSE));
 }
 
 void Lexer_deinit(Lexer* l)

@@ -46,7 +46,9 @@ void Hash_insert(Hash* h, void* key, size_t key_len, void* value, size_t value_l
                 HashBucket* new_bucket =
                     find_bucket(new_buckets, h->capacity, h->buckets[i].key, h->buckets[i].key_len);
                 new_bucket->key = h->buckets[i].key;
+                new_bucket->key_len = h->buckets[i].key_len;
                 new_bucket->value = h->buckets[i].value;
+                new_bucket->value_len = h->buckets[i].value_len;
             }
         }
         free(h->buckets);
