@@ -22,5 +22,5 @@ jobs:
           msystem: CLANG64
           update: true
           install: mingw-w64-clang-x86_64-toolchain
-      - run: ./build.bat
+      - run: ./build.sh
       - run: ./monkey_test.exe
