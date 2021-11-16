@@ -2,13 +2,8 @@
 
 &INCDIR = inc
 
-ifeq (@(TUP_PLATFORM),win32)
 CC = clang
 AR = llvm-ar
-else
-CC = gcc
-AR = ar
-endif
 CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -Wpedantic
