@@ -107,6 +107,8 @@ void Statement_deinit(Statement* s)
         ExpressionStatement_deinit((ExpressionStatement*)s);
         break;
     }
+
+    assert(false && "corrupt statement type");
 }
 
 void Expression_deinit(Expression* e)
@@ -206,6 +208,8 @@ void Node_deinit(Node* node)
         Expression_deinit((Expression*)node);
         break;
     }
+
+    assert(false && "corrupt node type");
 }
 
 sds Node_string(Node* node)
@@ -219,6 +223,8 @@ sds Node_string(Node* node)
     case NODE_TYPE_EXPRESSION:
         return Expression_string((Expression*)node);
     }
+
+    assert(false && "corrupt node type");
 }
 
 sds Statement_string(Statement* s)
@@ -232,6 +238,8 @@ sds Statement_string(Statement* s)
     case STATEMENT_TYPE_EXPRESSION:
         return ExpressionStatement_string((ExpressionStatement*)s);
     }
+
+    assert(false && "corrupt statement type");
 }
 
 sds Expression_string(Expression* e)
@@ -241,6 +249,8 @@ sds Expression_string(Expression* e)
     case EXPRESSION_TYPE_IDENTIFIER:
         return Identifier_string((Identifier*)e);
     }
+
+    assert(false && "corrupt expression type");
 }
 
 sds Program_string(Program* p)
