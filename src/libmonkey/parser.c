@@ -7,12 +7,14 @@ LetStatement* Parser_parse_let_statement(Parser* p);
 bool Parser_cur_token_is(Parser* p, TokenType type);
 bool Parser_peek_token_is(Parser* p, TokenType type);
 bool Parser_expect_peek(Parser* p, TokenType type);
+void Parser_peek_error(Parser* p, TokenType type);
 
 void Parser_init(Parser* p, const char* input)
 {
     Lexer_init(&p->l, input);
     p->cur_token.literal = NULL;
     p->peek_token.literal = NULL;
+    vec_init(&p->errors);
     Parser_next_token(p);
     Parser_next_token(p);
 }
@@ -22,6 +24,11 @@ void Parser_deinit(Parser* p)
     Lexer_deinit(&p->l);
     Token_deinit(&p->cur_token);
     Token_deinit(&p->peek_token);
+    for (int i = 0; i < p->errors.length; ++i)
+    {
+        sdsfree(p->errors.data[i]);
+    }
+    vec_deinit(&p->errors);
 }
 
 Program Parser_parse_program(Parser* p)
@@ -118,4 +125,10 @@ bool Parser_expect_peek(Parser* p, TokenType type)
     {
         return false;
     }
+}
+
+void Parser_peek_error(Parser* p, TokenType type)
+{
+    sds msg = sdscatprintf(sdsempty(), "expected next token to be %s, got %s instead", type, p->peek_token.type);
+    vec_push(&p->errors, msg);
 }

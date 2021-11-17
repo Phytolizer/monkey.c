@@ -3,6 +3,7 @@
 #include "test_parser.h"
 
 char* check_let_statement(Statement* s, const char* name);
+char* check_parser_errors(Parser* p);
 
 char* test_let_statements(void)
 {
@@ -13,6 +14,13 @@ char* test_let_statements(void)
     Parser_init(&p, input);
 
     Program program = Parser_parse_program(&p);
+    char* message = check_parser_errors(&p);
+    if (message != NULL)
+    {
+        Program_deinit(&program);
+        Parser_deinit(&p);
+        return message;
+    }
     test_assert(
         program.statements.length == 3,
         do {
@@ -69,4 +77,19 @@ char* check_let_statement(Statement* s, const char* name)
                 "Identifier_token_literal(&let_stmt->name) should be '%s', not '%s'.", name, toklit);
     sdsfree(toklit);
     return NULL;
+}
+
+char* check_parser_errors(Parser* p)
+{
+    if (p->errors.length == 0)
+    {
+        return NULL;
+    }
+
+    sds message = sdscatprintf(sdsempty(), "parser has %d errors\n", p->errors.length);
+    for (int i = 0; i < p->errors.length; i++)
+    {
+        message = sdscatprintf(message, "%s\n", p->errors.data[i]);
+    }
+    return message;
 }
