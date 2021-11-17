@@ -15,4 +15,5 @@ build-job:
 unit-test-job:
   stage: test
   script:
+    - ./build.sh
     - ./monkey_test.exe
