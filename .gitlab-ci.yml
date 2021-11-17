@@ -1,4 +1,4 @@
-image: clangbuiltlinux/ubuntu
+image: rsmmr/clang
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
