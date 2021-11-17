@@ -15,6 +15,8 @@ sds Node_token_literal(Node* n)
         return Statement_token_literal((Statement*)n);
     case NODE_TYPE_EXPRESSION:
         return Expression_token_literal((Expression*)n);
+    case NODE_TYPE_PROGRAM:
+        return Program_token_literal((Program*)n);
     }
 
     assert(false && "corrupt node type");
@@ -44,13 +46,11 @@ sds Expression_token_literal(Expression* e)
 
 sds Program_token_literal(Program* p)
 {
-    sds result = sdsempty();
-    for (int i = 0; i < p->statements.length; i++)
+    if (p->statements.length > 0)
     {
-        Statement* s = p->statements.data[i];
-        result = sdscat(result, Statement_token_literal(s));
+        return Statement_token_literal(p->statements.data[0]);
     }
-    return result;
+    return sdsempty();
 }
 
 void Identifier_init(Identifier* i)
