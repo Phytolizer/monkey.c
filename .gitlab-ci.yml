@@ -16,5 +16,6 @@ unit-test-job:
   stage: test
   script:
     - ./build.sh
+    - apt-get update
     - apt-get install --yes valgrind
     - valgrind --leak-check=full ./monkey_test.exe
