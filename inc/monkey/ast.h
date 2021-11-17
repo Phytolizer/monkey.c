@@ -21,7 +21,9 @@ typedef struct
     NodeType type;
 } Node;
 
-#define STATEMENT_TYPES_ X(LET)
+#define STATEMENT_TYPES_                                                                                               \
+    X(INVALID)                                                                                                         \
+    X(LET)
 
 typedef enum
 {
@@ -36,9 +38,10 @@ typedef struct
     StatementType type;
 } Statement;
 
+void Statement_init(Statement* s);
 const char* Statement_type_name(StatementType type);
 
-typedef vec_t(Statement) StatementVec;
+typedef vec_t(Statement*) StatementVec;
 
 typedef struct
 {
@@ -68,10 +71,11 @@ sds Identifier_token_literal(Identifier* i);
 
 typedef struct
 {
-    Node base;
+    Statement base;
     Token token;
     Identifier name;
     Expression* value;
 } LetStatement;
 
+void LetStatement_init(LetStatement* s);
 sds LetStatement_token_literal(LetStatement* l);

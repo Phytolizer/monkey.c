@@ -17,8 +17,15 @@ sds Node_token_literal(Node* n)
 
 sds Statement_token_literal(Statement* s)
 {
-    // TODO
-    return sdsempty();
+    switch (s->type)
+    {
+    case STATEMENT_TYPE_INVALID:
+        return sdsnew("<invalid>");
+    case STATEMENT_TYPE_LET:
+        return sdsdup(((LetStatement*)s)->token.literal);
+    }
+
+    assert(false && "corrupt statement type");
 }
 
 sds Expression_token_literal(Expression* e)
@@ -60,6 +67,11 @@ sds LetStatement_token_literal(LetStatement* l)
     return result;
 }
 
+void Statement_init(Statement* s)
+{
+    s->base.type = NODE_TYPE_STATEMENT;
+}
+
 const char* Statement_type_name(StatementType type)
 {
     static const char* STATEMENT_TYPE_NAMES[] = {
@@ -68,4 +80,10 @@ const char* Statement_type_name(StatementType type)
 #undef X
     };
     return STATEMENT_TYPE_NAMES[type];
+}
+
+void LetStatement_init(LetStatement* s)
+{
+    Statement_init(&s->base);
+    s->base.type = STATEMENT_TYPE_LET;
 }
