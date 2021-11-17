@@ -4,6 +4,7 @@
 void Parser_next_token(Parser* p);
 Statement* Parser_parse_statement(Parser* p);
 LetStatement* Parser_parse_let_statement(Parser* p);
+ReturnStatement* Parser_parse_return_statement(Parser* p);
 bool Parser_cur_token_is(Parser* p, TokenType type);
 bool Parser_peek_token_is(Parser* p, TokenType type);
 bool Parser_expect_peek(Parser* p, TokenType type);
@@ -65,10 +66,11 @@ Statement* Parser_parse_statement(Parser* p)
     {
         return (Statement*)Parser_parse_let_statement(p);
     }
-    else
+    if (strcmp(p->cur_token.type, T_RETURN) == 0)
     {
-        return NULL;
+        return (Statement*)Parser_parse_return_statement(p);
     }
+    return NULL;
 }
 
 LetStatement* Parser_parse_let_statement(Parser* p)
@@ -101,6 +103,25 @@ LetStatement* Parser_parse_let_statement(Parser* p)
     stmt->token = tok;
     stmt->name = name;
     stmt->value = NULL;
+    return stmt;
+}
+
+ReturnStatement* Parser_parse_return_statement(Parser* p)
+{
+    Token tok = Token_dup(&p->cur_token);
+
+    Parser_next_token(p);
+
+    // TODO: parse expression
+    while (!Parser_cur_token_is(p, T_SEMICOLON))
+    {
+        Parser_next_token(p);
+    }
+
+    ReturnStatement* stmt = malloc(sizeof(ReturnStatement));
+    ReturnStatement_init(stmt);
+    stmt->token = tok;
+    stmt->return_value = NULL;
     return stmt;
 }
 
