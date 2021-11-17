@@ -30,6 +30,8 @@ sds Statement_token_literal(Statement* s)
         return LetStatement_token_literal((LetStatement*)s);
     case STATEMENT_TYPE_RETURN:
         return ReturnStatement_token_literal((ReturnStatement*)s);
+    case STATEMENT_TYPE_EXPRESSION:
+        return ExpressionStatement_token_literal((ExpressionStatement*)s);
     }
 
     assert(false && "corrupt statement type");
@@ -101,6 +103,9 @@ void Statement_deinit(Statement* s)
     case STATEMENT_TYPE_RETURN:
         ReturnStatement_deinit((ReturnStatement*)s);
         break;
+    case STATEMENT_TYPE_EXPRESSION:
+        ExpressionStatement_deinit((ExpressionStatement*)s);
+        break;
     }
 }
 
@@ -167,4 +172,132 @@ void ReturnStatement_deinit(ReturnStatement* s)
 sds ReturnStatement_token_literal(ReturnStatement* r)
 {
     return sdsdup(r->token.literal);
+}
+
+void ExpressionStatement_init(ExpressionStatement* s)
+{
+    Statement_init(&s->base);
+    s->base.type = STATEMENT_TYPE_EXPRESSION;
+}
+
+void ExpressionStatement_deinit(ExpressionStatement* s)
+{
+    Expression_deinit(s->expression);
+    free(s->expression);
+    Token_deinit(&s->token);
+}
+
+sds ExpressionStatement_token_literal(ExpressionStatement* s)
+{
+    return sdsdup(s->token.literal);
+}
+
+void Node_deinit(Node* node)
+{
+    switch (node->type)
+    {
+    case NODE_TYPE_PROGRAM:
+        Program_deinit((Program*)node);
+        break;
+    case NODE_TYPE_STATEMENT:
+        Statement_deinit((Statement*)node);
+        break;
+    case NODE_TYPE_EXPRESSION:
+        Expression_deinit((Expression*)node);
+        break;
+    }
+}
+
+sds Node_string(Node* node)
+{
+    switch (node->type)
+    {
+    case NODE_TYPE_PROGRAM:
+        return Program_string((Program*)node);
+    case NODE_TYPE_STATEMENT:
+        return Statement_string((Statement*)node);
+    case NODE_TYPE_EXPRESSION:
+        return Expression_string((Expression*)node);
+    }
+}
+
+sds Statement_string(Statement* s)
+{
+    switch (s->type)
+    {
+    case STATEMENT_TYPE_LET:
+        return LetStatement_string((LetStatement*)s);
+    case STATEMENT_TYPE_RETURN:
+        return ReturnStatement_string((ReturnStatement*)s);
+    case STATEMENT_TYPE_EXPRESSION:
+        return ExpressionStatement_string((ExpressionStatement*)s);
+    }
+}
+
+sds Expression_string(Expression* e)
+{
+    switch (e->type)
+    {
+    case EXPRESSION_TYPE_IDENTIFIER:
+        return Identifier_string((Identifier*)e);
+    }
+}
+
+sds Program_string(Program* p)
+{
+    sds s = sdsempty();
+    for (int i = 0; i < p->statements.length; i++)
+    {
+        s = sdscat(s, Statement_string(p->statements.data[i]));
+    }
+    return s;
+}
+
+sds Identifier_string(Identifier* i)
+{
+    return sdsdup(i->value);
+}
+
+sds LetStatement_string(LetStatement* l)
+{
+    sds s = sdsempty();
+    s = sdscat(s, l->token.literal);
+    s = sdscat(s, " ");
+    sds name = Identifier_string(&l->name);
+    s = sdscatsds(s, name);
+    sdsfree(name);
+    if (l->value != NULL)
+    {
+        s = sdscat(s, " = ");
+        sds value = Expression_string(l->value);
+        s = sdscatsds(s, value);
+        sdsfree(value);
+    }
+    s = sdscat(s, ";");
+    return s;
+}
+
+sds ReturnStatement_string(ReturnStatement* r)
+{
+    sds s = sdsempty();
+    s = sdscat(s, r->token.literal);
+    s = sdscat(s, " ");
+    if (r->return_value != NULL)
+    {
+        sds value = Expression_string(r->return_value);
+        s = sdscatsds(s, value);
+        sdsfree(value);
+    }
+    s = sdscat(s, ";");
+    return s;
+}
+
+sds ExpressionStatement_string(ExpressionStatement* e)
+{
+    sds s = sdsempty();
+    sds expression = Expression_string(e->expression);
+    s = sdscatsds(s, expression);
+    sdsfree(expression);
+    s = sdscat(s, ";");
+    return s;
 }

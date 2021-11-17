@@ -22,9 +22,14 @@ typedef struct
     NodeType type;
 } Node;
 
+void Node_deinit(Node* node);
+sds Node_token_literal(Node* node);
+sds Node_string(Node* node);
+
 #define STATEMENT_TYPES_                                                                                               \
     X(LET)                                                                                                             \
-    X(RETURN)
+    X(RETURN)                                                                                                          \
+    X(EXPRESSION)
 
 typedef enum
 {
@@ -42,6 +47,8 @@ typedef struct
 void Statement_init(Statement* s);
 void Statement_deinit(Statement* s);
 const char* Statement_type_name(StatementType type);
+sds Statement_token_literal(Statement* s);
+sds Statement_string(Statement* s);
 
 typedef vec_t(Statement*) StatementVec;
 
@@ -62,10 +69,8 @@ typedef struct
 
 void Expression_init(Expression* e);
 void Expression_deinit(Expression* e);
-
-sds Node_token_literal(Node* n);
-sds Statement_token_literal(Statement* s);
 sds Expression_token_literal(Expression* e);
+sds Expression_string(Expression* e);
 
 typedef struct
 {
@@ -76,6 +81,7 @@ typedef struct
 void Program_init(Program* p);
 void Program_deinit(Program* p);
 sds Program_token_literal(Program* p);
+sds Program_string(Program* p);
 
 typedef struct
 {
@@ -87,6 +93,7 @@ typedef struct
 void Identifier_init(Identifier* i);
 void Identifier_deinit(Identifier* i);
 sds Identifier_token_literal(Identifier* i);
+sds Identifier_string(Identifier* i);
 
 typedef struct
 {
@@ -99,6 +106,7 @@ typedef struct
 void LetStatement_init(LetStatement* s);
 void LetStatement_deinit(LetStatement* s);
 sds LetStatement_token_literal(LetStatement* l);
+sds LetStatement_string(LetStatement* l);
 
 typedef struct
 {
@@ -110,3 +118,16 @@ typedef struct
 void ReturnStatement_init(ReturnStatement* s);
 void ReturnStatement_deinit(ReturnStatement* s);
 sds ReturnStatement_token_literal(ReturnStatement* r);
+sds ReturnStatement_string(ReturnStatement* r);
+
+typedef struct
+{
+    Statement base;
+    Token token;
+    Expression* expression;
+} ExpressionStatement;
+
+void ExpressionStatement_init(ExpressionStatement* s);
+void ExpressionStatement_deinit(ExpressionStatement* s);
+sds ExpressionStatement_token_literal(ExpressionStatement* s);
+sds ExpressionStatement_string(ExpressionStatement* s);
