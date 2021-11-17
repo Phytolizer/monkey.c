@@ -4,6 +4,8 @@ image:https://github.com/Phytolizer/monkey.c/actions/workflows/ci.yml/badge.svg?
 
 The Monkey programming language, implemented in pure C.
 
+Monkey C, monkey do.
+
 == Quickstart
 
 Ensure you have the Clang compiler.
