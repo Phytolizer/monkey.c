@@ -1,0 +1,15 @@
+image: clangbuiltlinux/ubuntu
+
+stages:
+  - build
+  - test
+
+build-job:
+  stage: build
+  script:
+    - ./build.sh
+
+unit-test-job:
+  stage: test
+  script:
+    - ./monkey_test.exe
