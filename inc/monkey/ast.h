@@ -22,7 +22,9 @@ typedef struct
     NodeType type;
 } Node;
 
-#define STATEMENT_TYPES_ X(LET)
+#define STATEMENT_TYPES_                                                                                               \
+    X(LET)                                                                                                             \
+    X(RETURN)
 
 typedef enum
 {
@@ -97,3 +99,14 @@ typedef struct
 void LetStatement_init(LetStatement* s);
 void LetStatement_deinit(LetStatement* s);
 sds LetStatement_token_literal(LetStatement* l);
+
+typedef struct
+{
+    Statement base;
+    Token token;
+    Expression* return_value;
+} ReturnStatement;
+
+void ReturnStatement_init(ReturnStatement* s);
+void ReturnStatement_deinit(ReturnStatement* s);
+sds ReturnStatement_token_literal(ReturnStatement* r);

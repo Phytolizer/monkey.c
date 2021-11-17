@@ -54,9 +54,57 @@ char* test_let_statements(void)
     return NULL;
 }
 
+char* test_return_statements(void)
+{
+    const char* input = "return 5;\n"
+                        "return 10;\n"
+                        "return 993322;\n";
+    Parser p;
+    Parser_init(&p, input);
+    Program program = Parser_parse_program(&p);
+    char* message = check_parser_errors(&p);
+    if (message != NULL)
+    {
+        Program_deinit(&program);
+        Parser_deinit(&p);
+        return message;
+    }
+    test_assert(
+        program.statements.length == 3,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "Program should have 3 statements.");
+
+    for (int i = 0; i < program.statements.length; i++)
+    {
+        Statement* stmt = program.statements.data[i];
+        test_assert(
+            stmt->type == STATEMENT_TYPE_RETURN,
+            do {
+                Program_deinit(&program);
+                Parser_deinit(&p);
+            } while (false),
+            "stmt->type should be STATEMENT_TYPE_RETURN.");
+        sds toklit = ReturnStatement_token_literal((ReturnStatement*)stmt);
+        test_assert(
+            strcmp(toklit, "return") == 0,
+            do {
+                sdsfree(toklit);
+                Program_deinit(&program);
+                Parser_deinit(&p);
+            } while (false),
+            "ReturnStatement_token_literal(return_stmt) not 'return', got '%s'", toklit);
+        sdsfree(toklit);
+    }
+    return NULL;
+}
+
 char* parser_tests(size_t* test_count)
 {
     test_run(test_let_statements);
+    test_run(test_return_statements);
     return NULL;
 }
 

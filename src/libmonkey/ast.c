@@ -27,7 +27,9 @@ sds Statement_token_literal(Statement* s)
     switch (s->type)
     {
     case STATEMENT_TYPE_LET:
-        return sdsdup(((LetStatement*)s)->token.literal);
+        return LetStatement_token_literal((LetStatement*)s);
+    case STATEMENT_TYPE_RETURN:
+        return ReturnStatement_token_literal((ReturnStatement*)s);
     }
 
     assert(false && "corrupt statement type");
@@ -65,19 +67,7 @@ sds Identifier_token_literal(Identifier* i)
 
 sds LetStatement_token_literal(LetStatement* l)
 {
-    sds result = sdsnewlen("let ", 4);
-    sds name = Identifier_token_literal(&l->name);
-    result = sdscat(result, name);
-    sdsfree(name);
-    result = sdscat(result, " = ");
-    if (l->value != NULL)
-    {
-        sds value = Expression_token_literal(l->value);
-        result = sdscat(result, value);
-        sdsfree(value);
-    }
-    result = sdscat(result, ";");
-    return result;
+    return sdsdup(l->token.literal);
 }
 
 void Statement_init(Statement* s)
@@ -108,6 +98,9 @@ void Statement_deinit(Statement* s)
     case STATEMENT_TYPE_LET:
         LetStatement_deinit((LetStatement*)s);
         break;
+    case STATEMENT_TYPE_RETURN:
+        ReturnStatement_deinit((ReturnStatement*)s);
+        break;
     }
 }
 
@@ -128,6 +121,7 @@ void LetStatement_deinit(LetStatement* s)
     if (s->value != NULL)
     {
         Expression_deinit(s->value);
+        free(s->value);
     }
 }
 
@@ -152,4 +146,25 @@ void Program_deinit(Program* p)
         free(s);
     }
     vec_deinit(&p->statements);
+}
+
+void ReturnStatement_init(ReturnStatement* s)
+{
+    Statement_init(&s->base);
+    s->base.type = STATEMENT_TYPE_RETURN;
+}
+
+void ReturnStatement_deinit(ReturnStatement* s)
+{
+    Token_deinit(&s->token);
+    if (s->return_value != NULL)
+    {
+        Expression_deinit(s->return_value);
+        free(s->return_value);
+    }
+}
+
+sds ReturnStatement_token_literal(ReturnStatement* r)
+{
+    return sdsdup(r->token.literal);
 }
