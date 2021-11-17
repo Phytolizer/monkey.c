@@ -59,3 +59,13 @@ sds LetStatement_token_literal(LetStatement* l)
     result = sdscat(result, ";");
     return result;
 }
+
+const char* Statement_type_name(StatementType type)
+{
+    static const char* STATEMENT_TYPE_NAMES[] = {
+#define X(x) #x,
+        STATEMENT_TYPES_
+#undef X
+    };
+    return STATEMENT_TYPE_NAMES[type];
+}

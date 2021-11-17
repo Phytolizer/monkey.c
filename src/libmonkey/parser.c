@@ -5,6 +5,8 @@ void Parser_next_token(Parser* p);
 void Parser_init(Parser* p, const char* input)
 {
     Lexer_init(&p->l, input);
+    p->cur_token.literal = NULL;
+    p->peek_token.literal = NULL;
     Parser_next_token(p);
     Parser_next_token(p);
 }
@@ -23,7 +25,10 @@ Program Parser_parse_program(Parser* p)
 
 void Parser_next_token(Parser* p)
 {
-    Token_deinit(&p->cur_token);
+    if (p->cur_token.literal != NULL)
+    {
+        Token_deinit(&p->cur_token);
+    }
     p->cur_token = p->peek_token;
     p->peek_token = Lexer_next_token(&p->l);
 }

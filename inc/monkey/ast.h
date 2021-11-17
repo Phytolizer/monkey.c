@@ -21,10 +21,22 @@ typedef struct
     NodeType type;
 } Node;
 
+#define STATEMENT_TYPES_ X(LET)
+
+typedef enum
+{
+#define X(x) STATEMENT_TYPE_##x,
+    STATEMENT_TYPES_
+#undef X
+} StatementType;
+
 typedef struct
 {
     Node base;
+    StatementType type;
 } Statement;
+
+const char* Statement_type_name(StatementType type);
 
 typedef vec_t(Statement) StatementVec;
 
