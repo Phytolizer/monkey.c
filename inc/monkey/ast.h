@@ -43,10 +43,22 @@ const char* Statement_type_name(StatementType type);
 
 typedef vec_t(Statement*) StatementVec;
 
+#define EXPRESSION_TYPES_ X(IDENTIFIER)
+
+typedef enum
+{
+#define X(x) EXPRESSION_TYPE_##x,
+    EXPRESSION_TYPES_
+#undef X
+} ExpressionType;
+
 typedef struct
 {
     Node base;
+    ExpressionType type;
 } Expression;
+
+void Expression_init(Expression* e);
 
 sds Node_token_literal(Node* n);
 sds Statement_token_literal(Statement* s);
@@ -62,11 +74,12 @@ sds Program_token_literal(Program* p);
 
 typedef struct
 {
-    Node base;
+    Expression base;
     Token token;
     sds value;
 } Identifier;
 
+void Identifier_init(Identifier* i);
 sds Identifier_token_literal(Identifier* i);
 
 typedef struct

@@ -26,7 +26,7 @@ char* test_let_statements(void)
 
     for (size_t i = 0; i < ntests; i++)
     {
-        char* message = check_let_statement(&program.statements.data[i], tests[i].expected_identifier);
+        char* message = check_let_statement(program.statements.data[i], tests[i].expected_identifier);
         if (message != NULL)
         {
             Parser_deinit(&p);
@@ -47,7 +47,7 @@ char* parser_tests(size_t* test_count)
 char* check_let_statement(Statement* s, const char* name)
 {
     sds toklit = Statement_token_literal(s);
-    test_assert(strcmp(toklit, T_LET) == 0, sdsfree(toklit), "Statement_token_literal(s) should be 'let', not '%s'.",
+    test_assert(strcmp(toklit, "let") == 0, sdsfree(toklit), "Statement_token_literal(s) should be 'let', not '%s'.",
                 toklit);
     sdsfree(toklit);
 

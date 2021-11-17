@@ -10,6 +10,7 @@ typedef struct
     sds literal;
 } Token;
 
+Token Token_dup(Token* t);
 void Token_deinit(Token* t);
 
 #define T_ILLEGAL "ILLEGAL"

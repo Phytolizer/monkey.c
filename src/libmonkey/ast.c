@@ -2,6 +2,11 @@
 #include <assert.h>
 #include <stdbool.h>
 
+void Expression_init(Expression* e)
+{
+    e->base.type = NODE_TYPE_EXPRESSION;
+}
+
 sds Node_token_literal(Node* n)
 {
     switch (n->type)
@@ -39,10 +44,15 @@ sds Program_token_literal(Program* p)
     sds result = sdsempty();
     for (int i = 0; i < p->statements.length; i++)
     {
-        Statement* s = &p->statements.data[i];
+        Statement* s = p->statements.data[i];
         result = sdscat(result, Statement_token_literal(s));
     }
     return result;
+}
+
+void Identifier_init(Identifier* i)
+{
+    Expression_init(&i->base);
 }
 
 sds Identifier_token_literal(Identifier* i)

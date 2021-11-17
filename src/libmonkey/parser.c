@@ -66,16 +66,17 @@ Statement* Parser_parse_statement(Parser* p)
 
 LetStatement* Parser_parse_let_statement(Parser* p)
 {
-    Token tok = p->cur_token;
+    Token tok = Token_dup(&p->cur_token);
     if (!Parser_expect_peek(p, T_IDENT))
     {
         return NULL;
     }
 
     Identifier name = {
-        .token = p->cur_token,
-        .value = p->cur_token.literal,
+        .token = Token_dup(&p->cur_token),
+        .value = sdsdup(p->cur_token.literal),
     };
+    Identifier_init(&name);
 
     if (!Parser_expect_peek(p, T_ASSIGN))
     {
