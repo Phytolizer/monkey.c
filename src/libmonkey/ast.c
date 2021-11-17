@@ -99,13 +99,13 @@ void Statement_deinit(Statement* s)
     {
     case STATEMENT_TYPE_LET:
         LetStatement_deinit((LetStatement*)s);
-        break;
+        return;
     case STATEMENT_TYPE_RETURN:
         ReturnStatement_deinit((ReturnStatement*)s);
-        break;
+        return;
     case STATEMENT_TYPE_EXPRESSION:
         ExpressionStatement_deinit((ExpressionStatement*)s);
-        break;
+        return;
     }
 
     assert(false && "corrupt statement type");
@@ -200,13 +200,13 @@ void Node_deinit(Node* node)
     {
     case NODE_TYPE_PROGRAM:
         Program_deinit((Program*)node);
-        break;
+        return;
     case NODE_TYPE_STATEMENT:
         Statement_deinit((Statement*)node);
-        break;
+        return;
     case NODE_TYPE_EXPRESSION:
         Expression_deinit((Expression*)node);
-        break;
+        return;
     }
 
     assert(false && "corrupt node type");
