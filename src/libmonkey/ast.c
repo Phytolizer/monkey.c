@@ -24,8 +24,6 @@ sds Statement_token_literal(Statement* s)
 {
     switch (s->type)
     {
-    case STATEMENT_TYPE_INVALID:
-        return sdsnew("<invalid>");
     case STATEMENT_TYPE_LET:
         return sdsdup(((LetStatement*)s)->token.literal);
     }
@@ -35,8 +33,13 @@ sds Statement_token_literal(Statement* s)
 
 sds Expression_token_literal(Expression* e)
 {
-    // TODO
-    return sdsempty();
+    switch (e->type)
+    {
+    case EXPRESSION_TYPE_IDENTIFIER:
+        return sdsdup(((Identifier*)e)->token.literal);
+    }
+
+    assert(false && "corrupt expression type");
 }
 
 sds Program_token_literal(Program* p)
@@ -96,4 +99,57 @@ void LetStatement_init(LetStatement* s)
 {
     Statement_init(&s->base);
     s->base.type = STATEMENT_TYPE_LET;
+}
+
+void Statement_deinit(Statement* s)
+{
+    switch (s->type)
+    {
+    case STATEMENT_TYPE_LET:
+        LetStatement_deinit((LetStatement*)s);
+        break;
+    }
+}
+
+void Expression_deinit(Expression* e)
+{
+    switch (e->type)
+    {
+    case EXPRESSION_TYPE_IDENTIFIER:
+        Identifier_deinit((Identifier*)e);
+        break;
+    }
+}
+
+void LetStatement_deinit(LetStatement* s)
+{
+    Token_deinit(&s->token);
+    Identifier_deinit(&s->name);
+    if (s->value != NULL)
+    {
+        Expression_deinit(s->value);
+    }
+}
+
+void Identifier_deinit(Identifier* i)
+{
+    Token_deinit(&i->token);
+    sdsfree(i->value);
+}
+
+void Program_init(Program* p)
+{
+    p->base.type = NODE_TYPE_PROGRAM;
+    vec_init(&p->statements);
+}
+
+void Program_deinit(Program* p)
+{
+    for (int i = 0; i < p->statements.length; i++)
+    {
+        Statement* s = p->statements.data[i];
+        Statement_deinit(s);
+        free(s);
+    }
+    vec_deinit(&p->statements);
 }

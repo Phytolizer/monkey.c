@@ -7,7 +7,8 @@
 // enable introspection via use of X-macros
 #define NODE_TYPES_                                                                                                    \
     X(STATEMENT)                                                                                                       \
-    X(EXPRESSION)
+    X(EXPRESSION)                                                                                                      \
+    X(PROGRAM)
 
 typedef enum
 {
@@ -21,9 +22,7 @@ typedef struct
     NodeType type;
 } Node;
 
-#define STATEMENT_TYPES_                                                                                               \
-    X(INVALID)                                                                                                         \
-    X(LET)
+#define STATEMENT_TYPES_ X(LET)
 
 typedef enum
 {
@@ -39,6 +38,7 @@ typedef struct
 } Statement;
 
 void Statement_init(Statement* s);
+void Statement_deinit(Statement* s);
 const char* Statement_type_name(StatementType type);
 
 typedef vec_t(Statement*) StatementVec;
@@ -59,6 +59,7 @@ typedef struct
 } Expression;
 
 void Expression_init(Expression* e);
+void Expression_deinit(Expression* e);
 
 sds Node_token_literal(Node* n);
 sds Statement_token_literal(Statement* s);
@@ -70,6 +71,8 @@ typedef struct
     StatementVec statements;
 } Program;
 
+void Program_init(Program* p);
+void Program_deinit(Program* p);
 sds Program_token_literal(Program* p);
 
 typedef struct
@@ -80,6 +83,7 @@ typedef struct
 } Identifier;
 
 void Identifier_init(Identifier* i);
+void Identifier_deinit(Identifier* i);
 sds Identifier_token_literal(Identifier* i);
 
 typedef struct
@@ -91,4 +95,5 @@ typedef struct
 } LetStatement;
 
 void LetStatement_init(LetStatement* s);
+void LetStatement_deinit(LetStatement* s);
 sds LetStatement_token_literal(LetStatement* l);

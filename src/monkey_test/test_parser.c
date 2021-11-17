@@ -13,7 +13,13 @@ char* test_let_statements(void)
     Parser_init(&p, input);
 
     Program program = Parser_parse_program(&p);
-    test_assert(program.statements.length == 3, Parser_deinit(&p), "Program should have 3 statements.");
+    test_assert(
+        program.statements.length == 3,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "Program should have 3 statements.");
     struct
     {
         const char* expected_identifier;
@@ -29,11 +35,13 @@ char* test_let_statements(void)
         char* message = check_let_statement(program.statements.data[i], tests[i].expected_identifier);
         if (message != NULL)
         {
+            Program_deinit(&program);
             Parser_deinit(&p);
             return message;
         }
     }
 
+    Program_deinit(&program);
     Parser_deinit(&p);
     return NULL;
 }
