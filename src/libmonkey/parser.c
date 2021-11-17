@@ -123,6 +123,7 @@ bool Parser_expect_peek(Parser* p, TokenType type)
     }
     else
     {
+        Parser_peek_error(p, type);
         return false;
     }
 }
