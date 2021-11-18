@@ -261,7 +261,9 @@ sds Program_string(Program* p)
     sds s = sdsempty();
     for (int i = 0; i < p->statements.length; i++)
     {
-        s = sdscat(s, Statement_string(p->statements.data[i]));
+        sds stmt = Statement_string(p->statements.data[i]);
+        s = sdscat(s, stmt);
+        sdsfree(stmt);
     }
     return s;
 }

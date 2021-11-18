@@ -98,6 +98,9 @@ char* test_return_statements(void)
             "ReturnStatement_token_literal(return_stmt) not 'return', got '%s'", toklit);
         sdsfree(toklit);
     }
+
+    Program_deinit(&program);
+    Parser_deinit(&p);
     return NULL;
 }
 
