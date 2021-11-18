@@ -13,6 +13,7 @@ char* test_string(void)
     Identifier_init(&stmt->name);
     stmt->name.token.type = T_IDENT;
     stmt->name.token.literal = sdsnew("myVar");
+    stmt->name.value = sdsnew("myVar");
     Identifier* value = malloc(sizeof(Identifier));
     Identifier_init(value);
     value->token.type = T_IDENT;
