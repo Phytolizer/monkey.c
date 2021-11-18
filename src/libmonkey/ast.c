@@ -60,6 +60,7 @@ sds Program_token_literal(Program* p)
 void Identifier_init(Identifier* i)
 {
     Expression_init(&i->base);
+    i->base.type = EXPRESSION_TYPE_IDENTIFIER;
 }
 
 sds Identifier_token_literal(Identifier* i)
@@ -117,8 +118,10 @@ void Expression_deinit(Expression* e)
     {
     case EXPRESSION_TYPE_IDENTIFIER:
         Identifier_deinit((Identifier*)e);
-        break;
+        return;
     }
+
+    assert(false && "corrupt expression type");
 }
 
 void LetStatement_deinit(LetStatement* s)
