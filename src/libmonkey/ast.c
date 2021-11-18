@@ -88,6 +88,16 @@ const char* Statement_type_name(StatementType type)
     return STATEMENT_TYPE_NAMES[type];
 }
 
+const char* Expression_type_name(ExpressionType type)
+{
+    static const char* EXPRESSION_TYPE_NAMES[] = {
+#define X(x) #x,
+        EXPRESSION_TYPES_
+#undef X
+    };
+    return EXPRESSION_TYPE_NAMES[type];
+}
+
 void LetStatement_init(LetStatement* s)
 {
     Statement_init(&s->base);

@@ -69,6 +69,7 @@ typedef struct
 
 void Expression_init(Expression* e);
 void Expression_deinit(Expression* e);
+const char* Expression_type_name(ExpressionType type);
 sds Expression_token_literal(Expression* e);
 sds Expression_string(Expression* e);
 

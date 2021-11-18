@@ -1,12 +1,18 @@
 #pragma once
 
+#include "hash/hash.h"
 #include "monkey/ast.h"
 #include "monkey/lexer.h"
 #include "vec.h"
 
 typedef vec_t(sds) SdsVec;
 
-typedef struct
+struct Parser;
+
+typedef Expression* (*PrefixParseFn)(struct Parser*);
+typedef Expression* (*InfixParseFn)(struct Parser*, Expression*);
+
+typedef struct Parser
 {
     Lexer l;
 
@@ -14,6 +20,9 @@ typedef struct
     Token peek_token;
 
     SdsVec errors;
+
+    Hash prefix_parse_fns;
+    Hash infix_parse_fns;
 } Parser;
 
 void Parser_init(Parser* p, const char* input);

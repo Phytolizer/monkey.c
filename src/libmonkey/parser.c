@@ -1,10 +1,24 @@
 #include "monkey/parser.h"
 #include <stdbool.h>
 
+typedef enum
+{
+    PREC_LOWEST,
+    PREC_EQUALS,
+    PREC_LESSGREATER,
+    PREC_SUM,
+    PREC_PRODUCT,
+    PREC_PREFIX,
+    PREC_CALL,
+} Precedence;
+
 void Parser_next_token(Parser* p);
 Statement* Parser_parse_statement(Parser* p);
 LetStatement* Parser_parse_let_statement(Parser* p);
 ReturnStatement* Parser_parse_return_statement(Parser* p);
+ExpressionStatement* Parser_parse_expression_statement(Parser* p);
+Expression* Parser_parse_expression(Parser* p, Precedence precedence);
+Expression* Parser_parse_identifier(Parser* p);
 bool Parser_cur_token_is(Parser* p, TokenType type);
 bool Parser_peek_token_is(Parser* p, TokenType type);
 bool Parser_expect_peek(Parser* p, TokenType type);
@@ -16,6 +30,9 @@ void Parser_init(Parser* p, const char* input)
     p->cur_token.literal = NULL;
     p->peek_token.literal = NULL;
     vec_init(&p->errors);
+    Hash_init(&p->prefix_parse_fns);
+    Hash_init(&p->infix_parse_fns);
+    Hash_insert(&p->prefix_parse_fns, T_IDENT, sizeof(T_IDENT), (void*)Parser_parse_identifier, sizeof(PrefixParseFn));
     Parser_next_token(p);
     Parser_next_token(p);
 }
@@ -30,6 +47,8 @@ void Parser_deinit(Parser* p)
         sdsfree(p->errors.data[i]);
     }
     vec_deinit(&p->errors);
+    Hash_deinit(&p->prefix_parse_fns);
+    Hash_deinit(&p->infix_parse_fns);
 }
 
 Program Parser_parse_program(Parser* p)
@@ -70,7 +89,7 @@ Statement* Parser_parse_statement(Parser* p)
     {
         return (Statement*)Parser_parse_return_statement(p);
     }
-    return NULL;
+    return (Statement*)Parser_parse_expression_statement(p);
 }
 
 LetStatement* Parser_parse_let_statement(Parser* p)
@@ -123,6 +142,47 @@ ReturnStatement* Parser_parse_return_statement(Parser* p)
     stmt->token = tok;
     stmt->return_value = NULL;
     return stmt;
+}
+
+ExpressionStatement* Parser_parse_expression_statement(Parser* p)
+{
+    Token tok = Token_dup(&p->cur_token);
+
+    Expression* expr = Parser_parse_expression(p, PREC_LOWEST);
+
+    if (Parser_peek_token_is(p, T_SEMICOLON))
+    {
+        Parser_next_token(p);
+    }
+
+    ExpressionStatement* stmt = malloc(sizeof(ExpressionStatement));
+    ExpressionStatement_init(stmt);
+    stmt->token = tok;
+    stmt->expression = expr;
+    return stmt;
+}
+
+Expression* Parser_parse_expression(Parser* p, Precedence precedence)
+{
+    PrefixParseFn* prefix =
+        (PrefixParseFn*)Hash_lookup(&p->prefix_parse_fns, p->cur_token.type, strlen(p->cur_token.type) + 1);
+    if (prefix == NULL)
+    {
+        return NULL;
+    }
+    Expression* left_expr = (*prefix)(p);
+
+    return left_expr;
+}
+
+Expression* Parser_parse_identifier(Parser* p)
+{
+    Token tok = Token_dup(&p->cur_token);
+    Identifier* ident = malloc(sizeof(Identifier));
+    Identifier_init(ident);
+    ident->token = tok;
+    ident->value = sdsdup(p->cur_token.literal);
+    return (Expression*)ident;
 }
 
 bool Parser_cur_token_is(Parser* p, TokenType type)

@@ -6,7 +6,7 @@
 #define HASH_INITIAL_CAPACITY 8
 #define HASH_MAX_LOAD 0.75
 
-HashBucket* find_bucket(HashBucket* buckets, size_t capacity, void* key, size_t key_len);
+HashBucket* find_bucket(HashBucket* buckets, size_t capacity, const void* key, size_t key_len);
 
 void Hash_init(Hash* h)
 {
@@ -28,7 +28,7 @@ void Hash_deinit(Hash* h)
     free(h->buckets);
 }
 
-void Hash_insert(Hash* h, void* key, size_t key_len, void* value, size_t value_len)
+void Hash_insert(Hash* h, const void* key, size_t key_len, const void* value, size_t value_len)
 {
     if (h->capacity == 0 || (double)h->count / h->capacity >= HASH_MAX_LOAD)
     {
@@ -65,7 +65,7 @@ void Hash_insert(Hash* h, void* key, size_t key_len, void* value, size_t value_l
     ++h->count;
 }
 
-void** Hash_lookup(Hash* h, void* key, size_t key_len)
+void** Hash_lookup(Hash* h, const void* key, size_t key_len)
 {
     if (h->count == 0)
     {
@@ -79,7 +79,7 @@ void** Hash_lookup(Hash* h, void* key, size_t key_len)
     return NULL;
 }
 
-HashBucket* find_bucket(HashBucket* buckets, size_t capacity, void* key, size_t key_len)
+HashBucket* find_bucket(HashBucket* buckets, size_t capacity, const void* key, size_t key_len)
 {
     if (capacity == 0)
     {

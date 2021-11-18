@@ -104,10 +104,72 @@ char* test_return_statements(void)
     return NULL;
 }
 
+char* test_identifier_expression(void)
+{
+    const char* input = "foobar;\n";
+    Parser p;
+    Parser_init(&p, input);
+    Program program = Parser_parse_program(&p);
+    char* message = check_parser_errors(&p);
+    if (message != NULL)
+    {
+        Program_deinit(&program);
+        Parser_deinit(&p);
+        return message;
+    }
+
+    test_assert(
+        program.statements.length == 1,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "Program should have 1 statement.");
+    Statement* stmt = program.statements.data[0];
+    test_assert(
+        stmt->type == STATEMENT_TYPE_EXPRESSION,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "stmt->type should be EXPRESSION, not %s.", Statement_type_name(stmt->type));
+    Expression* expr = ((ExpressionStatement*)stmt)->expression;
+    test_assert(
+        expr->type == EXPRESSION_TYPE_IDENTIFIER,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "expr->type should be IDENTIFIER, not %s.", Expression_type_name(expr->type));
+    Identifier* ident = (Identifier*)expr;
+    test_assert(
+        strcmp(ident->value, "foobar") == 0,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "ident->name should be 'foobar', not '%s'.", ident->value);
+    sds value = Identifier_token_literal(ident);
+    test_assert(
+        strcmp(value, "foobar") == 0,
+        do {
+            sdsfree(value);
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "Identifier_token_literal(ident) not 'foobar', got '%s'", value);
+    sdsfree(value);
+
+    Program_deinit(&program);
+    Parser_deinit(&p);
+    return NULL;
+}
+
 char* parser_tests(size_t* test_count)
 {
     test_run(test_let_statements);
     test_run(test_return_statements);
+    test_run(test_identifier_expression);
     return NULL;
 }
 
