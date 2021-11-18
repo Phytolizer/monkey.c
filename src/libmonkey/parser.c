@@ -30,9 +30,10 @@ void Parser_init(Parser* p, const char* input)
     p->cur_token.literal = NULL;
     p->peek_token.literal = NULL;
     vec_init(&p->errors);
-    Hash_init(&p->prefix_parse_fns);
-    Hash_init(&p->infix_parse_fns);
-    Hash_insert(&p->prefix_parse_fns, T_IDENT, sizeof(T_IDENT), (void*)Parser_parse_identifier, sizeof(PrefixParseFn));
+    ViewHash_init(&p->prefix_parse_fns);
+    ViewHash_init(&p->infix_parse_fns);
+    ViewHash_insert(&p->prefix_parse_fns, T_IDENT, sizeof(T_IDENT), (void*)Parser_parse_identifier,
+                    sizeof(PrefixParseFn));
     Parser_next_token(p);
     Parser_next_token(p);
 }
@@ -47,8 +48,8 @@ void Parser_deinit(Parser* p)
         sdsfree(p->errors.data[i]);
     }
     vec_deinit(&p->errors);
-    Hash_deinit(&p->prefix_parse_fns);
-    Hash_deinit(&p->infix_parse_fns);
+    ViewHash_deinit(&p->prefix_parse_fns);
+    ViewHash_deinit(&p->infix_parse_fns);
 }
 
 Program Parser_parse_program(Parser* p)
@@ -165,7 +166,7 @@ ExpressionStatement* Parser_parse_expression_statement(Parser* p)
 Expression* Parser_parse_expression(Parser* p, Precedence precedence)
 {
     PrefixParseFn* prefix =
-        (PrefixParseFn*)Hash_lookup(&p->prefix_parse_fns, p->cur_token.type, strlen(p->cur_token.type) + 1);
+        (PrefixParseFn*)ViewHash_lookup(&p->prefix_parse_fns, p->cur_token.type, strlen(p->cur_token.type) + 1);
     if (prefix == NULL)
     {
         return NULL;

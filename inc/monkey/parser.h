@@ -21,8 +21,8 @@ typedef struct Parser
 
     SdsVec errors;
 
-    Hash prefix_parse_fns;
-    Hash infix_parse_fns;
+    ViewHash prefix_parse_fns;
+    ViewHash infix_parse_fns;
 } Parser;
 
 void Parser_init(Parser* p, const char* input);
