@@ -209,7 +209,7 @@ char* test_integer_literal_expression(void)
             Program_deinit(&program);
             Parser_deinit(&p);
         } while (false),
-        "integer->value should be 5, not %d.", integer->value);
+        "integer->value should be 5, not %ld.", integer->value);
     sds value = IntegerLiteral_token_literal(integer);
     test_assert(
         strcmp(value, "5") == 0,
@@ -220,6 +220,8 @@ char* test_integer_literal_expression(void)
         } while (false),
         "IntegerLiteral_token_literal(integer) not '5', got '%s'", value);
     sdsfree(value);
+    Program_deinit(&program);
+    Parser_deinit(&p);
     return NULL;
 }
 
