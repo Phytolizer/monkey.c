@@ -165,11 +165,70 @@ char* test_identifier_expression(void)
     return NULL;
 }
 
+char* test_integer_literal_expression(void)
+{
+    const char* input = "5;\n";
+    Parser p;
+    Parser_init(&p, input);
+    Program program = Parser_parse_program(&p);
+    char* message = check_parser_errors(&p);
+    if (message != NULL)
+    {
+        Program_deinit(&program);
+        Parser_deinit(&p);
+        return message;
+    }
+
+    test_assert(
+        program.statements.length == 1,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "Program should have 1 statement, not %d.", program.statements.length);
+    Statement* stmt = program.statements.data[0];
+    test_assert(
+        stmt->type == STATEMENT_TYPE_EXPRESSION,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "stmt->type should be EXPRESSION, not %s.", Statement_type_name(stmt->type));
+    Expression* expr = ((ExpressionStatement*)stmt)->expression;
+    test_assert(
+        expr->type == EXPRESSION_TYPE_INTEGER,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "expr->type should be INTEGER, not %s.", Expression_type_name(expr->type));
+    IntegerLiteral* integer = (IntegerLiteral*)expr;
+    test_assert(
+        integer->value == 5,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "integer->value should be 5, not %d.", integer->value);
+    sds value = IntegerLiteral_token_literal(integer);
+    test_assert(
+        strcmp(value, "5") == 0,
+        do {
+            sdsfree(value);
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "IntegerLiteral_token_literal(integer) not '5', got '%s'", value);
+    sdsfree(value);
+    return NULL;
+}
+
 char* parser_tests(size_t* test_count)
 {
     test_run(test_let_statements);
     test_run(test_return_statements);
     test_run(test_identifier_expression);
+    test_run(test_integer_literal_expression);
     return NULL;
 }
 

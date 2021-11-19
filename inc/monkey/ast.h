@@ -52,7 +52,9 @@ sds Statement_string(Statement* s);
 
 typedef vec_t(Statement*) StatementVec;
 
-#define EXPRESSION_TYPES_ X(IDENTIFIER)
+#define EXPRESSION_TYPES_                                                                                              \
+    X(IDENTIFIER)                                                                                                      \
+    X(INTEGER)
 
 typedef enum
 {
@@ -132,3 +134,15 @@ void ExpressionStatement_init(ExpressionStatement* s);
 void ExpressionStatement_deinit(ExpressionStatement* s);
 sds ExpressionStatement_token_literal(ExpressionStatement* s);
 sds ExpressionStatement_string(ExpressionStatement* s);
+
+typedef struct
+{
+    Expression base;
+    Token token;
+    int64_t value;
+} IntegerLiteral;
+
+void IntegerLiteral_init(IntegerLiteral* i);
+void IntegerLiteral_deinit(IntegerLiteral* i);
+sds IntegerLiteral_token_literal(IntegerLiteral* i);
+sds IntegerLiteral_string(IntegerLiteral* i);

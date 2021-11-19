@@ -43,6 +43,8 @@ sds Expression_token_literal(Expression* e)
     {
     case EXPRESSION_TYPE_IDENTIFIER:
         return sdsdup(((Identifier*)e)->token.literal);
+    case EXPRESSION_TYPE_INTEGER:
+        return sdsdup(((IntegerLiteral*)e)->token.literal);
     }
 
     assert(false && "corrupt expression type");
@@ -128,6 +130,9 @@ void Expression_deinit(Expression* e)
     {
     case EXPRESSION_TYPE_IDENTIFIER:
         Identifier_deinit((Identifier*)e);
+        return;
+    case EXPRESSION_TYPE_INTEGER:
+        IntegerLiteral_deinit((IntegerLiteral*)e);
         return;
     }
 
@@ -261,6 +266,8 @@ sds Expression_string(Expression* e)
     {
     case EXPRESSION_TYPE_IDENTIFIER:
         return Identifier_string((Identifier*)e);
+    case EXPRESSION_TYPE_INTEGER:
+        return IntegerLiteral_string((IntegerLiteral*)e);
     }
 
     assert(false && "corrupt expression type");
@@ -325,4 +332,25 @@ sds ExpressionStatement_string(ExpressionStatement* e)
     sdsfree(expression);
     s = sdscat(s, ";");
     return s;
+}
+
+void IntegerLiteral_init(IntegerLiteral* i)
+{
+    Expression_init(&i->base);
+    i->base.type = EXPRESSION_TYPE_INTEGER;
+}
+
+void IntegerLiteral_deinit(IntegerLiteral* i)
+{
+    Token_deinit(&i->token);
+}
+
+sds IntegerLiteral_token_literal(IntegerLiteral* i)
+{
+    return sdsdup(i->token.literal);
+}
+
+sds IntegerLiteral_string(IntegerLiteral* i)
+{
+    return sdsdup(i->token.literal);
 }

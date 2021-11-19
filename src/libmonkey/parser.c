@@ -19,6 +19,7 @@ ReturnStatement* Parser_parse_return_statement(Parser* p);
 ExpressionStatement* Parser_parse_expression_statement(Parser* p);
 Expression* Parser_parse_expression(Parser* p, Precedence precedence);
 Expression* Parser_parse_identifier(Parser* p);
+Expression* Parser_parse_integer_literal(Parser* p);
 bool Parser_cur_token_is(Parser* p, TokenType type);
 bool Parser_peek_token_is(Parser* p, TokenType type);
 bool Parser_expect_peek(Parser* p, TokenType type);
@@ -33,6 +34,8 @@ void Parser_init(Parser* p, const char* input)
     ViewHash_init(&p->prefix_parse_fns);
     ViewHash_init(&p->infix_parse_fns);
     ViewHash_insert(&p->prefix_parse_fns, T_IDENT, sizeof(T_IDENT), (void*)Parser_parse_identifier,
+                    sizeof(PrefixParseFn));
+    ViewHash_insert(&p->prefix_parse_fns, T_INT, sizeof(T_INT), (void*)Parser_parse_integer_literal,
                     sizeof(PrefixParseFn));
     Parser_next_token(p);
     Parser_next_token(p);
@@ -184,6 +187,16 @@ Expression* Parser_parse_identifier(Parser* p)
     ident->token = tok;
     ident->value = sdsdup(p->cur_token.literal);
     return (Expression*)ident;
+}
+
+Expression* Parser_parse_integer_literal(Parser* p)
+{
+    Token tok = Token_dup(&p->cur_token);
+    IntegerLiteral* lit = malloc(sizeof(IntegerLiteral));
+    IntegerLiteral_init(lit);
+    lit->token = tok;
+    lit->value = strtol(p->cur_token.literal, NULL, 10);
+    return (Expression*)lit;
 }
 
 bool Parser_cur_token_is(Parser* p, TokenType type)
