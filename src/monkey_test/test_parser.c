@@ -1,8 +1,10 @@
+#include "test_parser.h"
 #include "monkey/parser.h"
 #include "test.h"
-#include "test_parser.h"
+
 
 char* check_let_statement(Statement* s, const char* name);
+char* check_integer_literal(Expression* e, int64_t value);
 char* check_parser_errors(Parser* p);
 
 char* test_let_statements(void)
@@ -225,12 +227,82 @@ char* test_integer_literal_expression(void)
     return NULL;
 }
 
+char* test_parsing_prefix_expressions(void)
+{
+    struct
+    {
+        const char* input;
+        const char* operator;
+        int64_t value;
+    } prefix_tests[] = {
+        {"!5;", "!", 5},
+        {"-15;", "-", 15},
+    };
+
+    for (size_t i = 0; i < sizeof(prefix_tests) / sizeof(prefix_tests[0]); i++)
+    {
+        Parser parser;
+        Parser_init(&parser, prefix_tests[i].input);
+        Program program = Parser_parse_program(&parser);
+        char* message = check_parser_errors(&parser);
+        if (message != NULL)
+        {
+            Program_deinit(&program);
+            Parser_deinit(&parser);
+            return message;
+        }
+        test_assert(
+            program.statements.length == 1,
+            do {
+                Program_deinit(&program);
+                Parser_deinit(&parser);
+            } while (false),
+            "Program should have 1 statement, not %d.", program.statements.length);
+        Statement* stmt = program.statements.data[0];
+        test_assert(
+            stmt->type == STATEMENT_TYPE_EXPRESSION,
+            do {
+                Program_deinit(&program);
+                Parser_deinit(&parser);
+            } while (false),
+            "stmt->type should be EXPRESSION, not %s.", Statement_type_name(stmt->type));
+        Expression* expr = ((ExpressionStatement*)stmt)->expression;
+        test_assert(
+            expr->type == EXPRESSION_TYPE_PREFIX,
+            do {
+                Program_deinit(&program);
+                Parser_deinit(&parser);
+            } while (false),
+            "expr->type should be PREFIX, not %s.", Expression_type_name(expr->type));
+        PrefixExpression* prefix = (PrefixExpression*)expr;
+        test_assert(
+            strcmp(prefix->operator, prefix_tests[i].operator) == 0,
+            do {
+                Program_deinit(&program);
+                Parser_deinit(&parser);
+            } while (false),
+            "prefix->operator should be '%s', not '%s'.", prefix_tests[i].operator, prefix->operator);
+        message = check_integer_literal(prefix->right, prefix_tests[i].value);
+        if (message != NULL)
+        {
+            Program_deinit(&program);
+            Parser_deinit(&parser);
+            return message;
+        }
+        Program_deinit(&program);
+        Parser_deinit(&parser);
+    }
+
+    return NULL;
+}
+
 char* parser_tests(size_t* test_count)
 {
     test_run(test_let_statements);
     test_run(test_return_statements);
     test_run(test_identifier_expression);
     test_run(test_integer_literal_expression);
+    test_run(test_parsing_prefix_expressions);
     return NULL;
 }
 
@@ -249,6 +321,19 @@ char* check_let_statement(Statement* s, const char* name)
     toklit = Identifier_token_literal(&let_stmt->name);
     test_assert(strcmp(toklit, name) == 0, sdsfree(toklit),
                 "Identifier_token_literal(&let_stmt->name) should be '%s', not '%s'.", name, toklit);
+    sdsfree(toklit);
+    return NULL;
+}
+
+char* check_integer_literal(Expression* e, int64_t value)
+{
+    test_assert(e->type == EXPRESSION_TYPE_INTEGER, (void)0, "e->type should be INTEGER, not %s.",
+                Expression_type_name(e->type));
+    IntegerLiteral* integer = (IntegerLiteral*)e;
+    test_assert(integer->value == value, (void)0, "integer->value should be %d, not %ld.", value, integer->value);
+    sds toklit = IntegerLiteral_token_literal(integer);
+    test_assert(strcmp(toklit, "5") == 0, sdsfree(toklit), "IntegerLiteral_token_literal(integer) not '5', got '%s'",
+                toklit);
     sdsfree(toklit);
     return NULL;
 }
