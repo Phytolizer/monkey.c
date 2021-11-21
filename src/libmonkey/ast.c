@@ -343,11 +343,7 @@ sds ReturnStatement_string(ReturnStatement* r)
 
 sds ExpressionStatement_string(ExpressionStatement* e)
 {
-    sds s = sdsempty();
-    sds expression = Expression_string(e->expression);
-    s = sdscatsds(s, expression);
-    sdsfree(expression);
-    return s;
+    return Expression_string(e->expression);
 }
 
 void IntegerLiteral_init(IntegerLiteral* i)
