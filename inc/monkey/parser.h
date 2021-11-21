@@ -23,6 +23,7 @@ typedef struct Parser
 
     ViewHash prefix_parse_fns;
     ViewHash infix_parse_fns;
+    Hash precedences;
 } Parser;
 
 void Parser_init(Parser* p, const char* input);

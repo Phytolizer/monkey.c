@@ -1,16 +1,27 @@
 #include "monkey/parser.h"
 #include <stdbool.h>
 
+#define PRECEDENCES_                                                                                                   \
+    X(LOWEST)                                                                                                          \
+    X(EQUALS)                                                                                                          \
+    X(LESSGREATER)                                                                                                     \
+    X(SUM)                                                                                                             \
+    X(PRODUCT)                                                                                                         \
+    X(PREFIX)                                                                                                          \
+    X(CALL)
+
 typedef enum
 {
-    PREC_LOWEST,
-    PREC_EQUALS,
-    PREC_LESSGREATER,
-    PREC_SUM,
-    PREC_PRODUCT,
-    PREC_PREFIX,
-    PREC_CALL,
+#define X(x) PREC_##x,
+    PRECEDENCES_
+#undef X
 } Precedence;
+
+static const Precedence PRECEDENCES[] = {
+#define X(x) PREC_##x,
+    PRECEDENCES_
+#undef X
+};
 
 void Parser_next_token(Parser* p);
 Statement* Parser_parse_statement(Parser* p);
@@ -21,8 +32,11 @@ Expression* Parser_parse_expression(Parser* p, Precedence precedence);
 Expression* Parser_parse_identifier(Parser* p);
 Expression* Parser_parse_integer_literal(Parser* p);
 Expression* Parser_parse_prefix_expression(Parser* p);
+Expression* Parser_parse_infix_expression(Parser* p, Expression* left);
 bool Parser_cur_token_is(Parser* p, TokenType type);
 bool Parser_peek_token_is(Parser* p, TokenType type);
+Precedence Parser_peek_precedence(Parser* p);
+Precedence Parser_cur_precedence(Parser* p);
 bool Parser_expect_peek(Parser* p, TokenType type);
 void Parser_peek_error(Parser* p, TokenType type);
 void Parser_no_prefix_parse_fn_error(Parser* p, TokenType type);
@@ -43,6 +57,31 @@ void Parser_init(Parser* p, const char* input)
                     sizeof(PrefixParseFn));
     ViewHash_insert(&p->prefix_parse_fns, T_MINUS, sizeof(T_MINUS), (void*)Parser_parse_prefix_expression,
                     sizeof(PrefixParseFn));
+    ViewHash_insert(&p->infix_parse_fns, T_PLUS, sizeof(T_PLUS), (void*)Parser_parse_infix_expression,
+                    sizeof(InfixParseFn));
+    ViewHash_insert(&p->infix_parse_fns, T_MINUS, sizeof(T_MINUS), (void*)Parser_parse_infix_expression,
+                    sizeof(InfixParseFn));
+    ViewHash_insert(&p->infix_parse_fns, T_SLASH, sizeof(T_SLASH), (void*)Parser_parse_infix_expression,
+                    sizeof(InfixParseFn));
+    ViewHash_insert(&p->infix_parse_fns, T_ASTERISK, sizeof(T_ASTERISK), (void*)Parser_parse_infix_expression,
+                    sizeof(InfixParseFn));
+    ViewHash_insert(&p->infix_parse_fns, T_EQ, sizeof(T_EQ), (void*)Parser_parse_infix_expression,
+                    sizeof(InfixParseFn));
+    ViewHash_insert(&p->infix_parse_fns, T_NOT_EQ, sizeof(T_NOT_EQ), (void*)Parser_parse_infix_expression,
+                    sizeof(InfixParseFn));
+    ViewHash_insert(&p->infix_parse_fns, T_LT, sizeof(T_LT), (void*)Parser_parse_infix_expression,
+                    sizeof(InfixParseFn));
+    ViewHash_insert(&p->infix_parse_fns, T_GT, sizeof(T_GT), (void*)Parser_parse_infix_expression,
+                    sizeof(InfixParseFn));
+    Hash_init(&p->precedences);
+    Hash_insert(&p->precedences, T_EQ, sizeof(T_EQ), &PRECEDENCES[PREC_EQUALS], sizeof(Precedence));
+    Hash_insert(&p->precedences, T_NOT_EQ, sizeof(T_NOT_EQ), &PRECEDENCES[PREC_EQUALS], sizeof(Precedence));
+    Hash_insert(&p->precedences, T_LT, sizeof(T_LT), &PRECEDENCES[PREC_LESSGREATER], sizeof(Precedence));
+    Hash_insert(&p->precedences, T_GT, sizeof(T_GT), &PRECEDENCES[PREC_LESSGREATER], sizeof(Precedence));
+    Hash_insert(&p->precedences, T_PLUS, sizeof(T_PLUS), &PRECEDENCES[PREC_SUM], sizeof(Precedence));
+    Hash_insert(&p->precedences, T_MINUS, sizeof(T_MINUS), &PRECEDENCES[PREC_SUM], sizeof(Precedence));
+    Hash_insert(&p->precedences, T_SLASH, sizeof(T_SLASH), &PRECEDENCES[PREC_PRODUCT], sizeof(Precedence));
+    Hash_insert(&p->precedences, T_ASTERISK, sizeof(T_ASTERISK), &PRECEDENCES[PREC_PRODUCT], sizeof(Precedence));
     Parser_next_token(p);
     Parser_next_token(p);
 }
@@ -59,6 +98,7 @@ void Parser_deinit(Parser* p)
     vec_deinit(&p->errors);
     ViewHash_deinit(&p->prefix_parse_fns);
     ViewHash_deinit(&p->infix_parse_fns);
+    Hash_deinit(&p->precedences);
 }
 
 Program Parser_parse_program(Parser* p)
@@ -183,6 +223,18 @@ Expression* Parser_parse_expression(Parser* p, Precedence precedence)
     }
     Expression* left_expr = (*prefix)(p);
 
+    while (!Parser_peek_token_is(p, T_SEMICOLON) && precedence < Parser_peek_precedence(p))
+    {
+        InfixParseFn* infix =
+            (InfixParseFn*)ViewHash_lookup(&p->infix_parse_fns, p->peek_token.type, strlen(p->peek_token.type) + 1);
+        if (infix == NULL)
+        {
+            return left_expr;
+        }
+        Parser_next_token(p);
+        left_expr = (*infix)(p, left_expr);
+    }
+
     return left_expr;
 }
 
@@ -222,6 +274,24 @@ Expression* Parser_parse_prefix_expression(Parser* p)
     return (Expression*)expr;
 }
 
+Expression* Parser_parse_infix_expression(Parser* p, Expression* left)
+{
+    Token tok = Token_dup(&p->cur_token);
+    sds operator= sdsdup(p->cur_token.literal);
+
+    Precedence precedence = Parser_cur_precedence(p);
+    Parser_next_token(p);
+    Expression* right = Parser_parse_expression(p, precedence);
+
+    InfixExpression* expr = malloc(sizeof(InfixExpression));
+    InfixExpression_init(expr);
+    expr->token = tok;
+    expr->operator= operator;
+    expr->left = left;
+    expr->right = right;
+    return (Expression*)expr;
+}
+
 bool Parser_cur_token_is(Parser* p, TokenType type)
 {
     return strcmp(p->cur_token.type, type) == 0;
@@ -230,6 +300,26 @@ bool Parser_cur_token_is(Parser* p, TokenType type)
 bool Parser_peek_token_is(Parser* p, TokenType type)
 {
     return strcmp(p->peek_token.type, type) == 0;
+}
+
+Precedence Parser_peek_precedence(Parser* p)
+{
+    Precedence** prec = (Precedence**)Hash_lookup(&p->precedences, p->peek_token.type, strlen(p->peek_token.type) + 1);
+    if (prec == NULL)
+    {
+        return PREC_LOWEST;
+    }
+    return **prec;
+}
+
+Precedence Parser_cur_precedence(Parser* p)
+{
+    Precedence** prec = (Precedence**)Hash_lookup(&p->precedences, p->cur_token.type, strlen(p->cur_token.type) + 1);
+    if (prec == NULL)
+    {
+        return PREC_LOWEST;
+    }
+    return **prec;
 }
 
 bool Parser_expect_peek(Parser* p, TokenType type)
