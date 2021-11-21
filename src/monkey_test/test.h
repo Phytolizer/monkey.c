@@ -38,6 +38,7 @@
 #define test_run(test)                                                                                                 \
     do                                                                                                                 \
     {                                                                                                                  \
+        fprintf(stderr, "Running " #test "...\n");                                                                     \
         char* message = test();                                                                                        \
         ++(*test_count);                                                                                               \
         if (message != NULL)                                                                                           \
