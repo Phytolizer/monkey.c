@@ -2,7 +2,6 @@
 #include "monkey/parser.h"
 #include "test.h"
 
-
 char* check_let_statement(Statement* s, const char* name);
 char* check_integer_literal(Expression* e, int64_t value);
 char* check_parser_errors(Parser* p);
@@ -332,8 +331,10 @@ char* check_integer_literal(Expression* e, int64_t value)
     IntegerLiteral* integer = (IntegerLiteral*)e;
     test_assert(integer->value == value, (void)0, "integer->value should be %d, not %ld.", value, integer->value);
     sds toklit = IntegerLiteral_token_literal(integer);
-    test_assert(strcmp(toklit, "5") == 0, sdsfree(toklit), "IntegerLiteral_token_literal(integer) not '5', got '%s'",
-                toklit);
+    char strval[10];
+    snprintf(strval, 10, "%ld", value);
+    test_assert(strcmp(toklit, strval) == 0, sdsfree(toklit),
+                "IntegerLiteral_token_literal(integer) not '%s', got '%s'", strval, toklit);
     sdsfree(toklit);
     return NULL;
 }
