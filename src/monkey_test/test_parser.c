@@ -406,7 +406,7 @@ char* check_integer_literal(Expression* e, int64_t value)
     test_assert(e->type == EXPRESSION_TYPE_INTEGER, (void)0, "e->type should be INTEGER, not %s.",
                 Expression_type_name(e->type));
     IntegerLiteral* integer = (IntegerLiteral*)e;
-    test_assert(integer->value == value, (void)0, "integer->value should be %d, not %ld.", value, integer->value);
+    test_assert(integer->value == value, (void)0, "integer->value should be %ld, not %ld.", value, integer->value);
     sds toklit = IntegerLiteral_token_literal(integer);
     char strval[10];
     snprintf(strval, 10, "%ld", value);
