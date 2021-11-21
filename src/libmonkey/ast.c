@@ -47,6 +47,8 @@ sds Expression_token_literal(Expression* e)
         return sdsdup(((IntegerLiteral*)e)->token.literal);
     case EXPRESSION_TYPE_PREFIX:
         return sdsdup(((PrefixExpression*)e)->token.literal);
+    case EXPRESSION_TYPE_INFIX:
+        return sdsdup(((InfixExpression*)e)->token.literal);
     }
 
     assert(false && "corrupt expression type");
@@ -138,6 +140,9 @@ void Expression_deinit(Expression* e)
         return;
     case EXPRESSION_TYPE_PREFIX:
         PrefixExpression_deinit((PrefixExpression*)e);
+        return;
+    case EXPRESSION_TYPE_INFIX:
+        InfixExpression_deinit((InfixExpression*)e);
         return;
     }
 
@@ -278,6 +283,8 @@ sds Expression_string(Expression* e)
         return IntegerLiteral_string((IntegerLiteral*)e);
     case EXPRESSION_TYPE_PREFIX:
         return PrefixExpression_string((PrefixExpression*)e);
+    case EXPRESSION_TYPE_INFIX:
+        return InfixExpression_string((InfixExpression*)e);
     }
 
     assert(false && "corrupt expression type");
@@ -390,6 +397,44 @@ sds PrefixExpression_string(PrefixExpression* p)
     s = sdscat(s, "(");
     s = sdscat(s, p->operator);
     sds right = Expression_string(p->right);
+    s = sdscatsds(s, right);
+    sdsfree(right);
+    s = sdscat(s, ")");
+    return s;
+}
+
+void InfixExpression_init(InfixExpression* i)
+{
+    Expression_init(&i->base);
+    i->base.type = EXPRESSION_TYPE_INFIX;
+}
+
+void InfixExpression_deinit(InfixExpression* i)
+{
+    Token_deinit(&i->token);
+    sdsfree(i->operator);
+    Expression_deinit(i->left);
+    free(i->left);
+    Expression_deinit(i->right);
+    free(i->right);
+}
+
+sds InfixExpression_token_literal(InfixExpression* i)
+{
+    return sdsdup(i->token.literal);
+}
+
+sds InfixExpression_string(InfixExpression* i)
+{
+    sds s = sdsempty();
+    s = sdscat(s, "(");
+    sds left = Expression_string(i->left);
+    s = sdscatsds(s, left);
+    sdsfree(left);
+    s = sdscat(s, " ");
+    s = sdscat(s, i->operator);
+    s = sdscat(s, " ");
+    sds right = Expression_string(i->right);
     s = sdscatsds(s, right);
     sdsfree(right);
     s = sdscat(s, ")");

@@ -55,7 +55,8 @@ typedef vec_t(Statement*) StatementVec;
 #define EXPRESSION_TYPES_                                                                                              \
     X(IDENTIFIER)                                                                                                      \
     X(INTEGER)                                                                                                         \
-    X(PREFIX)
+    X(PREFIX)                                                                                                          \
+    X(INFIX)
 
 typedef enum
 {
@@ -160,3 +161,17 @@ void PrefixExpression_init(PrefixExpression* p);
 void PrefixExpression_deinit(PrefixExpression* p);
 sds PrefixExpression_token_literal(PrefixExpression* p);
 sds PrefixExpression_string(PrefixExpression* p);
+
+typedef struct
+{
+    Expression base;
+    Token token;
+    Expression* left;
+    sds operator;
+    Expression* right;
+} InfixExpression;
+
+void InfixExpression_init(InfixExpression* i);
+void InfixExpression_deinit(InfixExpression* i);
+sds InfixExpression_token_literal(InfixExpression* i);
+sds InfixExpression_string(InfixExpression* i);

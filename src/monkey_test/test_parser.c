@@ -295,6 +295,82 @@ char* test_parsing_prefix_expressions(void)
     return NULL;
 }
 
+char* test_parsing_infix_expressions(void)
+{
+    struct
+    {
+        const char* input;
+        const char* operator;
+        int64_t value;
+    } infix_tests[] = {
+        {"5 + 5;", "+", 5}, {"5 - 5;", "-", 5}, {"5 * 5;", "*", 5},   {"5 / 5;", "/", 5},
+        {"5 > 5;", ">", 5}, {"5 < 5;", "<", 5}, {"5 == 5;", "==", 5}, {"5 != 5;", "!=", 5},
+    };
+
+    for (size_t i = 0; i < sizeof(infix_tests) / sizeof(infix_tests[0]); i++)
+    {
+        Parser parser;
+        Parser_init(&parser, infix_tests[i].input);
+        Program program = Parser_parse_program(&parser);
+        char* message = check_parser_errors(&parser);
+        if (message != NULL)
+        {
+            Program_deinit(&program);
+            Parser_deinit(&parser);
+            return message;
+        }
+        test_assert(
+            program.statements.length == 1,
+            do {
+                Program_deinit(&program);
+                Parser_deinit(&parser);
+            } while (false),
+            "Program should have 1 statement, not %d.", program.statements.length);
+        Statement* stmt = program.statements.data[0];
+        test_assert(
+            stmt->type == STATEMENT_TYPE_EXPRESSION,
+            do {
+                Program_deinit(&program);
+                Parser_deinit(&parser);
+            } while (false),
+            "stmt->type should be EXPRESSION, not %s.", Statement_type_name(stmt->type));
+        Expression* expr = ((ExpressionStatement*)stmt)->expression;
+        test_assert(
+            expr->type == EXPRESSION_TYPE_INFIX,
+            do {
+                Program_deinit(&program);
+                Parser_deinit(&parser);
+            } while (false),
+            "expr->type should be INFIX, not %s.", Expression_type_name(expr->type));
+        InfixExpression* infix = (InfixExpression*)expr;
+        message = check_integer_literal(infix->left, infix_tests[i].value);
+        if (message != NULL)
+        {
+            Program_deinit(&program);
+            Parser_deinit(&parser);
+            return message;
+        }
+        test_assert(
+            strcmp(infix->operator, infix_tests[i].operator) == 0,
+            do {
+                Program_deinit(&program);
+                Parser_deinit(&parser);
+            } while (false),
+            "infix->operator should be '%s', not '%s'.", infix_tests[i].operator, infix->operator);
+        message = check_integer_literal(infix->right, infix_tests[i].value);
+        if (message != NULL)
+        {
+            Program_deinit(&program);
+            Parser_deinit(&parser);
+            return message;
+        }
+        Program_deinit(&program);
+        Parser_deinit(&parser);
+    }
+
+    return NULL;
+}
+
 char* parser_tests(size_t* test_count)
 {
     test_run(test_let_statements);
@@ -302,6 +378,7 @@ char* parser_tests(size_t* test_count)
     test_run(test_identifier_expression);
     test_run(test_integer_literal_expression);
     test_run(test_parsing_prefix_expressions);
+    test_run(test_parsing_infix_expressions);
     return NULL;
 }
 
