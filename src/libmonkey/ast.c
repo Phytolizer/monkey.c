@@ -387,9 +387,11 @@ sds PrefixExpression_token_literal(PrefixExpression* p)
 sds PrefixExpression_string(PrefixExpression* p)
 {
     sds s = sdsempty();
+    s = sdscat(s, "(");
     s = sdscat(s, p->operator);
     sds right = Expression_string(p->right);
     s = sdscatsds(s, right);
     sdsfree(right);
+    s = sdscat(s, ")");
     return s;
 }
