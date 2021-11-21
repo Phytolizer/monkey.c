@@ -24,6 +24,7 @@ bool Parser_cur_token_is(Parser* p, TokenType type);
 bool Parser_peek_token_is(Parser* p, TokenType type);
 bool Parser_expect_peek(Parser* p, TokenType type);
 void Parser_peek_error(Parser* p, TokenType type);
+void Parser_no_prefix_parse_fn_error(Parser* p, TokenType type);
 
 void Parser_init(Parser* p, const char* input)
 {
@@ -172,6 +173,7 @@ Expression* Parser_parse_expression(Parser* p, Precedence precedence)
         (PrefixParseFn*)ViewHash_lookup(&p->prefix_parse_fns, p->cur_token.type, strlen(p->cur_token.type) + 1);
     if (prefix == NULL)
     {
+        Parser_no_prefix_parse_fn_error(p, p->cur_token.type);
         return NULL;
     }
     Expression* left_expr = (*prefix)(p);
@@ -226,5 +228,11 @@ bool Parser_expect_peek(Parser* p, TokenType type)
 void Parser_peek_error(Parser* p, TokenType type)
 {
     sds msg = sdscatprintf(sdsempty(), "expected next token to be %s, got %s instead", type, p->peek_token.type);
+    vec_push(&p->errors, msg);
+}
+
+void Parser_no_prefix_parse_fn_error(Parser* p, TokenType type)
+{
+    sds msg = sdscatprintf(sdsempty(), "no prefix parse function for %s found", type);
     vec_push(&p->errors, msg);
 }
