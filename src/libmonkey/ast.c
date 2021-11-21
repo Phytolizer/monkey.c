@@ -347,7 +347,6 @@ sds ExpressionStatement_string(ExpressionStatement* e)
     sds expression = Expression_string(e->expression);
     s = sdscatsds(s, expression);
     sdsfree(expression);
-    s = sdscat(s, ";");
     return s;
 }
 

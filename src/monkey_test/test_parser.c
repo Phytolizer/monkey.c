@@ -371,6 +371,56 @@ char* test_parsing_infix_expressions(void)
     return NULL;
 }
 
+char* test_operator_precedence_parsing(void)
+{
+    struct
+    {
+        const char* input;
+        const char* expected;
+    } tests[] = {
+        {"-a * b", "((-a) * b)"},
+        {"!-a", "(!(-a))"},
+        {"a + b + c", "((a + b) + c)"},
+        {"a + b - c", "((a + b) - c)"},
+        {"a * b * c", "((a * b) * c)"},
+        {"a * b / c", "((a * b) / c)"},
+        {"a + b / c", "(a + (b / c))"},
+        {"a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"},
+        {"3 + 4; -5 * 5", "(3 + 4)((-5) * 5)"},
+        {"5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"},
+        {"5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"},
+        {"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
+    };
+
+    for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); i++)
+    {
+        Parser parser;
+        Parser_init(&parser, tests[i].input);
+        Program program = Parser_parse_program(&parser);
+        char* message = check_parser_errors(&parser);
+        if (message != NULL)
+        {
+            Program_deinit(&program);
+            Parser_deinit(&parser);
+            return message;
+        }
+        sds actual = Program_string(&program);
+        test_assert(
+            strcmp(actual, tests[i].expected) == 0,
+            do {
+                sdsfree(actual);
+                Program_deinit(&program);
+                Parser_deinit(&parser);
+            } while (false),
+            "Expected: %s, got: %s.", tests[i].expected, actual);
+        sdsfree(actual);
+        Program_deinit(&program);
+        Parser_deinit(&parser);
+    }
+
+    return NULL;
+}
+
 char* parser_tests(size_t* test_count)
 {
     test_run(test_let_statements);
@@ -379,6 +429,7 @@ char* parser_tests(size_t* test_count)
     test_run(test_integer_literal_expression);
     test_run(test_parsing_prefix_expressions);
     test_run(test_parsing_infix_expressions);
+    test_run(test_operator_precedence_parsing);
     return NULL;
 }
 
