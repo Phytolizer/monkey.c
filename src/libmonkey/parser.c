@@ -33,6 +33,7 @@ Expression* Parser_parse_identifier(Parser* p);
 Expression* Parser_parse_integer_literal(Parser* p);
 Expression* Parser_parse_prefix_expression(Parser* p);
 Expression* Parser_parse_infix_expression(Parser* p, Expression* left);
+Expression* Parser_parse_boolean(Parser* p);
 bool Parser_cur_token_is(Parser* p, TokenType type);
 bool Parser_peek_token_is(Parser* p, TokenType type);
 Precedence Parser_peek_precedence(Parser* p);
@@ -57,6 +58,8 @@ void Parser_init(Parser* p, const char* input)
                     sizeof(PrefixParseFn));
     ViewHash_insert(&p->prefix_parse_fns, T_MINUS, sizeof(T_MINUS), (void*)Parser_parse_prefix_expression,
                     sizeof(PrefixParseFn));
+    ViewHash_insert(&p->prefix_parse_fns, T_TRUE, sizeof(T_TRUE), (void*)Parser_parse_boolean, sizeof(InfixParseFn));
+    ViewHash_insert(&p->prefix_parse_fns, T_FALSE, sizeof(T_FALSE), (void*)Parser_parse_boolean, sizeof(InfixParseFn));
     ViewHash_insert(&p->infix_parse_fns, T_PLUS, sizeof(T_PLUS), (void*)Parser_parse_infix_expression,
                     sizeof(InfixParseFn));
     ViewHash_insert(&p->infix_parse_fns, T_MINUS, sizeof(T_MINUS), (void*)Parser_parse_infix_expression,
@@ -290,6 +293,18 @@ Expression* Parser_parse_infix_expression(Parser* p, Expression* left)
     expr->left = left;
     expr->right = right;
     return (Expression*)expr;
+}
+
+Expression* Parser_parse_boolean(Parser* p)
+{
+    Token tok = Token_dup(&p->cur_token);
+    bool value = Parser_cur_token_is(p, T_TRUE);
+
+    Boolean* b = malloc(sizeof(Boolean));
+    Boolean_init(b);
+    b->token = tok;
+    b->value = value;
+    return (Expression*)b;
 }
 
 bool Parser_cur_token_is(Parser* p, TokenType type)
