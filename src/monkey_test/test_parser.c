@@ -1,9 +1,14 @@
 #include "test_parser.h"
+#include "monkey/ast.h"
 #include "monkey/parser.h"
 #include "test.h"
+#include <assert.h>
 
 char* check_let_statement(Statement* s, const char* name);
 char* check_integer_literal(Expression* e, int64_t value);
+char* check_identifier(Expression* e, const char* value);
+char* check_literal_expression(Expression* e, TestValue value);
+char* check_infix_expression(Expression* e, TestValue left, const char* operator, TestValue right);
 char* check_parser_errors(Parser* p);
 
 char* test_let_statements(void)
@@ -135,31 +140,7 @@ char* test_identifier_expression(void)
         } while (false),
         "stmt->type should be EXPRESSION, not %s.", Statement_type_name(stmt->type));
     Expression* expr = ((ExpressionStatement*)stmt)->expression;
-    test_assert(
-        expr->type == EXPRESSION_TYPE_IDENTIFIER,
-        do {
-            Program_deinit(&program);
-            Parser_deinit(&p);
-        } while (false),
-        "expr->type should be IDENTIFIER, not %s.", Expression_type_name(expr->type));
-    Identifier* ident = (Identifier*)expr;
-    test_assert(
-        strcmp(ident->value, "foobar") == 0,
-        do {
-            Program_deinit(&program);
-            Parser_deinit(&p);
-        } while (false),
-        "ident->name should be 'foobar', not '%s'.", ident->value);
-    sds value = Identifier_token_literal(ident);
-    test_assert(
-        strcmp(value, "foobar") == 0,
-        do {
-            sdsfree(value);
-            Program_deinit(&program);
-            Parser_deinit(&p);
-        } while (false),
-        "Identifier_token_literal(ident) not 'foobar', got '%s'", value);
-    sdsfree(value);
+    check_identifier(expr, "foobar");
 
     Program_deinit(&program);
     Parser_deinit(&p);
@@ -300,11 +281,12 @@ char* test_parsing_infix_expressions(void)
     struct
     {
         const char* input;
+        int64_t left;
         const char* operator;
-        int64_t value;
+        int64_t right;
     } infix_tests[] = {
-        {"5 + 5;", "+", 5}, {"5 - 5;", "-", 5}, {"5 * 5;", "*", 5},   {"5 / 5;", "/", 5},
-        {"5 > 5;", ">", 5}, {"5 < 5;", "<", 5}, {"5 == 5;", "==", 5}, {"5 != 5;", "!=", 5},
+        {"5 + 5;", 5, "+", 5}, {"5 - 5;", 5, "-", 5}, {"5 * 5;", 5, "*", 5},   {"5 / 5;", 5, "/", 5},
+        {"5 > 5;", 5, ">", 5}, {"5 < 5;", 5, "<", 5}, {"5 == 5;", 5, "==", 5}, {"5 != 5;", 5, "!=", 5},
     };
 
     for (size_t i = 0; i < sizeof(infix_tests) / sizeof(infix_tests[0]); i++)
@@ -335,29 +317,8 @@ char* test_parsing_infix_expressions(void)
             } while (false),
             "stmt->type should be EXPRESSION, not %s.", Statement_type_name(stmt->type));
         Expression* expr = ((ExpressionStatement*)stmt)->expression;
-        test_assert(
-            expr->type == EXPRESSION_TYPE_INFIX,
-            do {
-                Program_deinit(&program);
-                Parser_deinit(&parser);
-            } while (false),
-            "expr->type should be INFIX, not %s.", Expression_type_name(expr->type));
-        InfixExpression* infix = (InfixExpression*)expr;
-        message = check_integer_literal(infix->left, infix_tests[i].value);
-        if (message != NULL)
-        {
-            Program_deinit(&program);
-            Parser_deinit(&parser);
-            return message;
-        }
-        test_assert(
-            strcmp(infix->operator, infix_tests[i].operator) == 0,
-            do {
-                Program_deinit(&program);
-                Parser_deinit(&parser);
-            } while (false),
-            "infix->operator should be '%s', not '%s'.", infix_tests[i].operator, infix->operator);
-        message = check_integer_literal(infix->right, infix_tests[i].value);
+        message = check_infix_expression(expr, TEST_VALUE_NEW_INT64(infix_tests[i].left), infix_tests[i].operator,
+                                         TEST_VALUE_NEW_INT64(infix_tests[i].right));
         if (message != NULL)
         {
             Program_deinit(&program);
@@ -465,6 +426,49 @@ char* check_integer_literal(Expression* e, int64_t value)
                 "IntegerLiteral_token_literal(integer) not '%s', got '%s'", strval, toklit);
     sdsfree(toklit);
     return NULL;
+}
+
+char* check_identifier(Expression* e, const char* value)
+{
+    test_assert(e->type == EXPRESSION_TYPE_IDENTIFIER, (void)0, "e->type should be IDENTIFIER, not %s.",
+                Expression_type_name(e->type));
+    Identifier* ident = (Identifier*)e;
+    test_assert(strcmp(ident->value, value) == 0, (void)0, "ident->value not %s. got=%s", value, ident->value);
+    sds toklit = Identifier_token_literal(ident);
+    test_assert(strcmp(toklit, value) == 0, sdsfree(toklit), "Identifier_token_literal(ident) not %s. got=%s", value,
+                toklit);
+    sdsfree(toklit);
+    return NULL;
+}
+
+char* check_literal_expression(Expression* e, TestValue value)
+{
+    switch (value.kind)
+    {
+    case TEST_VALUE_INT:
+        return check_integer_literal(e, value.u.i);
+    case TEST_VALUE_INT64:
+        return check_integer_literal(e, value.u.i64);
+    case TEST_VALUE_STR:
+        return check_identifier(e, value.u.s);
+    }
+
+    assert(false && "corrupt test value");
+}
+
+char* check_infix_expression(Expression* e, TestValue left, const char* operator, TestValue right)
+{
+    test_assert(e->type == EXPRESSION_TYPE_INFIX, (void)0, "e->type is not INFIX. got=%s",
+                Expression_type_name(e->type));
+    InfixExpression* infix = (InfixExpression*)e;
+    char* message = check_literal_expression(infix->left, left);
+    if (message != NULL)
+    {
+        return message;
+    }
+    test_assert(strcmp(infix->operator, operator) == 0, (void)0, "infix->operator is not '%s'. got='%s'", operator,
+                infix->operator);
+    return check_literal_expression(infix->right, right);
 }
 
 char* check_parser_errors(Parser* p)

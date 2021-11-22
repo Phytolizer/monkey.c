@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -46,3 +47,24 @@
             return message;                                                                                            \
         }                                                                                                              \
     } while (false)
+
+typedef enum
+{
+    TEST_VALUE_INT,
+    TEST_VALUE_INT64,
+    TEST_VALUE_STR,
+} TestValueKind;
+
+typedef struct
+{
+    TestValueKind kind;
+    union {
+        int i;
+        int64_t i64;
+        const char* s;
+    } u;
+} TestValue;
+
+#define TEST_VALUE_NEW_INT(v) ((TestValue){.kind = TEST_VALUE_INT, .u = {.i = v}})
+#define TEST_VALUE_NEW_INT64(v) ((TestValue){.kind = TEST_VALUE_INT64, .u = {.i64 = v}})
+#define TEST_VALUE_NEW_STR(v) ((TestValue){.kind = TEST_VALUE_STR, .u = {.s = v}})
