@@ -53,6 +53,7 @@ typedef enum
     TEST_VALUE_INT,
     TEST_VALUE_INT64,
     TEST_VALUE_STR,
+    TEST_VALUE_BOOL,
 } TestValueKind;
 
 typedef struct
@@ -62,9 +63,11 @@ typedef struct
         int i;
         int64_t i64;
         const char* s;
+        bool b;
     } u;
 } TestValue;
 
 #define TEST_VALUE_NEW_INT(v) ((TestValue){.kind = TEST_VALUE_INT, .u = {.i = v}})
 #define TEST_VALUE_NEW_INT64(v) ((TestValue){.kind = TEST_VALUE_INT64, .u = {.i64 = v}})
 #define TEST_VALUE_NEW_STR(v) ((TestValue){.kind = TEST_VALUE_STR, .u = {.s = v}})
+#define TEST_VALUE_NEW_BOOL(v) ((TestValue){.kind = TEST_VALUE_BOOL, .u = {.b = v}})

@@ -3,6 +3,7 @@
 #include "monkey/token.h"
 #include "sds.h"
 #include "vec.h"
+#include <stdbool.h>
 
 // enable introspection via use of X-macros
 #define NODE_TYPES_                                                                                                    \
@@ -56,7 +57,8 @@ typedef vec_t(Statement*) StatementVec;
     X(IDENTIFIER)                                                                                                      \
     X(INTEGER)                                                                                                         \
     X(PREFIX)                                                                                                          \
-    X(INFIX)
+    X(INFIX)                                                                                                           \
+    X(BOOLEAN)
 
 typedef enum
 {
@@ -175,3 +177,15 @@ void InfixExpression_init(InfixExpression* i);
 void InfixExpression_deinit(InfixExpression* i);
 sds InfixExpression_token_literal(InfixExpression* i);
 sds InfixExpression_string(InfixExpression* i);
+
+typedef struct
+{
+    Expression base;
+    Token token;
+    bool value;
+} Boolean;
+
+void Boolean_init(Boolean* b);
+void Boolean_deinit(Boolean* b);
+sds Boolean_token_literal(Boolean* b);
+sds Boolean_string(Boolean* b);

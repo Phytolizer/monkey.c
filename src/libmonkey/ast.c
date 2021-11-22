@@ -49,6 +49,8 @@ sds Expression_token_literal(Expression* e)
         return sdsdup(((PrefixExpression*)e)->token.literal);
     case EXPRESSION_TYPE_INFIX:
         return sdsdup(((InfixExpression*)e)->token.literal);
+    case EXPRESSION_TYPE_BOOLEAN:
+        return sdsdup(((Boolean*)e)->token.literal);
     }
 
     assert(false && "corrupt expression type");
@@ -143,6 +145,9 @@ void Expression_deinit(Expression* e)
         return;
     case EXPRESSION_TYPE_INFIX:
         InfixExpression_deinit((InfixExpression*)e);
+        return;
+    case EXPRESSION_TYPE_BOOLEAN:
+        Boolean_deinit((Boolean*)e);
         return;
     }
 
@@ -285,6 +290,8 @@ sds Expression_string(Expression* e)
         return PrefixExpression_string((PrefixExpression*)e);
     case EXPRESSION_TYPE_INFIX:
         return InfixExpression_string((InfixExpression*)e);
+    case EXPRESSION_TYPE_BOOLEAN:
+        return Boolean_string((Boolean*)e);
     }
 
     assert(false && "corrupt expression type");
@@ -434,4 +441,25 @@ sds InfixExpression_string(InfixExpression* i)
     sdsfree(right);
     s = sdscat(s, ")");
     return s;
+}
+
+void Boolean_init(Boolean* b)
+{
+    Expression_init(&b->base);
+    b->base.type = EXPRESSION_TYPE_BOOLEAN;
+}
+
+void Boolean_deinit(Boolean* b)
+{
+    Token_deinit(&b->token);
+}
+
+sds Boolean_token_literal(Boolean* b)
+{
+    return sdsdup(b->token.literal);
+}
+
+sds Boolean_string(Boolean* b)
+{
+    return sdsdup(b->token.literal);
 }
