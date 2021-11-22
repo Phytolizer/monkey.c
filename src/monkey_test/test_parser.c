@@ -214,10 +214,12 @@ char* test_parsing_prefix_expressions(void)
     {
         const char* input;
         const char* operator;
-        int64_t value;
+        TestValue value;
     } prefix_tests[] = {
-        {"!5;", "!", 5},
-        {"-15;", "-", 15},
+        {"!5;", "!", TEST_VALUE_NEW_INT64(5)},
+        {"-15;", "-", TEST_VALUE_NEW_INT64(15)},
+        {"!true;", "!", TEST_VALUE_NEW_BOOL(true)},
+        {"!false;", "!", TEST_VALUE_NEW_BOOL(false)},
     };
 
     for (size_t i = 0; i < sizeof(prefix_tests) / sizeof(prefix_tests[0]); i++)
@@ -263,7 +265,7 @@ char* test_parsing_prefix_expressions(void)
                 Parser_deinit(&parser);
             } while (false),
             "prefix->operator should be '%s', not '%s'.", prefix_tests[i].operator, prefix->operator);
-        message = check_integer_literal(prefix->right, prefix_tests[i].value);
+        message = check_literal_expression(prefix->right, prefix_tests[i].value);
         if (message != NULL)
         {
             Program_deinit(&program);
@@ -282,12 +284,21 @@ char* test_parsing_infix_expressions(void)
     struct
     {
         const char* input;
-        int64_t left;
+        TestValue left;
         const char* operator;
-        int64_t right;
+        TestValue right;
     } infix_tests[] = {
-        {"5 + 5;", 5, "+", 5}, {"5 - 5;", 5, "-", 5}, {"5 * 5;", 5, "*", 5},   {"5 / 5;", 5, "/", 5},
-        {"5 > 5;", 5, ">", 5}, {"5 < 5;", 5, "<", 5}, {"5 == 5;", 5, "==", 5}, {"5 != 5;", 5, "!=", 5},
+        {"5 + 5;", TEST_VALUE_NEW_INT64(5), "+", TEST_VALUE_NEW_INT64(5)},
+        {"5 - 5;", TEST_VALUE_NEW_INT64(5), "-", TEST_VALUE_NEW_INT64(5)},
+        {"5 * 5;", TEST_VALUE_NEW_INT64(5), "*", TEST_VALUE_NEW_INT64(5)},
+        {"5 / 5;", TEST_VALUE_NEW_INT64(5), "/", TEST_VALUE_NEW_INT64(5)},
+        {"5 > 5;", TEST_VALUE_NEW_INT64(5), ">", TEST_VALUE_NEW_INT64(5)},
+        {"5 < 5;", TEST_VALUE_NEW_INT64(5), "<", TEST_VALUE_NEW_INT64(5)},
+        {"5 == 5;", TEST_VALUE_NEW_INT64(5), "==", TEST_VALUE_NEW_INT64(5)},
+        {"5 != 5;", TEST_VALUE_NEW_INT64(5), "!=", TEST_VALUE_NEW_INT64(5)},
+        {"true == true", TEST_VALUE_NEW_BOOL(true), "==", TEST_VALUE_NEW_BOOL(true)},
+        {"true != false", TEST_VALUE_NEW_BOOL(true), "!=", TEST_VALUE_NEW_BOOL(false)},
+        {"false == false", TEST_VALUE_NEW_BOOL(false), "==", TEST_VALUE_NEW_BOOL(false)},
     };
 
     for (size_t i = 0; i < sizeof(infix_tests) / sizeof(infix_tests[0]); i++)
@@ -318,8 +329,7 @@ char* test_parsing_infix_expressions(void)
             } while (false),
             "stmt->type should be EXPRESSION, not %s.", Statement_type_name(stmt->type));
         Expression* expr = ((ExpressionStatement*)stmt)->expression;
-        message = check_infix_expression(expr, TEST_VALUE_NEW_INT64(infix_tests[i].left), infix_tests[i].operator,
-                                         TEST_VALUE_NEW_INT64(infix_tests[i].right));
+        message = check_infix_expression(expr, infix_tests[i].left, infix_tests[i].operator, infix_tests[i].right);
         if (message != NULL)
         {
             Program_deinit(&program);
@@ -352,6 +362,10 @@ char* test_operator_precedence_parsing(void)
         {"5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"},
         {"5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"},
         {"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
+        {"true", "true"},
+        {"false", "false"},
+        {"3 > 5 == false", "((3 > 5) == false)"},
+        {"3 < 5 == true", "((3 < 5) == true)"},
     };
 
     for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); i++)
