@@ -384,8 +384,11 @@ void PrefixExpression_deinit(PrefixExpression* p)
 {
     Token_deinit(&p->token);
     sdsfree(p->operator);
-    Expression_deinit(p->right);
-    free(p->right);
+    if (p->right)
+    {
+        Expression_deinit(p->right);
+        free(p->right);
+    }
 }
 
 sds PrefixExpression_token_literal(PrefixExpression* p)
@@ -415,10 +418,16 @@ void InfixExpression_deinit(InfixExpression* i)
 {
     Token_deinit(&i->token);
     sdsfree(i->operator);
-    Expression_deinit(i->left);
-    free(i->left);
-    Expression_deinit(i->right);
-    free(i->right);
+    if (i->left)
+    {
+        Expression_deinit(i->left);
+        free(i->left);
+    }
+    if (i->right)
+    {
+        Expression_deinit(i->right);
+        free(i->right);
+    }
 }
 
 sds InfixExpression_token_literal(InfixExpression* i)
