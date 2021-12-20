@@ -8,6 +8,7 @@
 .tup
 /libhash.a
 /libmonkey.a
+/libnonstd.a
 /libsds.a
 /libvec.a
 /monkey_repl.exe

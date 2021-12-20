@@ -1,10 +1,11 @@
 include_rules
 
 : src/libmonkey/*.o |> !ar |> libmonkey.a {libs}
+: src/libnonstd/*.o |> !ar |> libnonstd.a {libs}
 : src/sds/*.o |> !ar |> libsds.a {libs}
 : src/vec/src/*.o |> !ar |> libvec.a {libs}
 : src/libhash/*.o |> !ar |> libhash.a {libs}
 
-LIBS = libmonkey.a libsds.a libvec.a libhash.a
+LIBS = libmonkey.a libsds.a libvec.a libhash.a libnonstd.a
 : src/monkey_repl/*.o | {libs} |> !ld |> monkey_repl.exe
 : src/monkey_test/*.o | {libs} |> !ld |> monkey_test.exe
