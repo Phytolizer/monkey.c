@@ -28,6 +28,7 @@ Statement* Parser_parse_statement(Parser* p);
 LetStatement* Parser_parse_let_statement(Parser* p);
 ReturnStatement* Parser_parse_return_statement(Parser* p);
 ExpressionStatement* Parser_parse_expression_statement(Parser* p);
+BlockStatement* Parser_parse_block_statement(Parser* p);
 Expression* Parser_parse_expression(Parser* p, Precedence precedence);
 Expression* Parser_parse_identifier(Parser* p);
 Expression* Parser_parse_integer_literal(Parser* p);
@@ -35,6 +36,7 @@ Expression* Parser_parse_prefix_expression(Parser* p);
 Expression* Parser_parse_infix_expression(Parser* p, Expression* left);
 Expression* Parser_parse_boolean(Parser* p);
 Expression* Parser_parse_grouped_expression(Parser* p);
+Expression* Parser_parse_if_expression(Parser* p);
 bool Parser_cur_token_is(Parser* p, TokenType type);
 bool Parser_peek_token_is(Parser* p, TokenType type);
 Precedence Parser_peek_precedence(Parser* p);
@@ -59,6 +61,7 @@ void Parser_init(Parser* p, const char* input)
                     sizeof(PrefixParseFn));
     ViewHash_insert(&p->prefix_parse_fns, T_MINUS, sizeof(T_MINUS), (void*)Parser_parse_prefix_expression,
                     sizeof(PrefixParseFn));
+    ViewHash_insert(&p->prefix_parse_fns, T_IF, sizeof(T_IF), (void*)Parser_parse_if_expression, sizeof(PrefixParseFn));
     ViewHash_insert(&p->prefix_parse_fns, T_TRUE, sizeof(T_TRUE), (void*)Parser_parse_boolean, sizeof(InfixParseFn));
     ViewHash_insert(&p->prefix_parse_fns, T_FALSE, sizeof(T_FALSE), (void*)Parser_parse_boolean, sizeof(InfixParseFn));
     ViewHash_insert(&p->prefix_parse_fns, T_LPAREN, sizeof(T_LPAREN), (void*)Parser_parse_grouped_expression,
@@ -218,6 +221,30 @@ ExpressionStatement* Parser_parse_expression_statement(Parser* p)
     return stmt;
 }
 
+BlockStatement* Parser_parse_block_statement(Parser* p)
+{
+    Token tok = Token_dup(&p->cur_token);
+    StatementVec statements;
+    vec_init(&statements);
+    Parser_next_token(p);
+
+    while (!Parser_cur_token_is(p, T_RBRACE) && !Parser_cur_token_is(p, T_EOF))
+    {
+        Statement* stmt = Parser_parse_statement(p);
+        if (stmt != NULL)
+        {
+            vec_push(&statements, stmt);
+        }
+        Parser_next_token(p);
+    }
+
+    BlockStatement* result = malloc(sizeof(BlockStatement));
+    BlockStatement_init(result);
+    result->token = tok;
+    result->statements = statements;
+    return result;
+}
+
 Expression* Parser_parse_expression(Parser* p, Precedence precedence)
 {
     PrefixParseFn* prefix =
@@ -322,6 +349,56 @@ Expression* Parser_parse_grouped_expression(Parser* p)
     }
 
     return exp;
+}
+
+Expression* Parser_parse_if_expression(Parser* p)
+{
+    Token tok = Token_dup(&p->cur_token);
+
+    if (!Parser_expect_peek(p, T_LPAREN))
+    {
+        Token_deinit(&tok);
+        return NULL;
+    }
+
+    Parser_next_token(p);
+    Expression* condition = Parser_parse_expression(p, PREC_LOWEST);
+
+    if (!Parser_expect_peek(p, T_RPAREN) || !Parser_expect_peek(p, T_LBRACE))
+    {
+        Expression_deinit(condition);
+        free(condition);
+        Token_deinit(&tok);
+        return NULL;
+    }
+
+    BlockStatement* consequence = Parser_parse_block_statement(p);
+    BlockStatement* alternative = NULL;
+
+    if (Parser_peek_token_is(p, T_ELSE))
+    {
+        Parser_next_token(p);
+        if (!Parser_expect_peek(p, T_LBRACE))
+        {
+            BlockStatement_deinit(consequence);
+            free(consequence);
+            Expression_deinit(condition);
+            free(condition);
+            Token_deinit(&tok);
+            return NULL;
+        }
+
+        alternative = Parser_parse_block_statement(p);
+    }
+
+    IfExpression* result = malloc(sizeof(IfExpression));
+    IfExpression_init(result);
+    result->token = tok;
+    result->condition = condition;
+    result->consequence = *consequence;
+    free(consequence);
+    result->alternative = alternative;
+    return (Expression*)result;
 }
 
 bool Parser_cur_token_is(Parser* p, TokenType type)
