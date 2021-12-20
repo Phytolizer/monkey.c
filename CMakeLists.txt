@@ -30,7 +30,7 @@ push_directory_library(
 push_directory_library(
     TARGET_NAME "libnonstd"
     OUTPUT_NAME "nonstd"
-    SOURCE_FILES "strdup.c"
+    SOURCE_FILES "strdup.c" "strpbrk.c" "strspn.c" "strtok.c"
     INCLUDED_DIRECTORIES "inc"
 )
 push_directory_library(

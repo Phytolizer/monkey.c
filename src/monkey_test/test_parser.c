@@ -2,9 +2,9 @@
 #include "monkey/ast.h"
 #include "monkey/parser.h"
 #include "nonstd/strdup.h"
+#include "nonstd/strtok.h"
 #include "test.h"
 #include <assert.h>
-#include <string.h>
 
 char* check_let_statement(Statement* s, const char* name, TestValue value);
 char* check_integer_literal(Expression* e, int64_t value);
@@ -731,8 +731,8 @@ char* test_function_parameter_parsing(void)
         char* expectedParams = nonstd_strdup(tests[i].expectedParams);
         char* saveptr = NULL;
         int i = 0;
-        for (char* param = strtok_r(expectedParams, ",", &saveptr); param != NULL;
-             param = strtok_r(NULL, ",", &saveptr))
+        for (char* param = nonstd_strtok_r(expectedParams, ",", &saveptr); param != NULL;
+             param = nonstd_strtok_r(NULL, ",", &saveptr))
         {
             test_assert(
                 i < function->parameters.length,
