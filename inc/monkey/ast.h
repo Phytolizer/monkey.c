@@ -60,7 +60,8 @@ typedef vec_t(Statement*) StatementVec;
     X(PREFIX)                                                                                                          \
     X(INFIX)                                                                                                           \
     X(BOOLEAN)                                                                                                         \
-    X(IF)
+    X(IF)                                                                                                              \
+    X(FUNCTION)
 
 typedef enum
 {
@@ -98,6 +99,8 @@ typedef struct
     Token token;
     sds value;
 } Identifier;
+
+typedef vec_t(Identifier*) IdentifierVec;
 
 void Identifier_init(Identifier* i);
 void Identifier_deinit(Identifier* i);
@@ -217,3 +220,16 @@ void IfExpression_init(IfExpression* i);
 void IfExpression_deinit(IfExpression* i);
 sds IfExpression_token_literal(IfExpression* i);
 sds IfExpression_string(IfExpression* i);
+
+typedef struct
+{
+    Expression base;
+    Token token;
+    IdentifierVec parameters;
+    BlockStatement body;
+} FunctionLiteral;
+
+void FunctionLiteral_init(FunctionLiteral* f);
+void FunctionLiteral_deinit(FunctionLiteral* f);
+sds FunctionLiteral_token_literal(FunctionLiteral* f);
+sds FunctionLiteral_string(FunctionLiteral* f);

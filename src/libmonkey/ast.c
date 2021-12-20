@@ -56,6 +56,8 @@ sds Expression_token_literal(Expression* e)
         return sdsdup(((Boolean*)e)->token.literal);
     case EXPRESSION_TYPE_IF:
         return sdsdup(((IfExpression*)e)->token.literal);
+    case EXPRESSION_TYPE_FUNCTION:
+        return sdsdup(((FunctionLiteral*)e)->token.literal);
     }
 
     assert(false && "corrupt expression type");
@@ -159,6 +161,9 @@ void Expression_deinit(Expression* e)
         return;
     case EXPRESSION_TYPE_IF:
         IfExpression_deinit((IfExpression*)e);
+        return;
+    case EXPRESSION_TYPE_FUNCTION:
+        FunctionLiteral_deinit((FunctionLiteral*)e);
         return;
     }
 
@@ -307,6 +312,8 @@ sds Expression_string(Expression* e)
         return Boolean_string((Boolean*)e);
     case EXPRESSION_TYPE_IF:
         return IfExpression_string((IfExpression*)e);
+    case EXPRESSION_TYPE_FUNCTION:
+        return FunctionLiteral_string((FunctionLiteral*)e);
     }
 
     assert(false && "corrupt expression type");
@@ -563,5 +570,50 @@ sds IfExpression_string(IfExpression* i)
         s = sdscatsds(s, alternative);
         sdsfree(alternative);
     }
+    return s;
+}
+
+void FunctionLiteral_init(FunctionLiteral* f)
+{
+    Expression_init(&f->base);
+    f->base.type = EXPRESSION_TYPE_FUNCTION;
+}
+
+void FunctionLiteral_deinit(FunctionLiteral* f)
+{
+    Token_deinit(&f->token);
+    for (int i = 0; i < f->parameters.length; ++i)
+    {
+        Identifier_deinit(f->parameters.data[i]);
+        free(f->parameters.data[i]);
+    }
+    vec_deinit(&f->parameters);
+    BlockStatement_deinit(&f->body);
+}
+
+sds FunctionLiteral_token_literal(FunctionLiteral* f)
+{
+    return sdsdup(f->token.literal);
+}
+
+sds FunctionLiteral_string(FunctionLiteral* f)
+{
+    sds s = sdsempty();
+    s = sdscatsds(s, f->token.literal);
+    s = sdscat(s, "(");
+    for (int i = 0; i < f->parameters.length; ++i)
+    {
+        sds param = Identifier_token_literal(f->parameters.data[i]);
+        s = sdscatsds(s, param);
+        sdsfree(param);
+        if (i < f->parameters.length - 1)
+        {
+            s = sdscat(s, ", ");
+        }
+    }
+    s = sdscat(s, ") ");
+    sds body = BlockStatement_string(&f->body);
+    s = sdscatsds(s, body);
+    sdsfree(body);
     return s;
 }
