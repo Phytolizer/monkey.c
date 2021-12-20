@@ -31,11 +31,13 @@ ReturnStatement* Parser_parse_return_statement(Parser* p);
 ExpressionStatement* Parser_parse_expression_statement(Parser* p);
 BlockStatement* Parser_parse_block_statement(Parser* p);
 IdentifierVec* Parser_parse_function_parameters(Parser* p);
+ExpressionVec* Parser_parse_call_arguments(Parser* p);
 Expression* Parser_parse_expression(Parser* p, Precedence precedence);
 Expression* Parser_parse_identifier(Parser* p);
 Expression* Parser_parse_integer_literal(Parser* p);
 Expression* Parser_parse_prefix_expression(Parser* p);
 Expression* Parser_parse_infix_expression(Parser* p, Expression* left);
+Expression* Parser_parse_call_expression(Parser* p, Expression* function);
 Expression* Parser_parse_boolean(Parser* p);
 Expression* Parser_parse_grouped_expression(Parser* p);
 Expression* Parser_parse_if_expression(Parser* p);
@@ -87,6 +89,8 @@ void Parser_init(Parser* p, const char* input)
                     sizeof(InfixParseFn));
     ViewHash_insert(&p->infix_parse_fns, T_GT, sizeof(T_GT), (void*)Parser_parse_infix_expression,
                     sizeof(InfixParseFn));
+    ViewHash_insert(&p->infix_parse_fns, T_LPAREN, sizeof(T_LPAREN), (void*)Parser_parse_call_expression,
+                    sizeof(InfixParseFn));
     Hash_init(&p->precedences);
     Hash_insert(&p->precedences, T_EQ, sizeof(T_EQ), &PRECEDENCES[PREC_EQUALS], sizeof(Precedence));
     Hash_insert(&p->precedences, T_NOT_EQ, sizeof(T_NOT_EQ), &PRECEDENCES[PREC_EQUALS], sizeof(Precedence));
@@ -96,6 +100,7 @@ void Parser_init(Parser* p, const char* input)
     Hash_insert(&p->precedences, T_MINUS, sizeof(T_MINUS), &PRECEDENCES[PREC_SUM], sizeof(Precedence));
     Hash_insert(&p->precedences, T_SLASH, sizeof(T_SLASH), &PRECEDENCES[PREC_PRODUCT], sizeof(Precedence));
     Hash_insert(&p->precedences, T_ASTERISK, sizeof(T_ASTERISK), &PRECEDENCES[PREC_PRODUCT], sizeof(Precedence));
+    Hash_insert(&p->precedences, T_LPAREN, sizeof(T_LPAREN), &PRECEDENCES[PREC_CALL], sizeof(Precedence));
     Parser_next_token(p);
     Parser_next_token(p);
 }
@@ -295,6 +300,41 @@ IdentifierVec* Parser_parse_function_parameters(Parser* p)
     return identifiers;
 }
 
+ExpressionVec* Parser_parse_call_arguments(Parser* p)
+{
+    ExpressionVec* args = malloc(sizeof(ExpressionVec));
+    vec_init(args);
+
+    if (Parser_peek_token_is(p, T_RPAREN))
+    {
+        Parser_next_token(p);
+        return args;
+    }
+
+    Parser_next_token(p);
+    vec_push(args, Parser_parse_expression(p, PREC_LOWEST));
+    while (Parser_peek_token_is(p, T_COMMA))
+    {
+        Parser_next_token(p);
+        Parser_next_token(p);
+        vec_push(args, Parser_parse_expression(p, PREC_LOWEST));
+    }
+
+    if (!Parser_expect_peek(p, T_RPAREN))
+    {
+        for (int i = 0; i < args->length; ++i)
+        {
+            Expression_deinit(args->data[i]);
+            free(args->data[i]);
+        }
+        vec_deinit(args);
+        free(args);
+        return NULL;
+    }
+
+    return args;
+}
+
 Expression* Parser_parse_expression(Parser* p, Precedence precedence)
 {
     PrefixParseFn* prefix =
@@ -373,6 +413,25 @@ Expression* Parser_parse_infix_expression(Parser* p, Expression* left)
     expr->left = left;
     expr->right = right;
     return (Expression*)expr;
+}
+
+Expression* Parser_parse_call_expression(Parser* p, Expression* function)
+{
+    CallExpression* result = malloc(sizeof(CallExpression));
+    CallExpression_init(result);
+    result->token = Token_dup(&p->cur_token);
+    result->function = function;
+    ExpressionVec* args = Parser_parse_call_arguments(p);
+    if (args == NULL)
+    {
+        Expression_deinit(result->function);
+        free(result->function);
+        Token_deinit(&result->token);
+        free(result);
+        return NULL;
+    }
+    result->args = *args;
+    return (Expression*)result;
 }
 
 Expression* Parser_parse_boolean(Parser* p)
