@@ -611,6 +611,93 @@ char* test_if_else_expression(void)
     return NULL;
 }
 
+char* test_function_literal_parsing(void)
+{
+    const char* input = "fn(x, y) { x + y; }";
+    Parser p;
+    Parser_init(&p, input);
+    Program program = Parser_parse_program(&p);
+    char* message = check_parser_errors(&p);
+    if (message != NULL)
+    {
+        Program_deinit(&program);
+        Parser_deinit(&p);
+        return message;
+    }
+
+    test_assert(
+        program.statements.length == 1,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "program.statements.length not 1. got=%d", program.statements.length);
+    test_assert(
+        program.statements.data[0]->type == STATEMENT_TYPE_EXPRESSION,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "stmt->type not EXPRESSION. got=%s", Statement_type_name(program.statements.data[0]->type));
+    ExpressionStatement* stmt = (ExpressionStatement*)program.statements.data[0];
+    test_assert(
+        stmt->expression->type == EXPRESSION_TYPE_FUNCTION,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "stmt->expression->type not FUNCTION. got=%s", Expression_type_name(stmt->expression->type));
+    FunctionLiteral* function = (FunctionLiteral*)stmt->expression;
+    test_assert(
+        function->parameters.length == 2,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "function->parameters.length not 2. got=%d", function->parameters.length);
+    message = check_literal_expression((Expression*)function->parameters.data[0], TEST_VALUE_NEW_STR("x"));
+    if (message != NULL)
+    {
+        Program_deinit(&program);
+        Parser_deinit(&p);
+        return message;
+    }
+    message = check_literal_expression((Expression*)function->parameters.data[1], TEST_VALUE_NEW_STR("y"));
+    if (message != NULL)
+    {
+        Program_deinit(&program);
+        Parser_deinit(&p);
+        return message;
+    }
+    test_assert(
+        function->body.statements.length == 1,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "function->body.statements.length not 1. got=%d", function->body.statements.length);
+    test_assert(
+        function->body.statements.data[0]->type == STATEMENT_TYPE_EXPRESSION,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "function->body.statements.data[0]->type != EXPRESSION. got=%s",
+        Statement_type_name(function->body.statements.data[0]->type));
+    ExpressionStatement* bodyStmt = (ExpressionStatement*)function->body.statements.data[0];
+    message = check_infix_expression(bodyStmt->expression, TEST_VALUE_NEW_STR("x"), "+", TEST_VALUE_NEW_STR("y"));
+    if (message != NULL)
+    {
+        Program_deinit(&program);
+        Parser_deinit(&p);
+        return message;
+    }
+
+    Program_deinit(&program);
+    Parser_deinit(&p);
+    return NULL;
+}
+
 char* parser_tests(size_t* test_count)
 {
     test_run(test_let_statements);
@@ -623,6 +710,7 @@ char* parser_tests(size_t* test_count)
     test_run(test_boolean_expression);
     test_run(test_if_expression);
     test_run(test_if_else_expression);
+    test_run(test_function_literal_parsing);
     return NULL;
 }
 
