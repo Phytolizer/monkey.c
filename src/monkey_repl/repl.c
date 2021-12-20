@@ -1,5 +1,5 @@
-#include "monkey/lexer.h"
 #include "repl.h"
+#include "monkey/parser.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,19 +24,31 @@ char* input_line(FILE* in)
     return line;
 }
 
+void print_parser_errors(FILE* out, SdsVec errors)
+{
+    for (int i = 0; i < errors.length; ++i)
+    {
+        fprintf(out, "    %s\n", errors.data[i]);
+    }
+}
+
 void repl(FILE* in, FILE* out)
 {
     char* line;
     while ((line = input_line(in)) != NULL)
     {
-        Lexer lexer;
-        Lexer_init(&lexer, line);
-        for (Token tok = Lexer_next_token(&lexer); strcmp(tok.type, T_EOF) != 0; tok = Lexer_next_token(&lexer))
+        Parser parser;
+        Parser_init(&parser, line);
+        Program program = Parser_parse_program(&parser);
+        if (parser.errors.length > 0)
         {
-            fprintf(out, "{Type:%s Literal:%s}\n", tok.type, tok.literal);
-            Token_deinit(&tok);
+            print_parser_errors(out, parser.errors);
+            continue;
         }
-        Lexer_deinit(&lexer);
+        sds programStr = Program_string(&program);
+        fprintf(out, "%s\n", programStr);
+        sdsfree(programStr);
+        Parser_deinit(&parser);
         free(line);
     }
 }
