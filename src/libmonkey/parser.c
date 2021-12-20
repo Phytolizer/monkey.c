@@ -1,4 +1,5 @@
 #include "monkey/parser.h"
+#include "monkey/ast.h"
 #include <stdbool.h>
 
 #define PRECEDENCES_                                                                                                   \
@@ -29,6 +30,7 @@ LetStatement* Parser_parse_let_statement(Parser* p);
 ReturnStatement* Parser_parse_return_statement(Parser* p);
 ExpressionStatement* Parser_parse_expression_statement(Parser* p);
 BlockStatement* Parser_parse_block_statement(Parser* p);
+IdentifierVec* Parser_parse_function_parameters(Parser* p);
 Expression* Parser_parse_expression(Parser* p, Precedence precedence);
 Expression* Parser_parse_identifier(Parser* p);
 Expression* Parser_parse_integer_literal(Parser* p);
@@ -37,6 +39,7 @@ Expression* Parser_parse_infix_expression(Parser* p, Expression* left);
 Expression* Parser_parse_boolean(Parser* p);
 Expression* Parser_parse_grouped_expression(Parser* p);
 Expression* Parser_parse_if_expression(Parser* p);
+Expression* Parser_parse_function_literal(Parser* p);
 bool Parser_cur_token_is(Parser* p, TokenType type);
 bool Parser_peek_token_is(Parser* p, TokenType type);
 Precedence Parser_peek_precedence(Parser* p);
@@ -62,6 +65,8 @@ void Parser_init(Parser* p, const char* input)
     ViewHash_insert(&p->prefix_parse_fns, T_MINUS, sizeof(T_MINUS), (void*)Parser_parse_prefix_expression,
                     sizeof(PrefixParseFn));
     ViewHash_insert(&p->prefix_parse_fns, T_IF, sizeof(T_IF), (void*)Parser_parse_if_expression, sizeof(PrefixParseFn));
+    ViewHash_insert(&p->prefix_parse_fns, T_FUNCTION, sizeof(T_FUNCTION), (void*)Parser_parse_function_literal,
+                    sizeof(PrefixParseFn));
     ViewHash_insert(&p->prefix_parse_fns, T_TRUE, sizeof(T_TRUE), (void*)Parser_parse_boolean, sizeof(InfixParseFn));
     ViewHash_insert(&p->prefix_parse_fns, T_FALSE, sizeof(T_FALSE), (void*)Parser_parse_boolean, sizeof(InfixParseFn));
     ViewHash_insert(&p->prefix_parse_fns, T_LPAREN, sizeof(T_LPAREN), (void*)Parser_parse_grouped_expression,
@@ -245,6 +250,51 @@ BlockStatement* Parser_parse_block_statement(Parser* p)
     return result;
 }
 
+IdentifierVec* Parser_parse_function_parameters(Parser* p)
+{
+    IdentifierVec* identifiers = malloc(sizeof(IdentifierVec));
+    vec_init(identifiers);
+
+    if (Parser_peek_token_is(p, T_RPAREN))
+    {
+        Parser_next_token(p);
+        return identifiers;
+    }
+
+    Parser_next_token(p);
+
+    Identifier* ident = malloc(sizeof(Identifier));
+    Identifier_init(ident);
+    ident->token = Token_dup(&p->cur_token);
+    ident->value = sdsdup(p->cur_token.literal);
+    vec_push(identifiers, ident);
+
+    while (Parser_peek_token_is(p, T_COMMA))
+    {
+        Parser_next_token(p);
+        Parser_next_token(p);
+        ident = malloc(sizeof(Identifier));
+        Identifier_init(ident);
+        ident->token = Token_dup(&p->cur_token);
+        ident->value = sdsdup(p->cur_token.literal);
+        vec_push(identifiers, ident);
+    }
+
+    if (!Parser_expect_peek(p, T_RPAREN))
+    {
+        for (int i = 0; i < identifiers->length; ++i)
+        {
+            Identifier_deinit(identifiers->data[i]);
+            free(identifiers->data[i]);
+        }
+        vec_deinit(identifiers);
+        free(identifiers);
+        return NULL;
+    }
+
+    return identifiers;
+}
+
 Expression* Parser_parse_expression(Parser* p, Precedence precedence)
 {
     PrefixParseFn* prefix =
@@ -398,6 +448,48 @@ Expression* Parser_parse_if_expression(Parser* p)
     result->consequence = *consequence;
     free(consequence);
     result->alternative = alternative;
+    return (Expression*)result;
+}
+
+Expression* Parser_parse_function_literal(Parser* p)
+{
+    Token tok = Token_dup(&p->cur_token);
+
+    if (!Parser_expect_peek(p, T_LPAREN))
+    {
+        Token_deinit(&tok);
+        return NULL;
+    }
+
+    IdentifierVec* parameters_result = Parser_parse_function_parameters(p);
+    if (parameters_result == NULL)
+    {
+        Token_deinit(&tok);
+        return NULL;
+    }
+    IdentifierVec parameters = *parameters_result;
+    free(parameters_result);
+
+    if (!Parser_expect_peek(p, T_LBRACE))
+    {
+        Token_deinit(&tok);
+        for (int i = 0; i < parameters.length; i++)
+        {
+            Identifier_deinit(parameters.data[i]);
+            free(parameters.data[i]);
+        }
+        vec_deinit(&parameters);
+        return NULL;
+    }
+
+    BlockStatement* body = Parser_parse_block_statement(p);
+
+    FunctionLiteral* result = malloc(sizeof(FunctionLiteral));
+    FunctionLiteral_init(result);
+    result->token = tok;
+    result->parameters = parameters;
+    result->body = *body;
+    free(body);
     return (Expression*)result;
 }
 
