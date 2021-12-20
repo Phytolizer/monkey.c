@@ -753,6 +753,8 @@ char* test_function_parameter_parsing(void)
             ++i;
         }
         free(expectedParams);
+        Program_deinit(&program);
+        Parser_deinit(&p);
     }
 
     return NULL;
@@ -824,6 +826,8 @@ char* test_call_expression_parsing(void)
     CHECK_MESSAGE(check_infix_expression(exp->args.data[2], TEST_VALUE_NEW_INT64(4), "+", TEST_VALUE_NEW_INT64(5)))
 #undef CHECK_MESSAGE
 
+    Program_deinit(&program);
+    Parser_deinit(&p);
     return NULL;
 }
 
