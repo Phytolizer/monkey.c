@@ -448,10 +448,68 @@ char* test_if_expression(void)
     if (message != NULL)
     {
         Program_deinit(&program);
+        Parser_deinit(&p);
         return message;
     }
 
+    test_assert(
+        program.statements.length == 1,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "program.statements.length not 1. got=%d", program.statements.length);
+    Statement* stmt = program.statements.data[0];
+    test_assert(
+        stmt->type == STATEMENT_TYPE_EXPRESSION,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "stmt->type not EXPRESSION. got=%s", Statement_type_name(stmt->type));
+    Expression* expr = ((ExpressionStatement*)stmt)->expression;
+    test_assert(
+        expr->type == EXPRESSION_TYPE_IF,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "expr->type not IF. got=%s", Expression_type_name(expr->type));
+    IfExpression* ifExp = (IfExpression*)expr;
+    test_assert(
+        ifExp->consequence.statements.length == 1,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "ifExp->consequence.statements.length not 1. got=%d", ifExp->consequence.statements.length);
+    Statement* consequence = ifExp->consequence.statements.data[0];
+    test_assert(
+        consequence->type == STATEMENT_TYPE_EXPRESSION,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "consequence->type not EXPRESSION. got=%s", Statement_type_name(consequence->type));
+    Expression* consequenceExp = ((ExpressionStatement*)consequence)->expression;
+    message = check_identifier(consequenceExp, "x");
+    if (message != NULL)
+    {
+        Program_deinit(&program);
+        Parser_deinit(&p);
+        return message;
+    }
+
+    test_assert(
+        ifExp->alternative == NULL,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "ifExp->alternative not NULL. got=%s", BlockStatement_string(ifExp->alternative));
+
     Program_deinit(&program);
+    Parser_deinit(&p);
     return NULL;
 }
 
