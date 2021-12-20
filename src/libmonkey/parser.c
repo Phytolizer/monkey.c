@@ -180,8 +180,9 @@ LetStatement* Parser_parse_let_statement(Parser* p)
         return NULL;
     }
 
-    // TODO: parse expression
-    while (!Parser_cur_token_is(p, T_SEMICOLON))
+    Parser_next_token(p);
+    Expression* value = Parser_parse_expression(p, PREC_LOWEST);
+    if (Parser_peek_token_is(p, T_SEMICOLON))
     {
         Parser_next_token(p);
     }
@@ -190,7 +191,7 @@ LetStatement* Parser_parse_let_statement(Parser* p)
     LetStatement_init(stmt);
     stmt->token = tok;
     stmt->name = name;
-    stmt->value = NULL;
+    stmt->value = value;
     return stmt;
 }
 

@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <string.h>
 
-char* check_let_statement(Statement* s, const char* name);
+char* check_let_statement(Statement* s, const char* name, TestValue value);
 char* check_integer_literal(Expression* e, int64_t value);
 char* check_identifier(Expression* e, const char* value);
 char* check_boolean(Expression* e, bool value);
@@ -16,50 +16,49 @@ char* check_parser_errors(Parser* p);
 
 char* test_let_statements(void)
 {
-    const char* input = "let x = 5;\n"
-                        "let y = 10;\n"
-                        "let foobar = 838383;\n";
-    Parser p;
-    Parser_init(&p, input);
-
-    Program program = Parser_parse_program(&p);
-    char* message = check_parser_errors(&p);
-    if (message != NULL)
-    {
-        Program_deinit(&program);
-        Parser_deinit(&p);
-        return message;
-    }
-    test_assert(
-        program.statements.length == 3,
-        do {
-            Program_deinit(&program);
-            Parser_deinit(&p);
-        } while (false),
-        "Program should have 3 statements.");
     struct
     {
-        const char* expected_identifier;
+        const char* input;
+        const char* expectedIdentifier;
+        TestValue expectedValue;
     } tests[] = {
-        {"x"},
-        {"y"},
-        {"foobar"},
+        {"let x = 5;", "x", TEST_VALUE_NEW_INT64(5)},
+        {"let y = true;", "y", TEST_VALUE_NEW_BOOL(true)},
+        {"let foobar = y;", "foobar", TEST_VALUE_NEW_STR("y")},
     };
-    size_t ntests = sizeof(tests) / sizeof(tests[0]);
 
-    for (size_t i = 0; i < ntests; i++)
+    for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); ++i)
     {
-        char* message = check_let_statement(program.statements.data[i], tests[i].expected_identifier);
+        Parser p;
+        Parser_init(&p, tests[i].input);
+
+        Program program = Parser_parse_program(&p);
+        char* message = check_parser_errors(&p);
         if (message != NULL)
         {
             Program_deinit(&program);
             Parser_deinit(&p);
             return message;
         }
-    }
+        test_assert(
+            program.statements.length == 1,
+            do {
+                Program_deinit(&program);
+                Parser_deinit(&p);
+            } while (false),
+            "Program should have 1 statement.");
 
-    Program_deinit(&program);
-    Parser_deinit(&p);
+        message = check_let_statement(program.statements.data[0], tests[i].expectedIdentifier, tests[i].expectedValue);
+        if (message != NULL)
+        {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+            return message;
+        }
+
+        Program_deinit(&program);
+        Parser_deinit(&p);
+    }
     return NULL;
 }
 
@@ -846,7 +845,7 @@ char* parser_tests(size_t* test_count)
     return NULL;
 }
 
-char* check_let_statement(Statement* s, const char* name)
+char* check_let_statement(Statement* s, const char* name, TestValue value)
 {
     sds toklit = Statement_token_literal(s);
     test_assert(strcmp(toklit, "let") == 0, sdsfree(toklit), "Statement_token_literal(s) should be 'let', not '%s'.",
@@ -862,6 +861,13 @@ char* check_let_statement(Statement* s, const char* name)
     test_assert(strcmp(toklit, name) == 0, sdsfree(toklit),
                 "Identifier_token_literal(&let_stmt->name) should be '%s', not '%s'.", name, toklit);
     sdsfree(toklit);
+
+    char* message = check_literal_expression(let_stmt->value, value);
+    if (message != NULL)
+    {
+        return message;
+    }
+
     return NULL;
 }
 
