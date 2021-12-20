@@ -15,6 +15,6 @@ CFLAGS += -Werror=incompatible-pointer-types
 CFLAGS += -std=c99
 CFLAGS += -g3
 
-!cc = |> ^j^ $(CC) $(CFLAGS) -I &(INCDIR) -c %f -o %o |> %B.o
+!cc = |> ^j^ $(CC) $(CFLAGS) -I&(INCDIR) -c %f -o %o |> %B.o
 !ld = |> $(CC) $(LDFLAGS) %f -o %o $(LIBS) |>
 !ar = |> $(AR) rcs %o %f |>
