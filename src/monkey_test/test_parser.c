@@ -577,8 +577,8 @@ char* check_parser_errors(Parser* p)
         message = sdscatprintf(message, "%s\n", p->errors.data[i]);
     }
     // make compatible with libc free()
-    char* result = NULL;
-    test_asprintf_(&result, "%s", message);
+    char* result = malloc(sdslen(message) + 1);
+    strncpy(result, message, sdslen(message));
     sdsfree(message);
     return result;
 }
