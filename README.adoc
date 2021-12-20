@@ -21,3 +21,5 @@ Alternatively, install https://github.com/gittup/tup[tup] and run:
 ----
 tup
 ----
+
+As a third option, monkey.c supports CMake.
