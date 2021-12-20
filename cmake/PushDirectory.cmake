@@ -1,6 +1,7 @@
 macro(_push_directory_preprocess_arguments)
     cmake_parse_arguments(
-        PARSE_ARGV 0 "PUSH_DIRECTORY" "" "TARGET_NAME;OUTPUT_NAME"
+        PARSE_ARGV 0 "PUSH_DIRECTORY" "SOURCE_DIRECTORY_COMES_LAST"
+        "TARGET_NAME;OUTPUT_NAME;SOURCE_DIRECTORY"
         "SOURCE_FILES;INCLUDED_DIRECTORIES;LINKED_LIBRARIES"
     )
     if(NOT PUSH_DIRECTORY_TARGET_NAME)
@@ -15,9 +16,22 @@ macro(_push_directory_preprocess_arguments)
                 "${PUSH_DIRECTORY_FUNCTION_NAME} requires a SOURCE_FILES argument"
         )
     endif()
-    list(TRANSFORM PUSH_DIRECTORY_SOURCE_FILES
-         PREPEND "src/${PUSH_DIRECTORY_TARGET_NAME}/"
-    )
+    if(NOT PUSH_DIRECTORY_SOURCE_DIRECTORY)
+        set(PUSH_DIRECTORY_SOURCE_DIRECTORY "src")
+    endif()
+    if(PUSH_DIRECTORY_SOURCE_DIRECTORY_COMES_LAST)
+        list(
+            TRANSFORM PUSH_DIRECTORY_SOURCE_FILES
+            PREPEND
+                "${PUSH_DIRECTORY_TARGET_NAME}/${PUSH_DIRECTORY_SOURCE_DIRECTORY}/"
+        )
+    else()
+        list(
+            TRANSFORM PUSH_DIRECTORY_SOURCE_FILES
+            PREPEND
+                "${PUSH_DIRECTORY_SOURCE_DIRECTORY}/${PUSH_DIRECTORY_TARGET_NAME}/"
+        )
+    endif()
 endmacro()
 
 macro(_push_directory_apply_to_target TARGET_NAME)
