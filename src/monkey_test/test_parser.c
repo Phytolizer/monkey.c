@@ -438,6 +438,23 @@ char* test_boolean_expression(void)
     return NULL;
 }
 
+char* test_if_expression(void)
+{
+    const char* input = "if (x < y) { x }";
+    Parser p;
+    Parser_init(&p, input);
+    Program program = Parser_parse_program(&p);
+    char* message = check_parser_errors(&p);
+    if (message != NULL)
+    {
+        Program_deinit(&program);
+        return message;
+    }
+
+    Program_deinit(&program);
+    return NULL;
+}
+
 char* parser_tests(size_t* test_count)
 {
     test_run(test_let_statements);
@@ -448,6 +465,7 @@ char* parser_tests(size_t* test_count)
     test_run(test_parsing_infix_expressions);
     test_run(test_operator_precedence_parsing);
     test_run(test_boolean_expression);
+    test_run(test_if_expression);
     return NULL;
 }
 
@@ -558,5 +576,9 @@ char* check_parser_errors(Parser* p)
     {
         message = sdscatprintf(message, "%s\n", p->errors.data[i]);
     }
-    return message;
+    // make compatible with libc free()
+    char* result = NULL;
+    test_asprintf_(&result, "%s", message);
+    sdsfree(message);
+    return result;
 }

@@ -30,7 +30,8 @@ sds Node_string(Node* node);
 #define STATEMENT_TYPES_                                                                                               \
     X(LET)                                                                                                             \
     X(RETURN)                                                                                                          \
-    X(EXPRESSION)
+    X(EXPRESSION)                                                                                                      \
+    X(BLOCK)
 
 typedef enum
 {
@@ -58,7 +59,8 @@ typedef vec_t(Statement*) StatementVec;
     X(INTEGER)                                                                                                         \
     X(PREFIX)                                                                                                          \
     X(INFIX)                                                                                                           \
-    X(BOOLEAN)
+    X(BOOLEAN)                                                                                                         \
+    X(IF)
 
 typedef enum
 {
@@ -189,3 +191,29 @@ void Boolean_init(Boolean* b);
 void Boolean_deinit(Boolean* b);
 sds Boolean_token_literal(Boolean* b);
 sds Boolean_string(Boolean* b);
+
+typedef struct
+{
+    Statement base;
+    Token token;
+    StatementVec statements;
+} BlockStatement;
+
+void BlockStatement_init(BlockStatement* b);
+void BlockStatement_deinit(BlockStatement* b);
+sds BlockStatement_token_literal(BlockStatement* b);
+sds BlockStatement_string(BlockStatement* b);
+
+typedef struct
+{
+    Expression base;
+    Token token;
+    Expression* condition;
+    BlockStatement consequence;
+    BlockStatement* alternative;
+} IfExpression;
+
+void IfExpression_init(IfExpression* i);
+void IfExpression_deinit(IfExpression* i);
+sds IfExpression_token_literal(IfExpression* i);
+sds IfExpression_string(IfExpression* i);

@@ -1,4 +1,5 @@
 #include "monkey/ast.h"
+#include "sds.h"
 #include <assert.h>
 #include <stdbool.h>
 
@@ -32,6 +33,8 @@ sds Statement_token_literal(Statement* s)
         return ReturnStatement_token_literal((ReturnStatement*)s);
     case STATEMENT_TYPE_EXPRESSION:
         return ExpressionStatement_token_literal((ExpressionStatement*)s);
+    case STATEMENT_TYPE_BLOCK:
+        return BlockStatement_token_literal((BlockStatement*)s);
     }
 
     assert(false && "corrupt statement type");
@@ -51,6 +54,8 @@ sds Expression_token_literal(Expression* e)
         return sdsdup(((InfixExpression*)e)->token.literal);
     case EXPRESSION_TYPE_BOOLEAN:
         return sdsdup(((Boolean*)e)->token.literal);
+    case EXPRESSION_TYPE_IF:
+        return sdsdup(((IfExpression*)e)->token.literal);
     }
 
     assert(false && "corrupt expression type");
@@ -125,6 +130,9 @@ void Statement_deinit(Statement* s)
     case STATEMENT_TYPE_EXPRESSION:
         ExpressionStatement_deinit((ExpressionStatement*)s);
         return;
+    case STATEMENT_TYPE_BLOCK:
+        BlockStatement_deinit((BlockStatement*)s);
+        return;
     }
 
     assert(false && "corrupt statement type");
@@ -148,6 +156,9 @@ void Expression_deinit(Expression* e)
         return;
     case EXPRESSION_TYPE_BOOLEAN:
         Boolean_deinit((Boolean*)e);
+        return;
+    case EXPRESSION_TYPE_IF:
+        IfExpression_deinit((IfExpression*)e);
         return;
     }
 
@@ -273,6 +284,8 @@ sds Statement_string(Statement* s)
         return ReturnStatement_string((ReturnStatement*)s);
     case STATEMENT_TYPE_EXPRESSION:
         return ExpressionStatement_string((ExpressionStatement*)s);
+    case STATEMENT_TYPE_BLOCK:
+        return BlockStatement_string((BlockStatement*)s);
     }
 
     assert(false && "corrupt statement type");
@@ -292,6 +305,8 @@ sds Expression_string(Expression* e)
         return InfixExpression_string((InfixExpression*)e);
     case EXPRESSION_TYPE_BOOLEAN:
         return Boolean_string((Boolean*)e);
+    case EXPRESSION_TYPE_IF:
+        return IfExpression_string((IfExpression*)e);
     }
 
     assert(false && "corrupt expression type");
@@ -471,4 +486,82 @@ sds Boolean_token_literal(Boolean* b)
 sds Boolean_string(Boolean* b)
 {
     return sdsdup(b->token.literal);
+}
+
+void BlockStatement_init(BlockStatement* b)
+{
+    Statement_init(&b->base);
+    b->base.type = STATEMENT_TYPE_BLOCK;
+}
+
+void BlockStatement_deinit(BlockStatement* b)
+{
+    Token_deinit(&b->token);
+    for (int i = 0; i < b->statements.length; ++i)
+    {
+        Statement_deinit(b->statements.data[i]);
+        free(b->statements.data[i]);
+    }
+    vec_deinit(&b->statements);
+}
+
+sds BlockStatement_token_literal(BlockStatement* b)
+{
+    return sdsdup(b->token.literal);
+}
+
+sds BlockStatement_string(BlockStatement* b)
+{
+    sds s = sdsempty();
+    for (int i = 0; i < b->statements.length; ++i)
+    {
+        sds stmt = Statement_string(b->statements.data[i]);
+        s = sdscatsds(s, stmt);
+        sdsfree(stmt);
+    }
+    return s;
+}
+
+void IfExpression_init(IfExpression* i)
+{
+    Expression_init(&i->base);
+    i->base.type = EXPRESSION_TYPE_IF;
+}
+
+void IfExpression_deinit(IfExpression* i)
+{
+    Token_deinit(&i->token);
+    Expression_deinit(i->condition);
+    free(i->condition);
+    BlockStatement_deinit(&i->consequence);
+    if (i->alternative != NULL)
+    {
+        BlockStatement_deinit(i->alternative);
+        free(i->alternative);
+    }
+}
+
+sds IfExpression_token_literal(IfExpression* i)
+{
+    return sdsdup(i->token.literal);
+}
+
+sds IfExpression_string(IfExpression* i)
+{
+    sds s = sdsnew("if");
+    sds condition = Expression_string(i->condition);
+    s = sdscatsds(s, condition);
+    sdsfree(condition);
+    s = sdscat(s, " ");
+    sds consequence = BlockStatement_string(&i->consequence);
+    s = sdscatsds(s, consequence);
+    sdsfree(consequence);
+    if (i->alternative != NULL)
+    {
+        s = sdscat(s, " else ");
+        sds alternative = BlockStatement_string(i->alternative);
+        s = sdscatsds(s, alternative);
+        sdsfree(alternative);
+    }
+    return s;
 }
