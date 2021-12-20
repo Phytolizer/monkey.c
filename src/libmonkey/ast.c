@@ -58,6 +58,8 @@ sds Expression_token_literal(Expression* e)
         return sdsdup(((IfExpression*)e)->token.literal);
     case EXPRESSION_TYPE_FUNCTION:
         return sdsdup(((FunctionLiteral*)e)->token.literal);
+    case EXPRESSION_TYPE_CALL:
+        return sdsdup(((CallExpression*)e)->token.literal);
     }
 
     assert(false && "corrupt expression type");
@@ -164,6 +166,9 @@ void Expression_deinit(Expression* e)
         return;
     case EXPRESSION_TYPE_FUNCTION:
         FunctionLiteral_deinit((FunctionLiteral*)e);
+        return;
+    case EXPRESSION_TYPE_CALL:
+        CallExpression_deinit((CallExpression*)e);
         return;
     }
 
@@ -314,6 +319,8 @@ sds Expression_string(Expression* e)
         return IfExpression_string((IfExpression*)e);
     case EXPRESSION_TYPE_FUNCTION:
         return FunctionLiteral_string((FunctionLiteral*)e);
+    case EXPRESSION_TYPE_CALL:
+        return CallExpression_string((CallExpression*)e);
     }
 
     assert(false && "corrupt expression type");
@@ -615,5 +622,50 @@ sds FunctionLiteral_string(FunctionLiteral* f)
     sds body = BlockStatement_string(&f->body);
     s = sdscatsds(s, body);
     sdsfree(body);
+    return s;
+}
+
+void CallExpression_init(CallExpression* c)
+{
+    Expression_init(&c->base);
+    c->base.type = EXPRESSION_TYPE_CALL;
+}
+
+void CallExpression_deinit(CallExpression* c)
+{
+    Token_deinit(&c->token);
+    Expression_deinit(c->function);
+    free(c->function);
+    for (int i = 0; i < c->args.length; ++i)
+    {
+        Expression_deinit(c->args.data[i]);
+        free(c->args.data[i]);
+    }
+    vec_deinit(&c->args);
+}
+
+sds CallExpression_token_literal(CallExpression* c)
+{
+    return sdsdup(c->token.literal);
+}
+
+sds CallExpression_string(CallExpression* c)
+{
+    sds s = sdsempty();
+    sds function = Expression_string(c->function);
+    s = sdscatsds(s, function);
+    sdsfree(function);
+    s = sdscat(s, "(");
+    for (int i = 0; i < c->args.length; ++i)
+    {
+        sds arg = Expression_string(c->args.data[i]);
+        s = sdscatsds(s, arg);
+        sdsfree(arg);
+        if (i < c->args.length - 1)
+        {
+            s = sdscat(s, ", ");
+        }
+    }
+    s = sdscat(s, ")");
     return s;
 }

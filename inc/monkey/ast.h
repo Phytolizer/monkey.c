@@ -61,7 +61,8 @@ typedef vec_t(Statement*) StatementVec;
     X(INFIX)                                                                                                           \
     X(BOOLEAN)                                                                                                         \
     X(IF)                                                                                                              \
-    X(FUNCTION)
+    X(FUNCTION)                                                                                                        \
+    X(CALL)
 
 typedef enum
 {
@@ -75,6 +76,8 @@ typedef struct
     Node base;
     ExpressionType type;
 } Expression;
+
+typedef vec_t(Expression*) ExpressionVec;
 
 void Expression_init(Expression* e);
 void Expression_deinit(Expression* e);
@@ -233,3 +236,16 @@ void FunctionLiteral_init(FunctionLiteral* f);
 void FunctionLiteral_deinit(FunctionLiteral* f);
 sds FunctionLiteral_token_literal(FunctionLiteral* f);
 sds FunctionLiteral_string(FunctionLiteral* f);
+
+typedef struct
+{
+    Expression base;
+    Token token;
+    Expression* function;
+    ExpressionVec args;
+} CallExpression;
+
+void CallExpression_init(CallExpression* c);
+void CallExpression_deinit(CallExpression* c);
+sds CallExpression_token_literal(CallExpression* c);
+sds CallExpression_string(CallExpression* c);
