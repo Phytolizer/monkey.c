@@ -1,6 +1,7 @@
 #include "test_parser.h"
 #include "monkey/ast.h"
 #include "monkey/parser.h"
+#include "nonstd/strdup.h"
 #include "test.h"
 #include <assert.h>
 
@@ -698,6 +699,62 @@ char* test_function_literal_parsing(void)
     return NULL;
 }
 
+char* test_function_parameter_parsing(void)
+{
+    struct
+    {
+        const char* input;
+        const char* expectedParams;
+    } tests[] = {
+        {"fn() {};", ""},
+        {"fn(x) {};", "x"},
+        {"fn(x, y, z) {};", "x,y,z"},
+    };
+
+    for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); ++i)
+    {
+        Parser p;
+        Parser_init(&p, tests[i].input);
+        Program program = Parser_parse_program(&p);
+        char* message = check_parser_errors(&p);
+        if (message != NULL)
+        {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+            return message;
+        }
+        ExpressionStatement* stmt = (ExpressionStatement*)program.statements.data[0];
+        FunctionLiteral* function = (FunctionLiteral*)stmt->expression;
+        char* expectedParams = nonstd_strdup(tests[i].expectedParams);
+        char* saveptr = NULL;
+        int i = 0;
+        for (char* param = strtok_r(expectedParams, ",", &saveptr); param != NULL;
+             param = strtok_r(NULL, ",", &saveptr))
+        {
+            test_assert(
+                i < function->parameters.length,
+                do {
+                    free(expectedParams);
+                    Program_deinit(&program);
+                    Parser_deinit(&p);
+                } while (false),
+                "function has too few parameters. got=%d", function->parameters.length);
+            test_assert(
+                strcmp(param, function->parameters.data[i]->value) == 0,
+                do {
+                    free(expectedParams);
+                    Program_deinit(&program);
+                    Parser_deinit(&p);
+                } while (false),
+                "function has wrong parameters. got=%s", function->parameters.data[i]->value);
+            ++i;
+        }
+        free(expectedParams);
+    }
+
+    return NULL;
+}
+
 char* parser_tests(size_t* test_count)
 {
     test_run(test_let_statements);
@@ -711,6 +768,7 @@ char* parser_tests(size_t* test_count)
     test_run(test_if_expression);
     test_run(test_if_else_expression);
     test_run(test_function_literal_parsing);
+    test_run(test_function_parameter_parsing);
     return NULL;
 }
 

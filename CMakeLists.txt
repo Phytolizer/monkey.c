@@ -28,10 +28,16 @@ push_directory_library(
     INCLUDED_DIRECTORIES "inc"
 )
 push_directory_library(
+    TARGET_NAME "libnonstd"
+    OUTPUT_NAME "nonstd"
+    SOURCE_FILES "strdup.c"
+    INCLUDED_DIRECTORIES "inc"
+)
+push_directory_library(
     TARGET_NAME "libmonkey"
     OUTPUT_NAME "monkey"
     SOURCE_FILES "ast.c" "lexer.c" "parser.c" "token.c"
-    LINKED_LIBRARIES "libhash" "sds" "vec"
+    LINKED_LIBRARIES "libhash" "libnonstd" "sds" "vec"
     INCLUDED_DIRECTORIES "inc"
 )
 
