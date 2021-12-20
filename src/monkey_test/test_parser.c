@@ -4,6 +4,7 @@
 #include "nonstd/strdup.h"
 #include "test.h"
 #include <assert.h>
+#include <string.h>
 
 char* check_let_statement(Statement* s, const char* name);
 char* check_integer_literal(Expression* e, int64_t value);
@@ -755,6 +756,75 @@ char* test_function_parameter_parsing(void)
     return NULL;
 }
 
+char* test_call_expression_parsing(void)
+{
+    const char* input = "add(1, 2 * 3, 4 + 5);";
+    Parser p;
+    Parser_init(&p, input);
+    Program program = Parser_parse_program(&p);
+    char* message = check_parser_errors(&p);
+    if (message != NULL)
+    {
+        Program_deinit(&program);
+        Parser_deinit(&p);
+        return message;
+    }
+
+    test_assert(
+        program.statements.length == 1,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "program.statements.length not 1. got=%d", program.statements.length);
+    test_assert(
+        program.statements.data[0]->type == STATEMENT_TYPE_EXPRESSION,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "program.statements.data[0]->type not EXPRESSION. got=%s",
+        Statement_type_name(program.statements.data[0]->type));
+    ExpressionStatement* stmt = (ExpressionStatement*)program.statements.data[0];
+    test_assert(
+        stmt->expression->type == EXPRESSION_TYPE_CALL,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "stmt->expression->type not CALL. got=%s", Expression_type_name(stmt->expression->type));
+    CallExpression* exp = (CallExpression*)stmt->expression;
+    message = check_identifier(exp->function, "add");
+    if (message != NULL)
+    {
+        Program_deinit(&program);
+        Parser_deinit(&p);
+        return message;
+    }
+
+    test_assert(
+        exp->args.length == 3,
+        do {
+            Program_deinit(&program);
+            Parser_deinit(&p);
+        } while (false),
+        "exp->args.length not 3. got=%d", exp->args.length);
+#define CHECK_MESSAGE(call)                                                                                            \
+    message = call;                                                                                                    \
+    if (message != NULL)                                                                                               \
+    {                                                                                                                  \
+        Program_deinit(&program);                                                                                      \
+        Parser_deinit(&p);                                                                                             \
+        return message;                                                                                                \
+    }
+    CHECK_MESSAGE(check_literal_expression(exp->args.data[0], TEST_VALUE_NEW_INT64(1)))
+    CHECK_MESSAGE(check_infix_expression(exp->args.data[1], TEST_VALUE_NEW_INT64(2), "*", TEST_VALUE_NEW_INT64(3)))
+    CHECK_MESSAGE(check_infix_expression(exp->args.data[2], TEST_VALUE_NEW_INT64(4), "+", TEST_VALUE_NEW_INT64(5)))
+#undef CHECK_MESSAGE
+
+    return NULL;
+}
+
 char* parser_tests(size_t* test_count)
 {
     test_run(test_let_statements);
@@ -769,6 +839,7 @@ char* parser_tests(size_t* test_count)
     test_run(test_if_else_expression);
     test_run(test_function_literal_parsing);
     test_run(test_function_parameter_parsing);
+    test_run(test_call_expression_parsing);
     return NULL;
 }
 
