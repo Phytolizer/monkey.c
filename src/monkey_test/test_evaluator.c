@@ -17,6 +17,17 @@ char* check_integer_object(Object* obj, int64_t expected)
     return NULL;
 }
 
+char* check_boolean_object(Object* obj, bool expected)
+{
+    test_assert(obj != NULL, (void)0, "Object should not be NULL");
+    test_assert(obj->type == OBJECT_TYPE_BOOLEAN, (void)0, "object is not INTEGER. got=%s",
+                Object_type_name(obj->type));
+    BooleanObj* result = (BooleanObj*)obj;
+    test_assert(result->value == expected, (void)0, "boolean has wrong value. got=%s, want=%s",
+                result->value ? "true" : "false", expected ? "true" : "false");
+    return NULL;
+}
+
 Object* test_eval(const char* input)
 {
     Parser p;
@@ -52,8 +63,33 @@ char* test_eval_integer_expression(void)
     return NULL;
 }
 
+char* test_eval_boolean_expression(void)
+{
+    struct
+    {
+        const char* input;
+        bool expected;
+    } tests[] = {
+        {"true", true},
+        {"false", false},
+    };
+
+    for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); ++i)
+    {
+        Object* evaluated = test_eval(tests[i].input);
+        char* message = check_boolean_object(evaluated, tests[i].expected);
+        if (message != NULL)
+        {
+            return message;
+        }
+    }
+
+    return NULL;
+}
+
 char* evaluator_tests(size_t* test_count)
 {
     test_run(test_eval_integer_expression);
+    test_run(test_eval_boolean_expression);
     return NULL;
 }
