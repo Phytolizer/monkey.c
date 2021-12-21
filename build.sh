@@ -8,7 +8,9 @@ cd "../../monkey_repl"
 (clang -Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Werror=return-type -Werror=incompatible-pointer-types -std=c99 -g3 -I../../inc -c repl.c -o repl.o)
 cd "../libmonkey"
 (clang -Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Werror=return-type -Werror=incompatible-pointer-types -std=c99 -g3 -I../../inc -c ast.c -o ast.o)
+(clang -Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Werror=return-type -Werror=incompatible-pointer-types -std=c99 -g3 -I../../inc -c evaluator.c -o evaluator.o)
 (clang -Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Werror=return-type -Werror=incompatible-pointer-types -std=c99 -g3 -I../../inc -c lexer.c -o lexer.o)
+(clang -Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Werror=return-type -Werror=incompatible-pointer-types -std=c99 -g3 -I../../inc -c object.c -o object.o)
 (clang -Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Werror=return-type -Werror=incompatible-pointer-types -std=c99 -g3 -I../../inc -c parser.c -o parser.o)
 (clang -Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Werror=return-type -Werror=incompatible-pointer-types -std=c99 -g3 -I../../inc -c token.c -o token.o)
 cd "../libnonstd"
@@ -19,6 +21,7 @@ cd "../libnonstd"
 cd "../monkey_test"
 (clang -Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Werror=return-type -Werror=incompatible-pointer-types -std=c99 -g3 -I../../inc -c test.c -o test.o)
 (clang -Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Werror=return-type -Werror=incompatible-pointer-types -std=c99 -g3 -I../../inc -c test_ast.c -o test_ast.o)
+(clang -Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Werror=return-type -Werror=incompatible-pointer-types -std=c99 -g3 -I../../inc -c test_evaluator.c -o test_evaluator.o)
 (clang -Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Werror=return-type -Werror=incompatible-pointer-types -std=c99 -g3 -I../../inc -c test_lexer.c -o test_lexer.o)
 (clang -Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Werror=return-type -Werror=incompatible-pointer-types -std=c99 -g3 -I../../inc -c test_parser.c -o test_parser.o)
 cd "../libhash"
@@ -27,10 +30,10 @@ cd "../libhash"
 cd "../sds"
 (clang -Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Werror=return-type -Werror=incompatible-pointer-types -std=c99 -g3 -I../../inc -c sds.c -o sds.o)
 cd "../.."
-(llvm-ar rcs libmonkey.a src/libmonkey/ast.o src/libmonkey/lexer.o src/libmonkey/parser.o src/libmonkey/token.o)
+(llvm-ar rcs libmonkey.a src/libmonkey/ast.o src/libmonkey/evaluator.o src/libmonkey/lexer.o src/libmonkey/object.o src/libmonkey/parser.o src/libmonkey/token.o)
 (llvm-ar rcs libnonstd.a src/libnonstd/strdup.o src/libnonstd/strpbrk.o src/libnonstd/strspn.o src/libnonstd/strtok.o)
 (llvm-ar rcs libsds.a src/sds/sds.o)
 (llvm-ar rcs libvec.a src/vec/src/vec.o)
 (llvm-ar rcs libhash.a src/libhash/fnv.o src/libhash/hash.o)
 (clang  src/monkey_repl/main.o src/monkey_repl/repl.o -o monkey_repl.exe libmonkey.a libsds.a libvec.a libhash.a libnonstd.a)
-(clang  src/monkey_test/test.o src/monkey_test/test_ast.o src/monkey_test/test_lexer.o src/monkey_test/test_parser.o -o monkey_test.exe libmonkey.a libsds.a libvec.a libhash.a libnonstd.a)
+(clang  src/monkey_test/test.o src/monkey_test/test_ast.o src/monkey_test/test_evaluator.o src/monkey_test/test_lexer.o src/monkey_test/test_parser.o -o monkey_test.exe libmonkey.a libsds.a libvec.a libhash.a libnonstd.a)
