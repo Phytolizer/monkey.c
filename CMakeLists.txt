@@ -36,7 +36,7 @@ push_directory_library(
 push_directory_library(
     TARGET_NAME "libmonkey"
     OUTPUT_NAME "monkey"
-    SOURCE_FILES "ast.c" "lexer.c" "parser.c" "token.c"
+    SOURCE_FILES "ast.c" "lexer.c" "parser.c" "token.c" "object.c" "evaluator.c"
     LINKED_LIBRARIES "libhash" "libnonstd" "sds" "vec"
     INCLUDED_DIRECTORIES "inc"
 )
@@ -51,5 +51,6 @@ push_directory_executable(
     TARGET_NAME "monkey_test"
     OUTPUT_NAME "monkey_test.exe"
     SOURCE_FILES "test.c" "test_ast.c" "test_lexer.c" "test_parser.c"
+                 "test_evaluator.c"
     LINKED_LIBRARIES "libmonkey"
 )

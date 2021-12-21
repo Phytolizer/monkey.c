@@ -123,6 +123,7 @@ void Parser_deinit(Parser* p)
 Program Parser_parse_program(Parser* p)
 {
     Program program = {0};
+    Program_init(&program);
     vec_init(&program.statements);
 
     while (strcmp(p->cur_token.type, T_EOF) != 0)
