@@ -87,9 +87,33 @@ char* test_eval_boolean_expression(void)
     return NULL;
 }
 
+char* test_bang_operator(void)
+{
+    struct
+    {
+        const char* input;
+        bool expected;
+    } tests[] = {
+        {"!true", false}, {"!false", true}, {"!5", false}, {"!!true", true}, {"!!false", false}, {"!!5", true},
+    };
+
+    for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); ++i)
+    {
+        Object* evaluated = test_eval(tests[i].input);
+        char* message = check_boolean_object(evaluated, tests[i].expected);
+        if (message != NULL)
+        {
+            return message;
+        }
+    }
+
+    return NULL;
+}
+
 char* evaluator_tests(size_t* test_count)
 {
     test_run(test_eval_integer_expression);
     test_run(test_eval_boolean_expression);
+    test_run(test_bang_operator);
     return NULL;
 }

@@ -4,6 +4,12 @@
 Object* eval_statements(StatementVec statements);
 Object* native_bool_to_boolean_object(bool value, bool cleanup);
 Object* nil_object(bool cleanup);
+Object* eval_prefix_expression(sds op, Object* right);
+Object* eval_bang_operator_expression(Object* right);
+
+static BooleanObj* TRUE = NULL;
+static BooleanObj* FALSE = NULL;
+static NilObj* NIL = NULL;
 
 Object* eval(Node* node)
 {
@@ -31,6 +37,10 @@ Object* eval(Node* node)
         }
         case EXPRESSION_TYPE_BOOLEAN:
             return native_bool_to_boolean_object(((Boolean*)expr)->value, false);
+        case EXPRESSION_TYPE_PREFIX: {
+            Object* right = eval(&((PrefixExpression*)expr)->right->base);
+            return eval_prefix_expression(((PrefixExpression*)expr)->operator, right);
+        }
         }
     }
     }
@@ -55,9 +65,6 @@ Object* eval_statements(StatementVec statements)
 
 Object* native_bool_to_boolean_object(bool value, bool cleanup)
 {
-    static BooleanObj* TRUE = NULL;
-    static BooleanObj* FALSE = NULL;
-
     if (cleanup)
     {
         free(TRUE);
@@ -82,7 +89,6 @@ Object* native_bool_to_boolean_object(bool value, bool cleanup)
 
 Object* nil_object(bool cleanup)
 {
-    static NilObj* NIL = NULL;
     if (!NIL)
     {
         NIL = malloc(sizeof(NilObj));
@@ -96,4 +102,30 @@ Object* nil_object(bool cleanup)
     }
 
     return (Object*)NIL;
+}
+
+Object* eval_prefix_expression(sds op, Object* right)
+{
+    if (strcmp(op, "!") == 0)
+    {
+        return eval_bang_operator_expression(right);
+    }
+    return NULL;
+}
+
+Object* eval_bang_operator_expression(Object* right)
+{
+    if (right == (Object*)TRUE)
+    {
+        return (Object*)FALSE;
+    }
+    if (right == (Object*)FALSE)
+    {
+        return (Object*)TRUE;
+    }
+    if (right == (Object*)NIL)
+    {
+        return (Object*)TRUE;
+    }
+    return (Object*)FALSE;
 }
