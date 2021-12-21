@@ -1,4 +1,6 @@
 #include "repl.h"
+#include "monkey/evaluator.h"
+#include "monkey/object.h"
 #include "monkey/parser.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,9 +47,13 @@ void repl(FILE* in, FILE* out)
             print_parser_errors(out, parser.errors);
             continue;
         }
-        sds programStr = Program_string(&program);
-        fprintf(out, "%s\n", programStr);
-        sdsfree(programStr);
+        Object* evaluated = eval(&program.base);
+        if (evaluated != NULL)
+        {
+            sds inspected = Object_inspect(evaluated);
+            fprintf(out, "%s\n", inspected);
+            sdsfree(inspected);
+        }
         Parser_deinit(&parser);
         free(line);
     }
