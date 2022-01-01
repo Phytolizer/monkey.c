@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string/string.h>
+#include <vec/vec.h>
 
 MkTokenType mk_token_illegal;
 MkTokenType mk_token_eof;
@@ -20,6 +21,8 @@ MkTokenType mk_token_slash;
 
 MkTokenType mk_token_lt;
 MkTokenType mk_token_gt;
+MkTokenType mk_token_eq;
+MkTokenType mk_token_not_eq;
 
 MkTokenType mk_token_comma;
 MkTokenType mk_token_semicolon;
@@ -60,6 +63,8 @@ void MkTokenTypesManage(MkTokenTypesAction action) {
 
       mk_token_lt = StringFromC("<");
       mk_token_gt = StringFromC(">");
+      mk_token_eq = StringFromC("==");
+      mk_token_not_eq = StringFromC("!=");
 
       mk_token_comma = StringFromC(",");
       mk_token_semicolon = StringFromC(";");
@@ -98,6 +103,8 @@ void MkTokenTypesManage(MkTokenTypesAction action) {
       VEC_FREE(&mk_token_slash);
       VEC_FREE(&mk_token_lt);
       VEC_FREE(&mk_token_gt);
+      VEC_FREE(&mk_token_eq);
+      VEC_FREE(&mk_token_not_eq);
       VEC_FREE(&mk_token_comma);
       VEC_FREE(&mk_token_semicolon);
       VEC_FREE(&mk_token_lparen);

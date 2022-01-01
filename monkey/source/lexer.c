@@ -7,10 +7,12 @@
 #include "monkey/token.h"
 
 static void ReadChar(MkLexer* lexer);
+static char PeekChar(MkLexer* lexer);
 static String ReadIdentifier(MkLexer* lexer);
 static String ReadNumber(MkLexer* lexer);
 static void SkipWhitespace(MkLexer* lexer);
 static MkToken SingleCharToken(MkTokenType type, uint8_t literal);
+static MkToken TwoCharToken(MkTokenType type, uint8_t c1, uint8_t c2);
 static bool IsLetter(uint8_t ch);
 static bool IsDigit(uint8_t ch);
 
@@ -26,7 +28,12 @@ MkToken MkLexerNextToken(MkLexer* lexer) {
   SkipWhitespace(lexer);
   switch (lexer->ch) {
     case '=':
-      tok = SingleCharToken(mk_token_assign, lexer->ch);
+      if (PeekChar(lexer) == '=') {
+        tok = TwoCharToken(mk_token_eq, lexer->ch, PeekChar(lexer));
+        ReadChar(lexer);
+      } else {
+        tok = SingleCharToken(mk_token_assign, lexer->ch);
+      }
       break;
     case ';':
       tok = SingleCharToken(mk_token_semicolon, lexer->ch);
@@ -53,7 +60,12 @@ MkToken MkLexerNextToken(MkLexer* lexer) {
       tok = SingleCharToken(mk_token_minus, lexer->ch);
       break;
     case '!':
-      tok = SingleCharToken(mk_token_bang, lexer->ch);
+      if (PeekChar(lexer) == '=') {
+        tok = TwoCharToken(mk_token_not_eq, lexer->ch, PeekChar(lexer));
+        ReadChar(lexer);
+      } else {
+        tok = SingleCharToken(mk_token_bang, lexer->ch);
+      }
       break;
     case '*':
       tok = SingleCharToken(mk_token_asterisk, lexer->ch);
@@ -100,6 +112,14 @@ void ReadChar(MkLexer* lexer) {
   lexer->read_position += 1;
 }
 
+char PeekChar(MkLexer* lexer) {
+  if (lexer->read_position >= SPAN_SIZE(&lexer->source)) {
+    return '\0';
+  } else {
+    return lexer->source.begin[lexer->read_position];
+  }
+}
+
 String ReadIdentifier(MkLexer* lexer) {
   StringView ident = {0};
   ident.begin = &lexer->source.begin[lexer->position];
@@ -133,6 +153,17 @@ MkToken SingleCharToken(MkTokenType type, uint8_t literal) {
       .literal = StringFromSpan((StringView){
           .begin = (const char*)&literal,
           .end = (const char*)&literal + 1,
+      }),
+  };
+}
+
+MkToken TwoCharToken(MkTokenType type, uint8_t c1, uint8_t c2) {
+  const char chars[] = {c1, c2};
+  return (MkToken){
+      .type = type,
+      .literal = StringFromSpan((StringView){
+          .begin = chars,
+          .end = chars + 2,
       }),
   };
 }

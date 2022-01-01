@@ -27,6 +27,9 @@ extern MkTokenType mk_token_slash;
 extern MkTokenType mk_token_lt;
 extern MkTokenType mk_token_gt;
 
+extern MkTokenType mk_token_eq;
+extern MkTokenType mk_token_not_eq;
+
 extern MkTokenType mk_token_comma;
 extern MkTokenType mk_token_semicolon;
 
