@@ -11,25 +11,25 @@ typedef struct {
   String literal;
 } MkToken;
 
-extern String mk_token_illegal;
-extern String mk_token_eof;
+extern MkTokenType mk_token_illegal;
+extern MkTokenType mk_token_eof;
 
-extern String mk_token_identifier;
-extern String mk_token_int;
+extern MkTokenType mk_token_ident;
+extern MkTokenType mk_token_int;
 
-extern String mk_token_assign;
-extern String mk_token_plus;
+extern MkTokenType mk_token_assign;
+extern MkTokenType mk_token_plus;
 
-extern String mk_token_comma;
-extern String mk_token_semicolon;
+extern MkTokenType mk_token_comma;
+extern MkTokenType mk_token_semicolon;
 
-extern String mk_token_lparen;
-extern String mk_token_rparen;
-extern String mk_token_lbrace;
-extern String mk_token_rbrace;
+extern MkTokenType mk_token_lparen;
+extern MkTokenType mk_token_rparen;
+extern MkTokenType mk_token_lbrace;
+extern MkTokenType mk_token_rbrace;
 
-extern String mk_token_function;
-extern String mk_token_let;
+extern MkTokenType mk_token_function;
+extern MkTokenType mk_token_let;
 
 typedef enum {
   kTokenTypesInit,
@@ -39,5 +39,6 @@ typedef enum {
 void MkTokenTypesManage(MkTokenTypesAction action);
 
 void MkTokenFree(MkToken tok);
+MkTokenType MkLookupIdent(StringView ident);
 
 #endif  // MONKEY_TOKEN_H_

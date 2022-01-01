@@ -60,10 +60,16 @@ transform_sources(
   LIBRARIES vec span
 )
 transform_sources(
+  hash
+  KIND library
+  SOURCES hash.c
+  LIBRARIES span vec
+)
+transform_sources(
   monkey
   KIND library
   SOURCES lexer.c token.c
-  LIBRARIES vec span string
+  LIBRARIES vec span string hash
 )
 transform_sources(
   embed
@@ -72,20 +78,23 @@ transform_sources(
   LIBRARIES argparse nonstd
 )
 add_custom_command(
-  OUTPUT "${PROJECT_BINARY_DIR}/embedded/next_token_test.c"
-         "${PROJECT_BINARY_DIR}/embedded/next_token_test.h"
-  DEPENDS embed
-  COMMAND "${CMAKE_COMMAND}" -E make_directory "${PROJECT_BINARY_DIR}/embedded"
+  OUTPUT "${PROJECT_BINARY_DIR}/embedded/monkey_test/input/next_token_test.c"
+         "${PROJECT_BINARY_DIR}/embedded/monkey_test/input/next_token_test.h"
+  DEPENDS embed monkey_test/input/next_token.test
+  COMMAND "${CMAKE_COMMAND}" -E make_directory
+          "${PROJECT_BINARY_DIR}/embedded/monkey_test/input"
   COMMAND
     "$<TARGET_FILE:embed>"
     "${PROJECT_SOURCE_DIR}/monkey_test/input/next_token.test" -o
-    "${PROJECT_BINARY_DIR}/embedded/next_token_test.c" -s "next_token_test"
+    "${PROJECT_BINARY_DIR}/embedded/monkey_test/input/next_token_test.c" -s
+    "next_token_test"
 )
 transform_sources(
   monkey_test
   KIND executable
   SOURCES main.c test_lexer.c
-  ABSOLUTE_SOURCES "${PROJECT_BINARY_DIR}/embedded/next_token_test.c"
+  ABSOLUTE_SOURCES
+    "${PROJECT_BINARY_DIR}/embedded/monkey_test/input/next_token_test.c"
   LIBRARIES monkey test
   INCLUDES "${PROJECT_BINARY_DIR}/embedded"
 )

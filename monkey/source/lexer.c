@@ -1,11 +1,15 @@
 #include "monkey/lexer.h"
 
+#include <stdbool.h>
+#include <stdint.h>
 #include <string/string.h>
 
 #include "monkey/token.h"
 
 static void ReadChar(MkLexer* lexer);
+static String ReadIdentifier(MkLexer* lexer);
 static MkToken SingleCharToken(MkTokenType type, uint8_t literal);
+static bool IsLetter(uint8_t ch);
 
 void MkLexerInit(MkLexer* lexer, StringView source) {
   lexer->source = source;
@@ -44,6 +48,14 @@ MkToken MkLexerNextToken(MkLexer* lexer) {
     case '\0':
       tok.type = mk_token_eof;
       break;
+    default:
+      if (IsLetter(lexer->ch)) {
+        tok.literal = ReadIdentifier(lexer);
+        tok.type = mk_token_ident;
+        return tok;
+      } else {
+        tok = SingleCharToken(mk_token_illegal, lexer->ch);
+      }
   }
   ReadChar(lexer);
   return tok;
@@ -59,6 +71,16 @@ void ReadChar(MkLexer* lexer) {
   lexer->read_position += 1;
 }
 
+String ReadIdentifier(MkLexer* lexer) {
+  StringView ident = {0};
+  ident.begin = &lexer->source.begin[lexer->read_position];
+  while (IsLetter(lexer->ch)) {
+    ReadChar(lexer);
+  }
+  ident.end = &lexer->source.begin[lexer->read_position];
+  return StringFromSpan(ident);
+}
+
 MkToken SingleCharToken(MkTokenType type, uint8_t literal) {
   return (MkToken){
       .type = type,
@@ -67,4 +89,8 @@ MkToken SingleCharToken(MkTokenType type, uint8_t literal) {
           .end = (const char*)&literal + 1,
       }),
   };
+}
+
+bool IsLetter(uint8_t ch) {
+  return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
 }

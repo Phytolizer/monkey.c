@@ -3,17 +3,34 @@
 #include <inttypes.h>
 #include <monkey/lexer.h>
 #include <monkey/token.h>
-#include <next_token_test.h>
 #include <test/test.h>
+
+#include "monkey_test/input/next_token_test.h"
 
 test_func(lexer_next_token) {
   struct {
     MkTokenType expected_type;
     const char* expected_literal;
   } tests[] = {
-      {mk_token_assign, "="}, {mk_token_plus, "+"},      {mk_token_lparen, "("},
-      {mk_token_rparen, ")"}, {mk_token_lbrace, "{"},    {mk_token_rbrace, "}"},
-      {mk_token_comma, ","},  {mk_token_semicolon, ";"}, {mk_token_eof, ""},
+      {mk_token_let, "let"},     {mk_token_ident, "five"},
+      {mk_token_assign, "="},    {mk_token_int, "5"},
+      {mk_token_semicolon, ";"}, {mk_token_let, "let"},
+      {mk_token_ident, "ten"},   {mk_token_assign, "="},
+      {mk_token_int, "10"},      {mk_token_semicolon, ";"},
+      {mk_token_let, "let"},     {mk_token_ident, "add"},
+      {mk_token_assign, "="},    {mk_token_function, "fn"},
+      {mk_token_lparen, "("},    {mk_token_ident, "x"},
+      {mk_token_comma, ","},     {mk_token_ident, "y"},
+      {mk_token_rparen, ")"},    {mk_token_lbrace, "{"},
+      {mk_token_ident, "x"},     {mk_token_plus, "+"},
+      {mk_token_ident, "y"},     {mk_token_semicolon, ";"},
+      {mk_token_rbrace, "}"},    {mk_token_semicolon, ";"},
+      {mk_token_let, "let"},     {mk_token_ident, "result"},
+      {mk_token_assign, "="},    {mk_token_ident, "add"},
+      {mk_token_lparen, "("},    {mk_token_ident, "five"},
+      {mk_token_comma, ","},     {mk_token_ident, "ten"},
+      {mk_token_rparen, ")"},    {mk_token_semicolon, ";"},
+      {mk_token_eof, ""},
   };
 
   MkLexer l = {0};
