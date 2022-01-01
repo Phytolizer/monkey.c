@@ -84,7 +84,7 @@ add_custom_command(
 transform_sources(
   monkey_test
   KIND executable
-  SOURCES main.c
+  SOURCES main.c test_lexer.c
   ABSOLUTE_SOURCES "${PROJECT_BINARY_DIR}/embedded/next_token_test.c"
   LIBRARIES monkey test
   INCLUDES "${PROJECT_BINARY_DIR}/embedded"
