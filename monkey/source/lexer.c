@@ -76,11 +76,11 @@ void ReadChar(MkLexer* lexer) {
 
 String ReadIdentifier(MkLexer* lexer) {
   StringView ident = {0};
-  ident.begin = &lexer->source.begin[lexer->read_position];
+  ident.begin = &lexer->source.begin[lexer->position];
   while (IsLetter(lexer->ch)) {
     ReadChar(lexer);
   }
-  ident.end = &lexer->source.begin[lexer->read_position];
+  ident.end = &lexer->source.begin[lexer->position];
   return StringFromSpan(ident);
 }
 

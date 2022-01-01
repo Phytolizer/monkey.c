@@ -25,14 +25,15 @@ HashAddResult HashAdd(HashUnpacked hash,
   while ((*hash.keys)[index].vec.size != 0) {
     if ((*hash.keys)[index].hash == key.hash &&
         HashKeyVecEqualSpan((*hash.keys)[index].vec, key.span)) {
-      memcpy(hash.values[index], value, hash.sizeof_value);
+      memcpy(&(*hash.values)[index * hash.sizeof_value], value,
+             hash.sizeof_value);
       return kHashAddReplace;
     }
     index = (index + 1) % *hash.capacity;
   }
 
   (*hash.keys)[index] = HashOwnKey(key);
-  memcpy(&(*hash.values)[index], value, hash.sizeof_value);
+  memcpy(&(*hash.values)[index * hash.sizeof_value], value, hash.sizeof_value);
   hash.size++;
   return kHashAddSuccess;
 }
@@ -59,7 +60,8 @@ bool HashGet(HashUnpacked hash, HashKeyView key, uint8_t* out_value) {
   while ((*hash.keys)[index].vec.size != 0) {
     if ((*hash.keys)[index].hash == key.hash &&
         HashKeyVecEqualSpan((*hash.keys)[index].vec, key.span)) {
-      memcpy(out_value, hash.values[index], hash.sizeof_value);
+      memcpy(out_value, &(*hash.values)[index * hash.sizeof_value],
+             hash.sizeof_value);
       return true;
     }
     index = (index + 1) % *hash.capacity;
@@ -82,11 +84,12 @@ bool HashRehash(HashUnpacked hash, uint64_t new_capacity) {
   for (uint64_t i = 0; i < *hash.capacity; i++) {
     if ((*hash.keys)[i].vec.size != 0) {
       uint64_t index = (*hash.keys)[i].hash % new_capacity;
-      while ((new_keys)[index].vec.size != 0) {
+      while (new_keys[index].vec.size != 0) {
         index = (index + 1) % new_capacity;
       }
       new_keys[index] = (*hash.keys)[i];
-      memcpy(&new_values[index], hash.values[i], hash.sizeof_value);
+      memcpy(&new_values[index * hash.sizeof_value],
+             &(*hash.values)[i * hash.sizeof_value], hash.sizeof_value);
     }
   }
 
