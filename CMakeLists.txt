@@ -98,3 +98,9 @@ transform_sources(
   LIBRARIES monkey test
   INCLUDES "${PROJECT_BINARY_DIR}/embedded"
 )
+transform_sources(
+  monkey_repl
+  KIND executable
+  SOURCES main.c
+  LIBRARIES monkey
+)

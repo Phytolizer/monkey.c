@@ -135,6 +135,11 @@ MkTokenType MkLookupIdent(StringView ident) {
   return type;
 }
 
+void MkTokenPrint(FILE* fp, MkToken tok) {
+  fprintf(fp, "{type: %" STRING_FMT ", literal: %" STRING_FMT "}",
+          STRING_PRINT(tok.type), STRING_PRINT(tok.literal));
+}
+
 HashKeySpan CreateKey(const char* k) {
   return (HashKeySpan){
       .begin = (const uint8_t*)k,
