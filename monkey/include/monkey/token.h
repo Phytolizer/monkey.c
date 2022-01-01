@@ -4,12 +4,12 @@
 #include <string/string.h>
 #include <vec/vec.h>
 
-typedef String TokenType;
+typedef String MkTokenType;
 
 typedef struct {
-  TokenType type;
+  MkTokenType type;
   String literal;
-} Token;
+} MkToken;
 
 extern String kTokenIllegal;
 extern String kTokenEof;
@@ -34,8 +34,10 @@ extern String kTokenLet;
 typedef enum {
   kTokenTypesInit,
   kTokenTypesFree,
-} TokenTypesAction;
+} MkTokenTypesAction;
 
-void TokenTypesManage(TokenTypesAction action);
+void MkTokenTypesManage(MkTokenTypesAction action);
+
+void MkTokenFree(MkToken tok);
 
 #endif  // MONKEY_TOKEN_H_

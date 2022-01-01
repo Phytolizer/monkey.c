@@ -23,7 +23,7 @@ String kTokenRBrace;
 String kTokenFunction;
 String kTokenLet;
 
-void TokenTypesManage(TokenTypesAction action) {
+void MkTokenTypesManage(MkTokenTypesAction action) {
   switch (action) {
     case kTokenTypesInit:
       kTokenIllegal = StringFromC("ILLEGAL");
@@ -63,4 +63,8 @@ void TokenTypesManage(TokenTypesAction action) {
       VEC_FREE(&kTokenLet);
       break;
   }
+}
+
+void MkTokenFree(MkToken tok) {
+  VEC_FREE(&tok.literal);
 }

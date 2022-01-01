@@ -5,12 +5,13 @@
       "Specify structure for custom cmake functions"
     ],
     "additional_commands": {
-      "foo": {
-        "flags": ["BAR", "BAZ"],
+      "transform_sources": {
         "kwargs": {
-          "HEADERS": "*",
+          "KIND": 1,
           "SOURCES": "*",
-          "DEPENDS": "*"
+          "INCLUDES": "*",
+          "ABSOLUTE_SOURCES": "*",
+          "LIBRARIES": "*"
         }
       }
     },

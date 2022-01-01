@@ -4,18 +4,26 @@
 #include <string.h>
 #include <vec/vec.h>
 
+StringView StringViewFromC(const char* cstr) {
+  return (StringView){.begin = cstr, .end = cstr + strlen(cstr)};
+}
+
 String StringFromC(const char* cstr) {
   String s = {0};
   VEC_APPEND(&s, cstr, strlen(cstr));
   return s;
 }
 
-String StringFromSpan(const char* begin, const char* end) {
+String StringFromSpan(StringView span) {
   String s = {0};
-  VEC_APPEND(&s, begin, end - begin);
+  VEC_APPEND(&s, span.begin, span.end - span.begin);
   return s;
 }
 
 bool StringEqual(const String a, const String b) {
   return a.size == b.size && memcmp(a.data, b.data, a.size) == 0;
+}
+
+bool StringEqualView(const String a, StringView b) {
+  return a.size == SPAN_SIZE(&b) && memcmp(a.data, b.begin, a.size) == 0;
 }
