@@ -18,31 +18,31 @@ MkToken MkLexerNextToken(MkLexer* lexer) {
   MkToken tok = {0};
   switch (lexer->ch) {
     case '=':
-      tok = SingleCharToken(kTokenAssign, lexer->ch);
+      tok = SingleCharToken(mk_token_assign, lexer->ch);
       break;
     case ';':
-      tok = SingleCharToken(kTokenSemicolon, lexer->ch);
+      tok = SingleCharToken(mk_token_semicolon, lexer->ch);
       break;
     case '(':
-      tok = SingleCharToken(kTokenLParen, lexer->ch);
+      tok = SingleCharToken(mk_token_lparen, lexer->ch);
       break;
     case ')':
-      tok = SingleCharToken(kTokenRParen, lexer->ch);
+      tok = SingleCharToken(mk_token_rparen, lexer->ch);
       break;
     case ',':
-      tok = SingleCharToken(kTokenComma, lexer->ch);
+      tok = SingleCharToken(mk_token_comma, lexer->ch);
       break;
     case '+':
-      tok = SingleCharToken(kTokenPlus, lexer->ch);
+      tok = SingleCharToken(mk_token_plus, lexer->ch);
       break;
     case '{':
-      tok = SingleCharToken(kTokenLBrace, lexer->ch);
+      tok = SingleCharToken(mk_token_lbrace, lexer->ch);
       break;
     case '}':
-      tok = SingleCharToken(kTokenRBrace, lexer->ch);
+      tok = SingleCharToken(mk_token_rbrace, lexer->ch);
       break;
     case '\0':
-      tok.type = kTokenEof;
+      tok.type = mk_token_eof;
       break;
   }
   ReadChar(lexer);

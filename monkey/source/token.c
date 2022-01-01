@@ -3,64 +3,64 @@
 #include <stdlib.h>
 #include <string/string.h>
 
-String kTokenIllegal;
-String kTokenEof;
+String mk_token_illegal;
+String mk_token_eof;
 
-String kTokenIdentifier;
-String kTokenInt;
+String mk_token_identifier;
+String mk_token_int;
 
-String kTokenAssign;
-String kTokenPlus;
+String mk_token_assign;
+String mk_token_plus;
 
-String kTokenComma;
-String kTokenSemicolon;
+String mk_token_comma;
+String mk_token_semicolon;
 
-String kTokenLParen;
-String kTokenRParen;
-String kTokenLBrace;
-String kTokenRBrace;
+String mk_token_lparen;
+String mk_token_rparen;
+String mk_token_lbrace;
+String mk_token_rbrace;
 
-String kTokenFunction;
-String kTokenLet;
+String mk_token_function;
+String mk_token_let;
 
 void MkTokenTypesManage(MkTokenTypesAction action) {
   switch (action) {
     case kTokenTypesInit:
-      kTokenIllegal = StringFromC("ILLEGAL");
-      kTokenEof = StringFromC("EOF");
+      mk_token_illegal = StringFromC("ILLEGAL");
+      mk_token_eof = StringFromC("EOF");
 
-      kTokenIdentifier = StringFromC("IDENT");
-      kTokenInt = StringFromC("INT");
+      mk_token_identifier = StringFromC("IDENT");
+      mk_token_int = StringFromC("INT");
 
-      kTokenAssign = StringFromC("=");
-      kTokenPlus = StringFromC("+");
+      mk_token_assign = StringFromC("=");
+      mk_token_plus = StringFromC("+");
 
-      kTokenComma = StringFromC(",");
-      kTokenSemicolon = StringFromC(";");
+      mk_token_comma = StringFromC(",");
+      mk_token_semicolon = StringFromC(";");
 
-      kTokenLParen = StringFromC("(");
-      kTokenRParen = StringFromC(")");
-      kTokenLBrace = StringFromC("{");
-      kTokenRBrace = StringFromC("}");
+      mk_token_lparen = StringFromC("(");
+      mk_token_rparen = StringFromC(")");
+      mk_token_lbrace = StringFromC("{");
+      mk_token_rbrace = StringFromC("}");
 
-      kTokenFunction = StringFromC("FUNCTION");
-      kTokenLet = StringFromC("LET");
+      mk_token_function = StringFromC("FUNCTION");
+      mk_token_let = StringFromC("LET");
       break;
     case kTokenTypesFree:
-      VEC_FREE(&kTokenIllegal);
-      VEC_FREE(&kTokenEof);
-      VEC_FREE(&kTokenIdentifier);
-      VEC_FREE(&kTokenInt);
-      VEC_FREE(&kTokenAssign);
-      VEC_FREE(&kTokenPlus);
-      VEC_FREE(&kTokenComma);
-      VEC_FREE(&kTokenSemicolon);
-      VEC_FREE(&kTokenLParen);
-      VEC_FREE(&kTokenRParen);
-      VEC_FREE(&kTokenLBrace);
-      VEC_FREE(&kTokenRBrace);
-      VEC_FREE(&kTokenFunction);
-      VEC_FREE(&kTokenLet);
+      VEC_FREE(&mk_token_illegal);
+      VEC_FREE(&mk_token_eof);
+      VEC_FREE(&mk_token_identifier);
+      VEC_FREE(&mk_token_int);
+      VEC_FREE(&mk_token_assign);
+      VEC_FREE(&mk_token_plus);
+      VEC_FREE(&mk_token_comma);
+      VEC_FREE(&mk_token_semicolon);
+      VEC_FREE(&mk_token_lparen);
+      VEC_FREE(&mk_token_rparen);
+      VEC_FREE(&mk_token_lbrace);
+      VEC_FREE(&mk_token_rbrace);
+      VEC_FREE(&mk_token_function);
+      VEC_FREE(&mk_token_let);
       break;
   }
 }

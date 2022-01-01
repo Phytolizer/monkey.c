@@ -11,25 +11,25 @@ typedef struct {
   String literal;
 } MkToken;
 
-extern String kTokenIllegal;
-extern String kTokenEof;
+extern String mk_token_illegal;
+extern String mk_token_eof;
 
-extern String kTokenIdentifier;
-extern String kTokenInt;
+extern String mk_token_identifier;
+extern String mk_token_int;
 
-extern String kTokenAssign;
-extern String kTokenPlus;
+extern String mk_token_assign;
+extern String mk_token_plus;
 
-extern String kTokenComma;
-extern String kTokenSemicolon;
+extern String mk_token_comma;
+extern String mk_token_semicolon;
 
-extern String kTokenLParen;
-extern String kTokenRParen;
-extern String kTokenLBrace;
-extern String kTokenRBrace;
+extern String mk_token_lparen;
+extern String mk_token_rparen;
+extern String mk_token_lbrace;
+extern String mk_token_rbrace;
 
-extern String kTokenFunction;
-extern String kTokenLet;
+extern String mk_token_function;
+extern String mk_token_let;
 
 typedef enum {
   kTokenTypesInit,

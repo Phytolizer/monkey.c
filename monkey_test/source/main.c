@@ -13,9 +13,9 @@ test_func(lexer_next_token) {
     MkTokenType expected_type;
     const char* expected_literal;
   } tests[] = {
-      {kTokenAssign, "="}, {kTokenPlus, "+"},      {kTokenLParen, "("},
-      {kTokenRParen, ")"}, {kTokenLBrace, "{"},    {kTokenRBrace, "}"},
-      {kTokenComma, ","},  {kTokenSemicolon, ";"}, {kTokenEof, ""},
+      {mk_token_assign, "="}, {mk_token_plus, "+"},      {mk_token_lparen, "("},
+      {mk_token_rparen, ")"}, {mk_token_lbrace, "{"},    {mk_token_rbrace, "}"},
+      {mk_token_comma, ","},  {mk_token_semicolon, ";"}, {mk_token_eof, ""},
   };
 
   MkLexer l = {0};
