@@ -1,3 +1,4 @@
 ---
-BasedOnStyle: Microsoft
+BasedOnStyle: Chromium
 PointerAlignment: Left
+IncludeBlocks: Regroup

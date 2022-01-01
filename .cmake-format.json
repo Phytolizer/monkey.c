@@ -12,38 +12,6 @@
           "SOURCES": "*",
           "DEPENDS": "*"
         }
-      },
-      "push_directory_executable": {
-        "flags": [
-          "TARGET_NAME",
-          "OUTPUT_NAME",
-          "SOURCE_FILES",
-          "INCLUDED_DIRECTORIES",
-          "LINKED_LIBRARIES"
-        ],
-        "kwargs": {
-          "TARGET_NAME": "1",
-          "OUTPUT_NAME": "1",
-          "SOURCE_FILES": "*",
-          "INCLUDED_DIRECTORIES": "*",
-          "LINKED_LIBRARIES": "*"
-        }
-      },
-      "push_directory_library": {
-        "flags": [
-          "TARGET_NAME",
-          "OUTPUT_NAME",
-          "SOURCE_FILES",
-          "INCLUDED_DIRECTORIES",
-          "LINKED_LIBRARIES"
-        ],
-        "kwargs": {
-          "TARGET_NAME": "1",
-          "OUTPUT_NAME": "1",
-          "SOURCE_FILES": "*",
-          "INCLUDED_DIRECTORIES": "*",
-          "LINKED_LIBRARIES": "*"
-        }
       }
     },
     "_help_override_spec": [
@@ -64,7 +32,7 @@
     "_help_line_width": ["How wide to allow formatted cmake files"],
     "line_width": 80,
     "_help_tab_size": ["How many spaces to tab for indent"],
-    "tab_size": 4,
+    "tab_size": 2,
     "_help_use_tabchars": [
       "If true, lines are indented using tab characters (utf-8",
       "0x09) instead of <tab_size> space characters (utf-8 0x20).",
@@ -161,7 +129,7 @@
       "If true, the parsers may infer whether or not an argument",
       "list is sortable (without annotation)."
     ],
-    "autosort": true,
+    "autosort": false,
     "_help_require_valid_layout": [
       "By default, if cmake-format cannot successfully fit",
       "everything into the desired linewidth it will apply the",
