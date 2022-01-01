@@ -8,8 +8,11 @@
 
 static void ReadChar(MkLexer* lexer);
 static String ReadIdentifier(MkLexer* lexer);
+static String ReadNumber(MkLexer* lexer);
+static void SkipWhitespace(MkLexer* lexer);
 static MkToken SingleCharToken(MkTokenType type, uint8_t literal);
 static bool IsLetter(uint8_t ch);
+static bool IsDigit(uint8_t ch);
 
 void MkLexerInit(MkLexer* lexer, StringView source) {
   lexer->source = source;
@@ -20,6 +23,7 @@ void MkLexerInit(MkLexer* lexer, StringView source) {
 
 MkToken MkLexerNextToken(MkLexer* lexer) {
   MkToken tok = {0};
+  SkipWhitespace(lexer);
   switch (lexer->ch) {
     case '=':
       tok = SingleCharToken(mk_token_assign, lexer->ch);
@@ -56,6 +60,10 @@ MkToken MkLexerNextToken(MkLexer* lexer) {
             .end = tok.literal.data + tok.literal.size,
         });
         return tok;
+      } else if (IsDigit(lexer->ch)) {
+        tok.literal = ReadNumber(lexer);
+        tok.type = mk_token_int;
+        return tok;
       } else {
         tok = SingleCharToken(mk_token_illegal, lexer->ch);
       }
@@ -84,6 +92,23 @@ String ReadIdentifier(MkLexer* lexer) {
   return StringFromSpan(ident);
 }
 
+String ReadNumber(MkLexer* lexer) {
+  StringView number = {0};
+  number.begin = &lexer->source.begin[lexer->position];
+  while (IsDigit(lexer->ch)) {
+    ReadChar(lexer);
+  }
+  number.end = &lexer->source.begin[lexer->position];
+  return StringFromSpan(number);
+}
+
+void SkipWhitespace(MkLexer* lexer) {
+  while (lexer->ch == ' ' || lexer->ch == '\t' || lexer->ch == '\n' ||
+         lexer->ch == '\r') {
+    ReadChar(lexer);
+  }
+}
+
 MkToken SingleCharToken(MkTokenType type, uint8_t literal) {
   return (MkToken){
       .type = type,
@@ -96,4 +121,8 @@ MkToken SingleCharToken(MkTokenType type, uint8_t literal) {
 
 bool IsLetter(uint8_t ch) {
   return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+}
+
+bool IsDigit(uint8_t ch) {
+  return ch >= '0' && ch <= '9';
 }
