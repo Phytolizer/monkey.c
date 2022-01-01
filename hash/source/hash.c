@@ -6,7 +6,7 @@
 
 enum { kInitialCapacity = 16, kMaxLoad = 0xBF };
 
-static bool HashRehash(HashUnpacked* hash, uint64_t new_capacity);
+static bool HashRehash(HashUnpacked hash, uint64_t new_capacity);
 static bool HashKeyVecEqualSpan(HashKeyVec a, HashKeySpan b);
 static uint64_t HashKeySpanHash(HashKeySpan key);
 static HashKey HashOwnKey(HashKeyView key);
@@ -14,21 +14,21 @@ static HashKey HashOwnKey(HashKeyView key);
 HashAddResult HashAdd(HashUnpacked hash,
                       HashKeyView key,
                       const uint8_t* value) {
-  if (hash.capacity == 0 || hash.size * 0x100 / hash.capacity > kMaxLoad) {
-    if (!HashRehash(&hash,
-                    hash.capacity ? hash.capacity * 2 : kInitialCapacity)) {
+  if (*hash.capacity == 0 || *hash.size * 0x100 / *hash.capacity > kMaxLoad) {
+    if (!HashRehash(hash,
+                    *hash.capacity ? *hash.capacity * 2 : kInitialCapacity)) {
       return kHashAddFailure;
     }
   }
 
-  uint64_t index = key.hash % hash.capacity;
+  uint64_t index = key.hash % *hash.capacity;
   while ((*hash.keys)[index].vec.size != 0) {
     if ((*hash.keys)[index].hash == key.hash &&
         HashKeyVecEqualSpan((*hash.keys)[index].vec, key.span)) {
       memcpy(hash.values[index], value, hash.sizeof_value);
       return kHashAddReplace;
     }
-    index = (index + 1) % hash.capacity;
+    index = (index + 1) % *hash.capacity;
   }
 
   (*hash.keys)[index] = HashOwnKey(key);
@@ -45,7 +45,7 @@ HashKeyView HashCreateKey(HashKeySpan key) {
 }
 
 void HashFree(HashUnpacked hash) {
-  for (uint64_t i = 0; i < hash.capacity; i++) {
+  for (uint64_t i = 0; i < *hash.capacity; i++) {
     if ((*hash.keys)[i].vec.size != 0) {
       VEC_FREE(&(*hash.keys)[i].vec);
     }
@@ -55,46 +55,46 @@ void HashFree(HashUnpacked hash) {
 }
 
 bool HashGet(HashUnpacked hash, HashKeyView key, uint8_t* out_value) {
-  uint64_t index = key.hash % hash.capacity;
+  uint64_t index = key.hash % *hash.capacity;
   while ((*hash.keys)[index].vec.size != 0) {
     if ((*hash.keys)[index].hash == key.hash &&
         HashKeyVecEqualSpan((*hash.keys)[index].vec, key.span)) {
       memcpy(out_value, hash.values[index], hash.sizeof_value);
       return true;
     }
-    index = (index + 1) % hash.capacity;
+    index = (index + 1) % *hash.capacity;
   }
   return false;
 }
 
-bool HashRehash(HashUnpacked* hash, uint64_t new_capacity) {
+bool HashRehash(HashUnpacked hash, uint64_t new_capacity) {
   HashKey* new_keys = calloc(new_capacity, sizeof(HashKey));
   if (!new_keys) {
     return false;
   }
 
-  uint8_t* new_values = calloc(new_capacity, hash->sizeof_value);
+  uint8_t* new_values = calloc(new_capacity, hash.sizeof_value);
   if (!new_values) {
     free(new_keys);
     return false;
   }
 
-  for (uint64_t i = 0; i < hash->capacity; i++) {
-    if ((*hash->keys)[i].vec.size != 0) {
-      uint64_t index = (*hash->keys)[i].hash % new_capacity;
+  for (uint64_t i = 0; i < *hash.capacity; i++) {
+    if ((*hash.keys)[i].vec.size != 0) {
+      uint64_t index = (*hash.keys)[i].hash % new_capacity;
       while ((new_keys)[index].vec.size != 0) {
         index = (index + 1) % new_capacity;
       }
-      new_keys[index] = (*hash->keys)[i];
-      memcpy(&new_values[index], hash->values[i], hash->sizeof_value);
+      new_keys[index] = (*hash.keys)[i];
+      memcpy(&new_values[index], hash.values[i], hash.sizeof_value);
     }
   }
 
-  free(*hash->keys);
-  free(*hash->values);
-  *hash->keys = new_keys;
-  *hash->values = new_values;
-  hash->capacity = new_capacity;
+  free(*hash.keys);
+  free(*hash.values);
+  *hash.keys = new_keys;
+  *hash.values = new_values;
+  *hash.capacity = new_capacity;
   return true;
 }
 

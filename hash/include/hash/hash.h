@@ -22,8 +22,8 @@ typedef struct {
 typedef struct {
   HashKey** keys;
   uint8_t** values;
-  uint64_t size;
-  uint64_t capacity;
+  uint64_t* size;
+  uint64_t* capacity;
   uint64_t sizeof_value;
 } HashUnpacked;
 
@@ -31,8 +31,8 @@ typedef struct {
   ((HashUnpacked){                             \
       .keys = &(Hash)->keys,                   \
       .values = (uint8_t**)&(Hash)->values,    \
-      .size = (Hash)->size,                    \
-      .capacity = (Hash)->capacity,            \
+      .size = &(Hash)->size,                   \
+      .capacity = &(Hash)->capacity,           \
       .sizeof_value = sizeof(*(Hash)->values), \
   })
 

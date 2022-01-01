@@ -51,7 +51,10 @@ MkToken MkLexerNextToken(MkLexer* lexer) {
     default:
       if (IsLetter(lexer->ch)) {
         tok.literal = ReadIdentifier(lexer);
-        tok.type = mk_token_ident;
+        tok.type = MkLookupIdent((StringView){
+            .begin = tok.literal.data,
+            .end = tok.literal.data + tok.literal.size,
+        });
         return tok;
       } else {
         tok = SingleCharToken(mk_token_illegal, lexer->ch);
