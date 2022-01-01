@@ -13,6 +13,13 @@ MkTokenType mk_token_int;
 
 MkTokenType mk_token_assign;
 MkTokenType mk_token_plus;
+MkTokenType mk_token_minus;
+MkTokenType mk_token_bang;
+MkTokenType mk_token_asterisk;
+MkTokenType mk_token_slash;
+
+MkTokenType mk_token_lt;
+MkTokenType mk_token_gt;
 
 MkTokenType mk_token_comma;
 MkTokenType mk_token_semicolon;
@@ -41,6 +48,13 @@ void MkTokenTypesManage(MkTokenTypesAction action) {
 
       mk_token_assign = StringFromC("=");
       mk_token_plus = StringFromC("+");
+      mk_token_minus = StringFromC("-");
+      mk_token_bang = StringFromC("!");
+      mk_token_asterisk = StringFromC("*");
+      mk_token_slash = StringFromC("/");
+
+      mk_token_lt = StringFromC("<");
+      mk_token_gt = StringFromC(">");
 
       mk_token_comma = StringFromC(",");
       mk_token_semicolon = StringFromC(";");
@@ -63,6 +77,12 @@ void MkTokenTypesManage(MkTokenTypesAction action) {
       VEC_FREE(&mk_token_int);
       VEC_FREE(&mk_token_assign);
       VEC_FREE(&mk_token_plus);
+      VEC_FREE(&mk_token_minus);
+      VEC_FREE(&mk_token_bang);
+      VEC_FREE(&mk_token_asterisk);
+      VEC_FREE(&mk_token_slash);
+      VEC_FREE(&mk_token_lt);
+      VEC_FREE(&mk_token_gt);
       VEC_FREE(&mk_token_comma);
       VEC_FREE(&mk_token_semicolon);
       VEC_FREE(&mk_token_lparen);

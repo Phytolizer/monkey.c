@@ -19,6 +19,13 @@ extern MkTokenType mk_token_int;
 
 extern MkTokenType mk_token_assign;
 extern MkTokenType mk_token_plus;
+extern MkTokenType mk_token_minus;
+extern MkTokenType mk_token_bang;
+extern MkTokenType mk_token_asterisk;
+extern MkTokenType mk_token_slash;
+
+extern MkTokenType mk_token_lt;
+extern MkTokenType mk_token_gt;
 
 extern MkTokenType mk_token_comma;
 extern MkTokenType mk_token_semicolon;

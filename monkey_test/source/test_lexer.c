@@ -30,6 +30,12 @@ test_func(lexer_next_token) {
       {mk_token_lparen, "("},    {mk_token_ident, "five"},
       {mk_token_comma, ","},     {mk_token_ident, "ten"},
       {mk_token_rparen, ")"},    {mk_token_semicolon, ";"},
+      {mk_token_bang, "!"},      {mk_token_minus, "-"},
+      {mk_token_slash, "/"},     {mk_token_asterisk, "*"},
+      {mk_token_int, "5"},       {mk_token_semicolon, ";"},
+      {mk_token_int, "5"},       {mk_token_lt, "<"},
+      {mk_token_int, "10"},      {mk_token_gt, ">"},
+      {mk_token_int, "5"},       {mk_token_semicolon, ";"},
       {mk_token_eof, ""},
   };
 

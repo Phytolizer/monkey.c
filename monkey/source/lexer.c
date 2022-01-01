@@ -49,6 +49,24 @@ MkToken MkLexerNextToken(MkLexer* lexer) {
     case '}':
       tok = SingleCharToken(mk_token_rbrace, lexer->ch);
       break;
+    case '-':
+      tok = SingleCharToken(mk_token_minus, lexer->ch);
+      break;
+    case '!':
+      tok = SingleCharToken(mk_token_bang, lexer->ch);
+      break;
+    case '*':
+      tok = SingleCharToken(mk_token_asterisk, lexer->ch);
+      break;
+    case '/':
+      tok = SingleCharToken(mk_token_slash, lexer->ch);
+      break;
+    case '<':
+      tok = SingleCharToken(mk_token_lt, lexer->ch);
+      break;
+    case '>':
+      tok = SingleCharToken(mk_token_gt, lexer->ch);
+      break;
     case '\0':
       tok.type = mk_token_eof;
       break;
