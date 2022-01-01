@@ -37,6 +37,11 @@ extern MkTokenType mk_token_rbrace;
 
 extern MkTokenType mk_token_function;
 extern MkTokenType mk_token_let;
+extern MkTokenType mk_token_if;
+extern MkTokenType mk_token_else;
+extern MkTokenType mk_token_return;
+extern MkTokenType mk_token_true;
+extern MkTokenType mk_token_false;
 
 typedef enum {
   kTokenTypesInit,

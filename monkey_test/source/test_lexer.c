@@ -36,7 +36,15 @@ test_func(lexer_next_token) {
       {mk_token_int, "5"},       {mk_token_lt, "<"},
       {mk_token_int, "10"},      {mk_token_gt, ">"},
       {mk_token_int, "5"},       {mk_token_semicolon, ";"},
-      {mk_token_eof, ""},
+      {mk_token_if, "if"},       {mk_token_lparen, "("},
+      {mk_token_int, "5"},       {mk_token_lt, "<"},
+      {mk_token_int, "10"},      {mk_token_rparen, ")"},
+      {mk_token_lbrace, "{"},    {mk_token_return, "return"},
+      {mk_token_true, "true"},   {mk_token_semicolon, ";"},
+      {mk_token_rbrace, "}"},    {mk_token_else, "else"},
+      {mk_token_lbrace, "{"},    {mk_token_return, "return"},
+      {mk_token_false, "false"}, {mk_token_semicolon, ";"},
+      {mk_token_rbrace, "}"},    {mk_token_eof, ""},
   };
 
   MkLexer l = {0};

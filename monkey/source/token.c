@@ -31,6 +31,11 @@ MkTokenType mk_token_rbrace;
 
 MkTokenType mk_token_function;
 MkTokenType mk_token_let;
+MkTokenType mk_token_if;
+MkTokenType mk_token_else;
+MkTokenType mk_token_return;
+MkTokenType mk_token_true;
+MkTokenType mk_token_false;
 
 static HASH_TYPE(MkTokenType) token_types = {0};
 
@@ -66,9 +71,19 @@ void MkTokenTypesManage(MkTokenTypesAction action) {
 
       mk_token_function = StringFromC("FUNCTION");
       mk_token_let = StringFromC("LET");
+      mk_token_if = StringFromC("IF");
+      mk_token_else = StringFromC("ELSE");
+      mk_token_return = StringFromC("RETURN");
+      mk_token_true = StringFromC("TRUE");
+      mk_token_false = StringFromC("FALSE");
 
       HASH_ADD(&token_types, CreateKey("fn"), mk_token_function);
       HASH_ADD(&token_types, CreateKey("let"), mk_token_let);
+      HASH_ADD(&token_types, CreateKey("if"), mk_token_if);
+      HASH_ADD(&token_types, CreateKey("else"), mk_token_else);
+      HASH_ADD(&token_types, CreateKey("return"), mk_token_return);
+      HASH_ADD(&token_types, CreateKey("true"), mk_token_true);
+      HASH_ADD(&token_types, CreateKey("false"), mk_token_false);
       break;
     case kTokenTypesFree:
       VEC_FREE(&mk_token_illegal);
@@ -91,6 +106,11 @@ void MkTokenTypesManage(MkTokenTypesAction action) {
       VEC_FREE(&mk_token_rbrace);
       VEC_FREE(&mk_token_function);
       VEC_FREE(&mk_token_let);
+      VEC_FREE(&mk_token_if);
+      VEC_FREE(&mk_token_else);
+      VEC_FREE(&mk_token_return);
+      VEC_FREE(&mk_token_true);
+      VEC_FREE(&mk_token_false);
       HASH_FREE(&token_types);
       break;
   }
