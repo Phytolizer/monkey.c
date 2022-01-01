@@ -32,7 +32,7 @@ HashAddResult HashAdd(HashUnpacked hash,
   }
 
   (*hash.keys)[index] = HashOwnKey(key);
-  memcpy(hash.values[index], value, hash.sizeof_value);
+  memcpy(&(*hash.values)[index], value, hash.sizeof_value);
   hash.size++;
   return kHashAddSuccess;
 }
@@ -48,8 +48,8 @@ void HashFree(HashUnpacked hash) {
       VEC_FREE(&(*hash.keys)[i].vec);
     }
   }
-  free(hash.keys);
-  free(hash.values);
+  free(*hash.keys);
+  free(*hash.values);
 }
 
 bool HashGet(HashUnpacked hash, HashKeyView key, uint8_t* out_value) {
