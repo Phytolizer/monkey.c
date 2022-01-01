@@ -15,5 +15,6 @@ bool StringEqual(const String a, const String b);
 bool StringEqualView(const String a, StringView b);
 
 #define STRING_PRINT(S) (int)(S).size, (S).data
+#define STRING_FMT ".*s"
 
 #endif  // STRING_STRING_H_

@@ -23,7 +23,7 @@ test_func(lexer_next_token) {
                       .begin = next_token_test,
                       .end = next_token_test + next_token_test_size,
                   });
-  for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
+  for (uint64_t i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
     MkToken t = MkLexerNextToken(&l);
     test_assert(
         StringEqual(t.type, tests[i].expected_type),
@@ -31,15 +31,17 @@ test_func(lexer_next_token) {
           MkTokenFree(t);
           MkTokenTypesManage(kTokenTypesFree);
         } while (false),
-        "tests[%zu].expected_type: %.*s, t.type: %.*s", i,
-        STRING_PRINT(tests[i].expected_type), STRING_PRINT(t.type));
+        "tests[%" PRIu64 "].expected_type: %" STRING_FMT
+        ", t.type: %" STRING_FMT,
+        i, STRING_PRINT(tests[i].expected_type), STRING_PRINT(t.type));
     test_assert(
         StringEqualView(t.literal, StringViewFromC(tests[i].expected_literal)),
         do {
           MkTokenFree(t);
           MkTokenTypesManage(kTokenTypesFree);
         } while (false),
-        "");
+        "tests[%" PRIu64 "].expected_literal: %s, t.literal: %" STRING_FMT, i,
+        tests[i].expected_literal, STRING_PRINT(t.literal));
   }
   test_pass();
 }
