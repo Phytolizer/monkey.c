@@ -38,8 +38,10 @@ HashAddResult HashAdd(HashUnpacked hash,
 }
 
 HashKeyView HashCreateKey(HashKeySpan key) {
-  HashKeyView hash_key = {.span = key, .hash = HashKeySpanHash(key)};
-  return hash_key;
+  return (HashKeyView){
+      .span = key,
+      .hash = HashKeySpanHash(key),
+  };
 }
 
 void HashFree(HashUnpacked hash) {
