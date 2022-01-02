@@ -57,5 +57,6 @@ void MkTokenTypesManage(MkTokenTypesAction action);
 void MkTokenFree(MkToken tok);
 MkTokenType MkLookupIdent(StringView ident);
 void MkTokenPrint(FILE* fp, MkToken tok);
+MkToken MkTokenDuplicate(const MkToken tok);
 
 #endif  // MONKEY_TOKEN_H_

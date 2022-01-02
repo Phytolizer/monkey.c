@@ -140,6 +140,15 @@ void MkTokenPrint(FILE* fp, MkToken tok) {
           STRING_PRINT(tok.type), STRING_PRINT(tok.literal));
 }
 
+MkToken MkTokenDuplicate(const MkToken tok) {
+  MkToken dup = {
+      .type = tok.type,
+      .literal = {0},
+  };
+  VEC_APPEND(&dup.literal, tok.literal.data, tok.literal.size);
+  return dup;
+}
+
 HashKeySpan CreateKey(const char* k) {
   return (HashKeySpan){
       .begin = (const uint8_t*)k,

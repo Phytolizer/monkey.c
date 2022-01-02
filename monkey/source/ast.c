@@ -26,6 +26,9 @@ String MkAstNodeTokenLiteral(MkAstNode* node) {
 }
 
 void MkAstNodeFree(MkAstNode* node) {
+  if (node == NULL) {
+    return;
+  }
   switch (node->type) {
     case kMkAstNodeProgram:
       ProgramFree((MkAstProgram*)node);
@@ -69,6 +72,9 @@ String ExpressionTokenLiteral(MkAstExpression* expr) {
 }
 
 void ProgramFree(MkAstProgram* prog) {
+  if (prog == NULL) {
+    return;
+  }
   for (size_t i = 0; i < prog->statements.size; i++) {
     StatementFree(prog->statements.data[i]);
   }
@@ -76,6 +82,9 @@ void ProgramFree(MkAstProgram* prog) {
 }
 
 void StatementFree(MkAstStatement* stmt) {
+  if (stmt == NULL) {
+    return;
+  }
   switch (stmt->type) {
     case kMkAstStatementLet: {
       MkAstLetStatement* let_stmt = (MkAstLetStatement*)stmt;
@@ -86,6 +95,9 @@ void StatementFree(MkAstStatement* stmt) {
 }
 
 void ExpressionFree(MkAstExpression* expr) {
+  if (expr == NULL) {
+    return;
+  }
   switch (expr->type) {
     case kMkAstExpressionIdentifier: {
       MkAstIdentifier* ident = (MkAstIdentifier*)expr;
