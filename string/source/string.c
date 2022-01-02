@@ -20,6 +20,12 @@ String StringFromSpan(StringView span) {
   return s;
 }
 
+String StringDuplicate(const String s) {
+  String result = {0};
+  VEC_APPEND(&result, s.data, s.size);
+  return result;
+}
+
 bool StringEqual(const String a, const String b) {
   return a.size == b.size && memcmp(a.data, b.data, a.size) == 0;
 }

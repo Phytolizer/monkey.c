@@ -68,7 +68,7 @@ transform_sources(
 transform_sources(
   monkey
   KIND library
-  SOURCES lexer.c token.c
+  SOURCES ast.c lexer.c parser.c token.c
   LIBRARIES vec span string hash
 )
 transform_sources(
@@ -92,7 +92,7 @@ add_custom_command(
 transform_sources(
   monkey_test
   KIND executable
-  SOURCES main.c test_lexer.c
+  SOURCES main.c test_lexer.c test_parser.c
   ABSOLUTE_SOURCES
     "${PROJECT_BINARY_DIR}/embedded/monkey_test/input/next_token_test.c"
   LIBRARIES monkey test

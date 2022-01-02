@@ -36,6 +36,16 @@
     }                                          \
   } while (false)
 
+#define test_run_subtest(Name, Cleanup, ...)          \
+  do {                                                \
+    char* message = test_subtest_##Name(__VA_ARGS__); \
+    if (message != NULL) {                            \
+      Cleanup;                                        \
+      return message;                                 \
+    }                                                 \
+  } while (false)
+
+#define test_subtest_func(Name, ...) char* test_subtest_##Name(__VA_ARGS__)
 #define test_func(Test) char* test_##Test(void)
 #define test_suite_func(Suite) char* test_suite_##Suite(uint64_t* test_count)
 #define test_pass() return NULL

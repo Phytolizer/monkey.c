@@ -11,6 +11,7 @@ typedef SPAN_TYPE(char) StringView;
 StringView StringViewFromC(const char* cstr);
 String StringFromC(const char* cstr);
 String StringFromSpan(StringView span);
+String StringDuplicate(const String s);
 bool StringEqual(const String a, const String b);
 bool StringEqualView(const String a, StringView b);
 
