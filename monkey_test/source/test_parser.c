@@ -14,15 +14,16 @@
 TEST_SUBTEST_FUNC(TestLetStatement,
                   MkAstLetStatement* statement,
                   const char* expected_name);
+TEST_SUBTEST_FUNC(CheckParserErrors, MkParser parser);
 
 TEST_FUNC(ParserLetStatements) {
   struct {
     const char* input;
     const char* expected_identifier;
   } tests[] = {
-      {"let x = 5;", "x"},
-      {"let y = true;", "y"},
-      {"let foobar = y;", "foobar"},
+      {"let x  5;", "x"},
+      {"let  = true;", "y"},
+      {"let foobar = ;", "foobar"},
   };
 
   for (uint64_t i = 0; i < sizeof(tests) / sizeof(tests[0]); ++i) {
@@ -38,6 +39,15 @@ TEST_FUNC(ParserLetStatements) {
           MkTokenTypesManage(kTokenTypesFree);
         } while (false),
         "tests[%" PRIu64 "]: program is null", i);
+    TEST_RUN_SUBTEST(
+        CheckParserErrors,
+        do {
+          MkAstNodeFree(&program->base);
+          free(program);
+          MkParserFree(parser);
+          MkTokenTypesManage(kTokenTypesFree);
+        } while (false),
+        parser);
     TEST_ASSERT(
         program->statements.size == 1,
         do {
@@ -89,4 +99,16 @@ TEST_SUBTEST_FUNC(TestLetStatement,
               expected_name);
   VEC_FREE(&toklit);
   TEST_PASS();
+}
+
+TEST_SUBTEST_FUNC(CheckParserErrors, MkParser parser) {
+  if (parser.errors.size == 0) {
+    TEST_PASS();
+  }
+
+  for (uint64_t i = 0; i < parser.errors.size; ++i) {
+    String error = parser.errors.data[i];
+    fprintf(stderr, "[PARSER ERROR] %" STRING_FMT "\n", STRING_PRINT(error));
+  }
+  TEST_FAIL("parser has %" PRIu64 " errors", parser.errors.size);
 }

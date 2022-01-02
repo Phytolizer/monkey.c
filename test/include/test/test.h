@@ -17,6 +17,8 @@
     }                                                     \
   } while (false)
 
+#define TEST_FAIL(...) TEST_ASSERT(false, (void)0, __VA_ARGS__)
+
 #define TEST_RUN_SUITE(Name, Count)            \
   do {                                         \
     char* message = TestSuite##Name(Count);    \

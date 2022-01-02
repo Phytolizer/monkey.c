@@ -7,12 +7,15 @@
 #include "string/string.h"
 
 static void ParserNextToken(MkParser* parser);
+static bool ExpectPeek(MkParser* parser, MkTokenType type);
+static void PeekError(MkParser* parser, MkTokenType type);
 static MkAstStatement* ParseStatement(MkParser* parser);
 static MkAstStatement* ParseLetStatement(MkParser* parser);
 static MkAstExpression* ParseExpression(MkParser* parser);
 
 void MkParserInit(MkParser* parser, MkLexer lexer) {
   parser->lexer = lexer;
+  parser->errors = (MkErrors){0};
   ParserNextToken(parser);
   ParserNextToken(parser);
 }
@@ -30,6 +33,10 @@ MkAstProgram* MkParserParseProgram(MkParser* parser) {
 }
 
 void MkParserFree(MkParser parser) {
+  for (uint64_t i = 0; i < parser.errors.size; ++i) {
+    VEC_FREE(&parser.errors.data[i]);
+  }
+  VEC_FREE(&parser.errors);
   MkTokenFree(parser.current_token);
   MkTokenFree(parser.peek_token);
 }
@@ -38,6 +45,22 @@ void ParserNextToken(MkParser* parser) {
   MkTokenFree(parser->current_token);
   parser->current_token = parser->peek_token;
   parser->peek_token = MkLexerNextToken(&parser->lexer);
+}
+
+bool ExpectPeek(MkParser* parser, MkTokenType type) {
+  if (StringEqual(parser->peek_token.type, type)) {
+    ParserNextToken(parser);
+    return true;
+  }
+  PeekError(parser, type);
+  return false;
+}
+
+void PeekError(MkParser* parser, MkTokenType type) {
+  String error = StringFormat(
+      "expected next token to be %" STRING_FMT ", got %" STRING_FMT " instead",
+      STRING_PRINT(type), STRING_PRINT(parser->peek_token.type));
+  VEC_PUSH(&parser->errors, error);
 }
 
 MkAstStatement* ParseStatement(MkParser* parser) {
@@ -52,8 +75,8 @@ MkAstStatement* ParseLetStatement(MkParser* parser) {
   let_statement->base.base.type = kMkAstNodeStatement;
   let_statement->base.type = kMkAstStatementLet;
   let_statement->token = MkTokenDuplicate(parser->current_token);
-  ParserNextToken(parser);
-  if (!StringEqual(parser->current_token.type, mk_token_ident)) {
+  if (!ExpectPeek(parser, mk_token_ident)) {
+    MkTokenFree(let_statement->token);
     free(let_statement);
     return NULL;
   }
@@ -63,9 +86,9 @@ MkAstStatement* ParseLetStatement(MkParser* parser) {
       .token = MkTokenDuplicate(parser->current_token),
       .value = StringDuplicate(parser->current_token.literal),
   };
-  ParserNextToken(parser);
-  if (!StringEqual(parser->current_token.type, mk_token_assign)) {
+  if (!ExpectPeek(parser, mk_token_assign)) {
     MkAstNodeFree(&let_statement->name.base.base);
+    MkTokenFree(let_statement->token);
     free(let_statement);
     return NULL;
   }
