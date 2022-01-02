@@ -21,9 +21,9 @@ TEST_FUNC(ParserLetStatements) {
     const char* input;
     const char* expected_identifier;
   } tests[] = {
-      {"let x  5;", "x"},
-      {"let  = true;", "y"},
-      {"let foobar = ;", "foobar"},
+      {"let x = 5;", "x"},
+      {"let y = true;", "y"},
+      {"let foobar = y;", "foobar"},
   };
 
   for (uint64_t i = 0; i < sizeof(tests) / sizeof(tests[0]); ++i) {
