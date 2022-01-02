@@ -22,6 +22,7 @@
     char* message = TestSuite##Name(Count);    \
     if (message != NULL) {                     \
       fprintf(stderr, "[FAIL] %s\n", message); \
+      free(message);                           \
       exit(EXIT_FAILURE);                      \
     }                                          \
   } while (false)
