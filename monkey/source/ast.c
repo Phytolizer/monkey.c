@@ -1,5 +1,6 @@
 #include "monkey/ast.h"
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string/string.h>
 
@@ -75,8 +76,9 @@ void ProgramFree(MkAstProgram* prog) {
   if (prog == NULL) {
     return;
   }
-  for (size_t i = 0; i < prog->statements.size; i++) {
+  for (uint64_t i = 0; i < prog->statements.size; i++) {
     StatementFree(prog->statements.data[i]);
+    free(prog->statements.data[i]);
   }
   VEC_FREE(&prog->statements);
 }
@@ -89,7 +91,9 @@ void StatementFree(MkAstStatement* stmt) {
     case kMkAstStatementLet: {
       MkAstLetStatement* let_stmt = (MkAstLetStatement*)stmt;
       MkTokenFree(let_stmt->token);
+      ExpressionFree(&let_stmt->name.base);
       ExpressionFree(let_stmt->value);
+      free(let_stmt->value);
     } break;
   }
 }

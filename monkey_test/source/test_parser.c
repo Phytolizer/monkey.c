@@ -7,6 +7,7 @@
 #include <monkey/token.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <string/string.h>
 
@@ -41,6 +42,7 @@ test_func(parser_let_statements) {
         program->statements.size == 1,
         do {
           MkAstNodeFree(&program->base);
+          free(program);
           MkParserFree(parser);
           MkTokenTypesManage(kTokenTypesFree);
         } while (false),
@@ -50,6 +52,7 @@ test_func(parser_let_statements) {
         statement->type == kMkAstStatementLet,
         do {
           MkAstNodeFree(&program->base);
+          free(program);
           MkParserFree(parser);
           MkTokenTypesManage(kTokenTypesFree);
         } while (false),
@@ -58,10 +61,14 @@ test_func(parser_let_statements) {
         TestLetStatement,
         do {
           MkAstNodeFree(&program->base);
+          free(program);
           MkParserFree(parser);
           MkTokenTypesManage(kTokenTypesFree);
         } while (false),
         (MkAstLetStatement*)statement, tests[i].expected_identifier);
+    MkAstNodeFree(&program->base);
+    free(program);
+    MkParserFree(parser);
   }
   test_pass();
 }

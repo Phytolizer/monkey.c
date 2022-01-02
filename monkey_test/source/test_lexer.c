@@ -75,6 +75,7 @@ test_func(lexer_next_token) {
         } while (false),
         "tests[%" PRIu64 "].expected_literal: %s, t.literal: %" STRING_FMT, i,
         tests[i].expected_literal, STRING_PRINT(t.literal));
+    MkTokenFree(t);
   }
   test_pass();
 }

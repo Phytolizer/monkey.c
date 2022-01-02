@@ -95,7 +95,7 @@ transform_sources(
   SOURCES main.c test_lexer.c test_parser.c
   ABSOLUTE_SOURCES
     "${PROJECT_BINARY_DIR}/embedded/monkey_test/input/next_token_test.c"
-  LIBRARIES monkey test
+  LIBRARIES monkey test asan
   INCLUDES "${PROJECT_BINARY_DIR}/embedded"
 )
 transform_sources(
