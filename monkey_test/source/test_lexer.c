@@ -7,7 +7,7 @@
 
 #include "monkey_test/input/next_token_test.h"
 
-test_func(lexer_next_token) {
+TEST_FUNC(LexerNextToken) {
   struct {
     MkTokenType expected_type;
     const char* expected_literal;
@@ -58,7 +58,7 @@ test_func(lexer_next_token) {
                   });
   for (uint64_t i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
     MkToken t = MkLexerNextToken(&l);
-    test_assert(
+    TEST_ASSERT(
         StringEqual(t.type, tests[i].expected_type),
         do {
           MkTokenFree(t);
@@ -67,7 +67,7 @@ test_func(lexer_next_token) {
         "tests[%" PRIu64 "].expected_type: %" STRING_FMT
         ", t.type: %" STRING_FMT,
         i, STRING_PRINT(tests[i].expected_type), STRING_PRINT(t.type));
-    test_assert(
+    TEST_ASSERT(
         StringEqualView(t.literal, StringViewFromC(tests[i].expected_literal)),
         do {
           MkTokenFree(t);
@@ -77,5 +77,5 @@ test_func(lexer_next_token) {
         tests[i].expected_literal, STRING_PRINT(t.literal));
     MkTokenFree(t);
   }
-  test_pass();
+  TEST_PASS();
 }

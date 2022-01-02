@@ -3,6 +3,6 @@
 
 #include <test/test.h>
 
-test_func(lexer_next_token);
+TEST_FUNC(LexerNextToken);
 
 #endif  // MONKEY_TEST_LEXER_H_

@@ -3,6 +3,6 @@
 
 #include <test/test.h>
 
-test_func(parser_let_statements);
+TEST_FUNC(ParserLetStatements);
 
 #endif  // MONKEY_TEST_PARSER_H_

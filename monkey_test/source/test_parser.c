@@ -11,11 +11,11 @@
 #include <string.h>
 #include <string/string.h>
 
-test_subtest_func(TestLetStatement,
+TEST_SUBTEST_FUNC(TestLetStatement,
                   MkAstLetStatement* statement,
                   const char* expected_name);
 
-test_func(parser_let_statements) {
+TEST_FUNC(ParserLetStatements) {
   struct {
     const char* input;
     const char* expected_identifier;
@@ -31,14 +31,14 @@ test_func(parser_let_statements) {
     MkParser parser = {0};
     MkParserInit(&parser, lexer);
     MkAstProgram* program = MkParserParseProgram(&parser);
-    test_assert(
+    TEST_ASSERT(
         program != NULL,
         do {
           MkParserFree(parser);
           MkTokenTypesManage(kTokenTypesFree);
         } while (false),
         "tests[%" PRIu64 "]: program is null", i);
-    test_assert(
+    TEST_ASSERT(
         program->statements.size == 1,
         do {
           MkAstNodeFree(&program->base);
@@ -48,7 +48,7 @@ test_func(parser_let_statements) {
         } while (false),
         "tests[%" PRIu64 "]: program->statements.size != 1", i);
     MkAstStatement* statement = program->statements.data[0];
-    test_assert(
+    TEST_ASSERT(
         statement->type == kMkAstStatementLet,
         do {
           MkAstNodeFree(&program->base);
@@ -57,7 +57,7 @@ test_func(parser_let_statements) {
           MkTokenTypesManage(kTokenTypesFree);
         } while (false),
         "tests[%" PRIu64 "]: statement->type != Let", i);
-    test_run_subtest(
+    TEST_RUN_SUBTEST(
         TestLetStatement,
         do {
           MkAstNodeFree(&program->base);
@@ -70,23 +70,23 @@ test_func(parser_let_statements) {
     free(program);
     MkParserFree(parser);
   }
-  test_pass();
+  TEST_PASS();
 }
 
-test_subtest_func(TestLetStatement,
+TEST_SUBTEST_FUNC(TestLetStatement,
                   MkAstLetStatement* statement,
                   const char* expected_name) {
   String toklit = MkAstNodeTokenLiteral(&statement->base.base);
-  test_assert(StringEqualView(toklit, StringViewFromC("let")),
+  TEST_ASSERT(StringEqualView(toklit, StringViewFromC("let")),
               VEC_FREE(&toklit), "statement TokenLiteral != 'let'");
   VEC_FREE(&toklit);
-  test_assert(
+  TEST_ASSERT(
       StringEqualView(statement->name.value, StringViewFromC(expected_name)),
       (void)0, "statement name.value != '%s'", expected_name);
   toklit = MkAstNodeTokenLiteral(&statement->name.base.base);
-  test_assert(StringEqualView(toklit, StringViewFromC(expected_name)),
+  TEST_ASSERT(StringEqualView(toklit, StringViewFromC(expected_name)),
               VEC_FREE(&toklit), "statement name TokenLiteral != '%s'",
               expected_name);
   VEC_FREE(&toklit);
-  test_pass();
+  TEST_PASS();
 }

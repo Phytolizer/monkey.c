@@ -3,8 +3,8 @@
 
 #include <stddef.h>
 
-char* nonstd_strdup(const char* str);
-char* nonstd_strndup(const char* str, size_t n);
-void* nonstd_memdup(const void* mem, size_t nbytes);
+char* NonstdStrdup(const char* str);
+char* NonstdStrndup(const char* str, size_t n);
+void* NonstdMemdup(const void* mem, size_t nbytes);
 
 #endif  // NONSTD_STRDUP_H_
