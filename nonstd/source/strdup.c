@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* NonstdStrdup(const char* str)
+char* NonstdStringDuplicate(const char* str)
 {
     size_t len = strlen(str);
     char* result = malloc(len + 1);
@@ -11,7 +11,7 @@ char* NonstdStrdup(const char* str)
     return result;
 }
 
-char* NonstdStrndup(const char* str, size_t n)
+char* NonstdStringDuplicateN(const char* str, size_t n)
 {
     char* result = malloc(n + 1);
     memcpy(result, str, n);
@@ -19,7 +19,7 @@ char* NonstdStrndup(const char* str, size_t n)
     return result;
 }
 
-void* NonstdMemdup(const void* mem, size_t nbytes)
+void* NonstdMemoryDuplicate(const void* mem, size_t nbytes)
 {
     void* result = malloc(nbytes);
     memcpy(result, mem, nbytes);

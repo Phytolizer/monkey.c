@@ -1,7 +1,7 @@
 #include "nonstd/strpbrk.h"
 #include <stddef.h>
 
-char* NonstdStrpbrk(const char* s, const char* accept)
+char* NonstdStringPointBreak(const char* s, const char* accept)
 {
     while (*s != '\0')
     {

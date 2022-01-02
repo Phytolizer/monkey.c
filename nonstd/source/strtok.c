@@ -7,17 +7,17 @@
 char* NonstdStrtok(char* str, const char* delim)
 {
     static char* olds;
-    return NonstdStrtokR(str, delim, &olds);
+    return NonstdStringTokenizeReentrant(str, delim, &olds);
 }
 
-char* NonstdStrtokR(char* str, const char* delim, char** savep)
+char* NonstdStringTokenizeReentrant(char* str, const char* delim, char** savep)
 {
     if (str == NULL)
     {
         str = *savep;
     }
 
-    str += NonstdStrspn(str, delim);
+    str += NonstdStringSpan(str, delim);
     if (*str == '\0')
     {
         *savep = str;
@@ -25,7 +25,7 @@ char* NonstdStrtokR(char* str, const char* delim, char** savep)
     }
 
     char* token = str;
-    str = NonstdStrpbrk(token, delim);
+    str = NonstdStringPointBreak(token, delim);
     if (str == NULL)
     {
         *savep = strchr(token, '\0');

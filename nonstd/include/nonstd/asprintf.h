@@ -1,6 +1,6 @@
 #ifndef NONSTD_ASPRINTF_H_
 #define NONSTD_ASPRINTF_H_
 
-void NonstdAsprintf(char** result, const char* format, ...);
+void NonstdAllocatedStringPrintf(char** result, const char* format, ...);
 
 #endif  // NONSTD_ASPRINTF_H_

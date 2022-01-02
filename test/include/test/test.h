@@ -7,14 +7,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TEST_ASSERT(Test, Cleanup, ...)      \
-  do {                                       \
-    if (!(Test)) {                           \
-      char* message;                         \
-      NonstdAsprintf(&message, __VA_ARGS__); \
-      Cleanup;                               \
-      return message;                        \
-    }                                        \
+#define TEST_ASSERT(Test, Cleanup, ...)                   \
+  do {                                                    \
+    if (!(Test)) {                                        \
+      char* message;                                      \
+      NonstdAllocatedStringPrintf(&message, __VA_ARGS__); \
+      Cleanup;                                            \
+      return message;                                     \
+    }                                                     \
   } while (false)
 
 #define TEST_RUN_SUITE(Name, Count)            \

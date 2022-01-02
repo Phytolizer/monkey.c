@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void NonstdAsprintf(char** result, const char* format, ...) {
+void NonstdAllocatedStringPrintf(char** result, const char* format, ...) {
   va_list args;
   va_start(args, format);
   int size = vsnprintf(NULL, 0, format, args);

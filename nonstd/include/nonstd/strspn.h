@@ -3,6 +3,6 @@
 
 #include <stddef.h>
 
-size_t NonstdStrspn(const char* s, const char* accept);
+size_t NonstdStringSpan(const char* s, const char* accept);
 
 #endif  // NONSTD_STRSPN_H_
