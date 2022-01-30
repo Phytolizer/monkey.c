@@ -16,3 +16,11 @@ declare_module(
     KIND executable
     SOURCES Embed.c
 )
+add_custom_command(
+    OUTPUT "${PROJECT_BINARY_DIR}/Embedded/Test.h"
+    "${PROJECT_BINARY_DIR}/Embedded/Test.c"
+    DEPENDS Embed
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${PROJECT_BINARY_DIR}/Embedded"
+    COMMAND "$<TARGET_FILE:Embed>" "${PROJECT_SOURCE_DIR}/CMakeLists.txt" "${PROJECT_BINARY_DIR}/Embedded/Test"
+)
+declare_module(Test KIND executable ABSOLUTE_SOURCES "${PROJECT_BINARY_DIR}/Embedded/Test.h" "${PROJECT_BINARY_DIR}/Embedded/Test.c")
