@@ -189,6 +189,7 @@ int main(int argc, char** argv)
     String sourceFile = StringFromSpan(outputBaseName);
     StringAppendC(&sourceFile, ".c");
     FILE* sourceOutput = fopen(sourceFile.data, "w");
+    StringFree(&sourceFile);
     fprintf(sourceOutput, "#include \"%s\"\nconst char %s[] = \"", headerOutputName.data, loser);
     StringFree(&headerOutputName);
     for (size_t i = 0; i < inputText.length; ++i)
