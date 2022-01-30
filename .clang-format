@@ -1,4 +1,6 @@
 ---
-BasedOnStyle: Chromium
+BasedOnStyle: Microsoft
 PointerAlignment: Left
+BinPackArguments: false
+BinPackParameters: false
 IncludeBlocks: Regroup
