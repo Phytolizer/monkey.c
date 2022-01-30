@@ -156,20 +156,10 @@ int main(int argc, char** argv)
     }
     StringFree(&fileNameStr);
 
-    fseek(input, 0, SEEK_END);
-    size_t inputLen = ftell(input);
-    fseek(input, 0, SEEK_SET);
-    String inputText = StringInitN(inputLen);
-    fread(inputText.data, 1, inputLen, input);
-    inputText.length = inputLen;
-    fclose(input);
-
     String headerOutputName = StringFromSpan(outputBaseName);
     StringAppendC(&headerOutputName, ".h");
     FILE* headerOutput = fopen(headerOutputName.data, "w");
 
-    char buffer[1024] = {0};
-    size_t cursor = 0;
     const char* loser = strrchr(outputBaseName.data, '\\');
     if (loser == NULL)
     {
@@ -192,41 +182,35 @@ int main(int argc, char** argv)
     StringFree(&sourceFile);
     fprintf(sourceOutput, "#include \"%s\"\nconst char %s[] = \"", headerOutputName.data, loser);
     StringFree(&headerOutputName);
-    for (size_t i = 0; i < inputText.length; ++i)
+    char buffer[1024] = {0};
+    while (fgets(buffer, sizeof buffer, input))
     {
-        if (cursor > sizeof(buffer) - 2)
+        for (size_t i = 0; i < sizeof buffer && buffer[i] != '\0'; ++i)
         {
-            fwrite(buffer, 1, cursor, sourceOutput);
-            cursor = 0;
-        }
-        switch (inputText.data[i])
-        {
-        case '\n':
-            buffer[cursor++] = '\\';
-            buffer[cursor++] = 'n';
-            break;
-        case '\r':
-            buffer[cursor++] = '\\';
-            buffer[cursor++] = 'r';
-            break;
-        case '\t':
-            buffer[cursor++] = '\\';
-            buffer[cursor++] = 't';
-            break;
-        case '"':
-            buffer[cursor++] = '\\';
-            buffer[cursor++] = '"';
-            break;
-        default:
-            buffer[cursor++] = inputText.data[i];
-            break;
+            switch (buffer[i])
+            {
+                case '\n':
+                    fwrite("\\n", 1, 2, sourceOutput);
+                    break;
+                case '\r':
+                    fwrite("\\r", 1, 2, sourceOutput);
+                    break;
+                case '\t':
+                    fwrite("\\t", 1, 2, sourceOutput);
+                    break;
+                case '"':
+                    fwrite("\\\"", 1, 2, sourceOutput);
+                    break;
+                default:
+                    fputc(buffer[i], sourceOutput);
+                    break;
+            }
         }
     }
-    fwrite(buffer, 1, cursor, sourceOutput);
     fprintf(sourceOutput, "\";\n");
     fclose(sourceOutput);
 
-    StringFree(&inputText);
+    fclose(input);
     ArgumentsComplete(&args);
     return 0;
 }

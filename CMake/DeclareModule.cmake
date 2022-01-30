@@ -43,11 +43,12 @@ function(declare_module NAME)
         -Werror=unused-function
         -Werror=unused-parameter
         -Werror=unused-variable
-        -fsanitize=address,undefined
     )
-    target_link_options(
-        ${DM_TARGET_NAME} ${DM_PUBLICITY} -fsanitize=address,undefined
-    )
+    if(WIN32)
+        target_compile_definitions(
+            ${DM_TARGET_NAME} ${DM_PUBLICITY} _CRT_SECURE_NO_WARNINGS
+        )
+    endif()
     if(DM_INTERNAL_INCLUDE)
         target_include_directories(
             ${DM_TARGET_NAME} PRIVATE "Modules/${NAME}/InternalInclude"
@@ -56,11 +57,6 @@ function(declare_module NAME)
     if(DM_OUTPUT_NAME)
         set_target_properties(
             ${DM_TARGET_NAME} PROPERTIES OUTPUT_NAME ${DM_OUTPUT_NAME}
-        )
-    endif()
-    if(WIN32)
-        target_compile_definitions(
-            ${DM_TARGET_NAME} ${DM_PUBLICITY} _CRT_SECURE_NO_WARNINGS
         )
     endif()
 endfunction()
