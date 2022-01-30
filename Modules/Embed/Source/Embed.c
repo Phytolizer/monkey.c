@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -160,23 +161,17 @@ int main(int argc, char** argv)
     {
         for (size_t i = 0; i < sizeof buffer && buffer[i] != '\0'; ++i)
         {
-            switch (buffer[i])
+            if (iscntrl(buffer[i]))
             {
-                case '\n':
-                    fwrite("\\n", 1, 2, sourceOutput);
-                    break;
-                case '\r':
-                    fwrite("\\r", 1, 2, sourceOutput);
-                    break;
-                case '\t':
-                    fwrite("\\t", 1, 2, sourceOutput);
-                    break;
-                case '"':
-                    fwrite("\\\"", 1, 2, sourceOutput);
-                    break;
-                default:
-                    fputc(buffer[i], sourceOutput);
-                    break;
+                fprintf(sourceOutput, "\\%03o", buffer[i]);
+            }
+            else if (buffer[i] == '"')
+            {
+                fwrite("\\\"", 1, 2, sourceOutput);
+            }
+            else
+            {
+                fputc(buffer[i], sourceOutput);
             }
         }
     }
