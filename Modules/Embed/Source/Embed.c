@@ -159,7 +159,7 @@ int main(int argc, char** argv)
     char buffer[1024] = {0};
     while (fgets(buffer, sizeof buffer, input))
     {
-        for (size_t i = 0; i < sizeof buffer && buffer[i] != '\0'; ++i)
+        for (size_t i = 0; buffer[i] != '\0'; ++i)
         {
             if (iscntrl(buffer[i]))
             {
