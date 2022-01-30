@@ -20,7 +20,7 @@ typedef struct
 #define SS_FMT "%.*s"
 #define SS_ARG(span) (int)span.length, span.data
 
-String StringFromSpan(StringSpan span)
+static String StringFromSpan(StringSpan span)
 {
     String s = {
         .data = calloc(1, span.length + 1),
@@ -31,29 +31,7 @@ String StringFromSpan(StringSpan span)
     return s;
 }
 
-String StringFromC(const char* c)
-{
-    size_t n = strlen(c);
-    String s = {
-        .data = calloc(1, n + 1),
-        .capacity = n,
-        .length = n,
-    };
-    memcpy(s.data, c, n);
-    return s;
-}
-
-String StringInitN(size_t n)
-{
-    String s = {
-        .data = calloc(1, n + 1),
-        .capacity = n + 1,
-        .length = 0,
-    };
-    return s;
-}
-
-void StringAlloc(String* s)
+static void StringAlloc(String* s)
 {
     size_t oldCapacity = s->capacity;
     if (s->capacity == 0)
@@ -65,7 +43,7 @@ void StringAlloc(String* s)
     memset(s->data + oldCapacity, 0, s->capacity - oldCapacity);
 }
 
-void StringAppendC(String* s, const char* c)
+static void StringAppendC(String* s, const char* c)
 {
     size_t n = strlen(c);
     while (s->length + n + 1 > s->capacity)
@@ -77,7 +55,7 @@ void StringAppendC(String* s, const char* c)
     s->length += n;
 }
 
-void StringFree(String* s)
+static void StringFree(String* s)
 {
     free(s->data);
     s->data = NULL;
@@ -92,7 +70,7 @@ typedef struct
     StringSpan* data;
 } Arguments;
 
-Arguments ArgumentsInit(size_t argc, char** argv)
+static Arguments ArgumentsInit(size_t argc, char** argv)
 {
     StringSpan* data = calloc(sizeof(StringSpan), argc);
     Arguments args = {
@@ -110,7 +88,7 @@ Arguments ArgumentsInit(size_t argc, char** argv)
     return args;
 }
 
-void ArgumentsComplete(Arguments* args)
+static void ArgumentsComplete(Arguments* args)
 {
     free(args->dataAlloc);
     args->data = NULL;
@@ -118,12 +96,7 @@ void ArgumentsComplete(Arguments* args)
     args->count = 0;
 }
 
-bool ArgumentsEmpty(Arguments args)
-{
-    return args.count == 0;
-}
-
-StringSpan NextArgument(Arguments* args)
+static StringSpan NextArgument(Arguments* args)
 {
     StringSpan arg = args->data[0];
     args->data++;
