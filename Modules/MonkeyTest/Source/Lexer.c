@@ -37,7 +37,15 @@ static TEST_FUNC(NextToken)
         {TokenTypeInt, STRING_SPAN("5")},       {TokenTypeLt, STRING_SPAN("<")},
         {TokenTypeInt, STRING_SPAN("10")},      {TokenTypeGt, STRING_SPAN(">")},
         {TokenTypeInt, STRING_SPAN("5")},       {TokenTypeSemicolon, STRING_SPAN(";")},
-        {TokenTypeEof, STRING_SPAN("")},
+        {TokenTypeIf, STRING_SPAN("if")},       {TokenTypeLparen, STRING_SPAN("(")},
+        {TokenTypeInt, STRING_SPAN("5")},       {TokenTypeLt, STRING_SPAN("<")},
+        {TokenTypeInt, STRING_SPAN("10")},      {TokenTypeRparen, STRING_SPAN(")")},
+        {TokenTypeLbrace, STRING_SPAN("{")},    {TokenTypeReturn, STRING_SPAN("return")},
+        {TokenTypeTrue, STRING_SPAN("true")},   {TokenTypeSemicolon, STRING_SPAN(";")},
+        {TokenTypeRbrace, STRING_SPAN("}")},    {TokenTypeElse, STRING_SPAN("else")},
+        {TokenTypeLbrace, STRING_SPAN("{")},    {TokenTypeReturn, STRING_SPAN("return")},
+        {TokenTypeFalse, STRING_SPAN("false")}, {TokenTypeSemicolon, STRING_SPAN(";")},
+        {TokenTypeRbrace, STRING_SPAN("}")},    {TokenTypeEof, STRING_SPAN("")},
     };
     Lexer l = LexerInit((StringSpan){.data = NextToken, .length = NextToken_LENGTH});
     for (size_t i = 0; i < sizeof tests / sizeof tests[0]; i += 1)

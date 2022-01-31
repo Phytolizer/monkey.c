@@ -25,7 +25,12 @@
     X(Lbrace, "{")                                                                                                     \
     X(Rbrace, "}")                                                                                                     \
     X(Function, "FUNCTION")                                                                                            \
-    X(Let, "LET")
+    X(Let, "LET")                                                                                                      \
+    X(If, "IF")                                                                                                        \
+    X(Else, "ELSE")                                                                                                    \
+    X(Return, "RETURN")                                                                                                \
+    X(True, "TRUE")                                                                                                    \
+    X(False, "FALSE")
 
 typedef String TokenType;
 

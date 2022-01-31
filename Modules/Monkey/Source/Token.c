@@ -14,16 +14,44 @@ TokenType LookupIdent(StringSpan ident)
     }
     switch (ident.data[0])
     {
+        case 'e':
+            if (StringSpansEqual(ident, STRING_SPAN("else")))
+            {
+                return TokenTypeElse;
+            }
+            break;
         case 'f':
+            if (StringSpansEqual(ident, STRING_SPAN("false")))
+            {
+                return TokenTypeFalse;
+            }
             if (StringSpansEqual(ident, STRING_SPAN("fn")))
             {
                 return TokenTypeFunction;
+            }
+            break;
+        case 'i':
+            if (StringSpansEqual(ident, STRING_SPAN("if")))
+            {
+                return TokenTypeIf;
             }
             break;
         case 'l':
             if (StringSpansEqual(ident, STRING_SPAN("let")))
             {
                 return TokenTypeLet;
+            }
+            break;
+        case 'r':
+            if (StringSpansEqual(ident, STRING_SPAN("return")))
+            {
+                return TokenTypeReturn;
+            }
+            break;
+        case 't':
+            if (StringSpansEqual(ident, STRING_SPAN("true")))
+            {
+                return TokenTypeTrue;
             }
             break;
     }
