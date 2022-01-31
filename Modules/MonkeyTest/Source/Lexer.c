@@ -9,36 +9,38 @@ static TEST_FUNC(NextToken)
     struct
     {
         TokenType expectedType;
-        const char* expectedLiteral;
+        StringSpan expectedLiteral;
     } tests[] = {
-        {TokenTypeAssign, "="},
-        {TokenTypePlus, "+"},
-        {TokenTypeLparen, "("},
-        {TokenTypeRparen, ")"},
-        {TokenTypeLbrace, "{"},
-        {TokenTypeRbrace, "}"},
-        {TokenTypeComma, ","},
-        {TokenTypeSemicolon, ";"},
-        {TokenTypeEof, ""},
+        {TokenTypeAssign, STRING_SPAN("=")},
+        {TokenTypePlus, STRING_SPAN("+")},
+        {TokenTypeLparen, STRING_SPAN("(")},
+        {TokenTypeRparen, STRING_SPAN(")")},
+        {TokenTypeLbrace, STRING_SPAN("{")},
+        {TokenTypeRbrace, STRING_SPAN("}")},
+        {TokenTypeComma, STRING_SPAN(",")},
+        {TokenTypeSemicolon, STRING_SPAN(";")},
+        {TokenTypeEof, STRING_SPAN("")},
     };
-    Lexer l = LexerInit(NextToken, NextToken_LENGTH);
+    Lexer l = LexerInit((StringSpan){.data = NextToken, .length = NextToken_LENGTH});
     for (size_t i = 0; i < sizeof tests / sizeof tests[0]; i += 1)
     {
         Token t = LexerNextToken(&l);
         TEST_ASSERT(t.type.data == tests[i].expectedType.data,
-                    (void)0,
+                    free(t.literal.data),
                     "tests[%zu] -- tokentype wrong. expected='%.*s', actual='%.*s'",
                     i,
-                    tests[i].expectedType.len,
+                    tests[i].expectedType.length,
                     tests[i].expectedType.data,
-                    t.type.len,
+                    t.type.length,
                     t.type.data);
-        TEST_ASSERT(strcmp(t.literal, tests[i].expectedLiteral) == 0,
-                    (void)0,
-                    "tests[%zu] -- literal wrong. expected='%s', actual='%s'",
+        TEST_ASSERT(StringSpansEqual(STRING_AS_SPAN(t.literal), tests[i].expectedLiteral),
+                    free(t.literal.data),
+                    "tests[%zu] -- literal wrong. expected='%.*s', actual='%.*s'",
                     i,
-                    tests[i].expectedLiteral,
-                    t.literal);
+                    tests[i].expectedLiteral.length,
+                    tests[i].expectedLiteral.data,
+                    t.literal.length,
+                    t.literal.data);
     }
     TEST_PASS();
 }

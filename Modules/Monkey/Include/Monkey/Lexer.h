@@ -1,16 +1,17 @@
 #pragma once
 
 #include "Monkey/Token.h"
+
+#include <SimpleString/String.h>
 #include <stddef.h>
 
 typedef struct
 {
-    const char* input;
-    const int inputLen;
+    StringSpan input;
     int position;
     int readPosition;
     char ch;
 } Lexer;
 
-Lexer LexerInit(const char* input, int inputLen);
+Lexer LexerInit(StringSpan input);
 Token LexerNextToken(Lexer* l);

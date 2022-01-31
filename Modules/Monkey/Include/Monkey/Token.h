@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SimpleString/String.h>
+
 #define TOKEN_TYPES_X                                                                                                  \
     X(Illegal, "ILLEGAL")                                                                                              \
     X(Eof, "EOF")                                                                                                      \
@@ -16,11 +18,7 @@
     X(Function, "FUNCTION")                                                                                            \
     X(Let, "LET")
 
-typedef struct
-{
-    const char* data;
-    int len;
-} TokenType;
+typedef String TokenType;
 
 #define X(x, y) extern const TokenType TokenType##x;
 TOKEN_TYPES_X
@@ -29,6 +27,5 @@ TOKEN_TYPES_X
 typedef struct
 {
     TokenType type;
-    char* literal;
-    int literalLen;
+    String literal;
 } Token;

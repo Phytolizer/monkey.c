@@ -5,13 +5,11 @@
 
 static void LexerReadChar(Lexer* l);
 static Token NewToken(TokenType type, char ch);
-static char* CopyString(const char* str, int len);
 
-Lexer LexerInit(const char* input, const int inputLen)
+Lexer LexerInit(StringSpan input)
 {
     Lexer l = {
         .input = input,
-        .inputLen = inputLen,
         .position = 0,
         .readPosition = 0,
         .ch = '\0',
@@ -54,8 +52,7 @@ Token LexerNextToken(Lexer* l)
             break;
         case '\0':
             tok.type = TokenTypeEof;
-            tok.literal = CopyString("", 0);
-            tok.literalLen = 0;
+            tok.literal = StringCopy("", 0);
             break;
     }
 
@@ -66,13 +63,13 @@ Token LexerNextToken(Lexer* l)
 
 void LexerReadChar(Lexer* l)
 {
-    if (l->readPosition >= l->inputLen)
+    if (l->readPosition >= l->input.length)
     {
         l->ch = '\0';
     }
     else
     {
-        l->ch = l->input[l->readPosition];
+        l->ch = l->input.data[l->readPosition];
     }
     l->position = l->readPosition;
     l->readPosition += 1;
@@ -82,14 +79,6 @@ Token NewToken(TokenType type, char ch)
 {
     return (Token){
         .type = type,
-        .literal = CopyString(&ch, 1),
-        .literalLen = 1,
+        .literal = StringCopy(&ch, 1),
     };
-}
-
-char* CopyString(const char* str, int len)
-{
-    char* result = calloc(len + 1, 1);
-    memcpy(result, str, len);
-    return result;
 }

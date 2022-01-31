@@ -17,9 +17,15 @@ declare_module(
     SOURCES Embed.c
 )
 declare_module(
+    SimpleString
+    KIND library
+    SOURCES String.c
+)
+declare_module(
     Monkey
     KIND library
     SOURCES Lexer.c Token.c
+    DEPENDS SimpleString
 )
 
 declare_module(TestFramework KIND interface)
