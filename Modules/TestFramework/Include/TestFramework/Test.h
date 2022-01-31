@@ -99,6 +99,10 @@ typedef struct
         }                                                                                                              \
     } while (0)
 
+/// Use this macro if there is no cleanup to be performed.
+/// Of course, you could also just write (void)0.
+#define TEST_CLEANUP_NONE (void)0
+
 /// Dump a test summary to stderr.
 /// This can be called after running all suites for a user-friendly summary.
 #define TEST_SUMMARY(State)                                                                                            \

@@ -10,6 +10,11 @@ String StringCopy(const char* data, int length)
     return result;
 }
 
+String StringDuplicate(StringSpan s)
+{
+    return StringCopy(s.data, s.length);
+}
+
 String StringSubstring(StringSpan str, int start, int end)
 {
     String result = {.data = calloc(end - start + 1, 1), .length = end - start};

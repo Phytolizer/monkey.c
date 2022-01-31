@@ -26,7 +26,7 @@ declare_module(
 declare_module(
     Monkey
     KIND library
-    SOURCES Lexer.c Token.c
+    SOURCES Ast.c Lexer.c Parser.c Token.c
     DEPENDS SimpleString WindowsHelpers
 )
 declare_module(
@@ -58,6 +58,6 @@ declare_module(
     ABSOLUTE_SOURCES
         "${PROJECT_BINARY_DIR}/Embedded/MonkeyTest/Input/Lexer/NextToken.c"
     INCLUDES "${PROJECT_BINARY_DIR}/Embedded"
-    SOURCES Main.c Lexer.c
+    SOURCES Main.c Lexer.c Parser.c
     DEPENDS Monkey TestFramework WindowsHelpers
 )

@@ -1,4 +1,5 @@
 #include "MonkeyTest/Lexer.h"
+#include "MonkeyTest/Parser.h"
 
 #include <TestFramework/Test.h>
 
@@ -13,6 +14,7 @@ int main(void)
 
     // Run the tests.
     TEST_RUN_SUITE(Lexer, &testState);
+    TEST_RUN_SUITE(Parser, &testState);
 
     // Verify the absence of leaks.
     if (LEAK_CHECK())

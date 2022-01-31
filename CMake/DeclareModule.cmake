@@ -49,6 +49,9 @@ function(declare_module NAME)
             ${DM_TARGET_NAME} ${DM_PUBLICITY} _CRT_SECURE_NO_WARNINGS
         )
     endif()
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_compile_definitions(${DM_TARGET_NAME} ${DM_PUBLICITY} DEBUG)
+    endif()
     if(DM_INTERNAL_INCLUDE)
         target_include_directories(
             ${DM_TARGET_NAME} PRIVATE "Modules/${NAME}/InternalInclude"
