@@ -29,6 +29,45 @@ Program* ProgramInit(Statement** statements, int statementsLength)
     return result;
 }
 
+void ProgramDeinit(Program* p)
+{
+    for (int i = 0; i < p->statementsLength; i++)
+    {
+        StatementDeinit(p->statements[i]);
+        free(p->statements[i]);
+    }
+    free(p->statements);
+}
+
+void StatementDeinit(Statement* s)
+{
+    switch (s->type)
+    {
+        case StatementTypeLet:
+            free(s->letStatement.token.literal.data);
+            free(s->letStatement.name->token.literal.data);
+            free(s->letStatement.name->value.data);
+            free(s->letStatement.name);
+            if (s->letStatement.value != NULL)
+            {
+                ExpressionDeinit(s->letStatement.value);
+                free(s->letStatement.value);
+            }
+            break;
+    }
+}
+
+void ExpressionDeinit(Expression* e)
+{
+    switch (e->type)
+    {
+        case ExpressionTypeIdentifier:
+            free(e->identifier.token.literal.data);
+            free(e->identifier.value.data);
+            break;
+    }
+}
+
 Node* LetStatementInit(Token token, Identifier* name, Expression* value)
 {
     Node* result = calloc(sizeof(Node), 1);

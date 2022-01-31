@@ -86,6 +86,9 @@ typedef struct
 } Node;
 
 Program* ProgramInit(Statement** statements, int statementsLength);
+void ProgramDeinit(Program* p);
+void StatementDeinit(Statement* s);
+void ExpressionDeinit(Expression* e);
 Node* LetStatementInit(Token token, Identifier* name, Expression* value);
 Node* IdentifierInit(Token token, String value);
 

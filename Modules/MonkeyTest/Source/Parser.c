@@ -40,9 +40,20 @@ static TEST_FUNC(LetStatements)
     for (size_t i = 0; i < sizeof tests / sizeof tests[0]; i += 1)
     {
         Statement* stmt = program->statements[i];
-        TEST_RUN_SUBTEST(TestLetStatement, ParserDeinit(&p), stmt, tests[i].expectedIdentifier);
+        TEST_RUN_SUBTEST(
+            TestLetStatement,
+            {
+                ParserDeinit(&p);
+                ProgramDeinit(program);
+                free(program);
+            },
+            stmt,
+            tests[i].expectedIdentifier);
     }
 
+    ParserDeinit(&p);
+    ProgramDeinit(program);
+    free(program);
     TEST_PASS();
 }
 
