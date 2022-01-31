@@ -6,6 +6,9 @@
 #define SECURITY_WIN32
 #include <security.h>
 #else
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #endif
 

@@ -147,7 +147,10 @@ int main(int argc, char** argv)
     {
         loser += 1;
     }
-    fprintf(headerOutput, "#pragma once\nextern const char %s[];\nextern const size_t %s_LENGTH;\n", loser, loser);
+    fprintf(headerOutput,
+            "#pragma once\n#include <stddef.h>\nextern const char %s[];\nextern const size_t %s_LENGTH;\n",
+            loser,
+            loser);
     fclose(headerOutput);
 
     String sourceFile = StringFromSpan(outputBaseName);
