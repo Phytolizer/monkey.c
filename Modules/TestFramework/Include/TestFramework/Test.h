@@ -93,7 +93,7 @@ typedef struct
         {                                                                                                              \
             int messageLength = snprintf(NULL, 0, __VA_ARGS__);                                                        \
             char* message = calloc(messageLength + 1, 1);                                                              \
-            snprintf(message, messageLength, __VA_ARGS__);                                                             \
+            snprintf(message, messageLength + 1, __VA_ARGS__);                                                         \
             CleanupOnFailure;                                                                                          \
             return (TestResult){.success = false, .message = message, .messageLength = messageLength};                 \
         }                                                                                                              \
