@@ -34,7 +34,7 @@ Program* ParseProgram(Parser* p)
     Statement** statements = calloc(statementsCapacity, sizeof(Statement*));
     int statementsLength = 0;
 
-    while (p->curToken.type.data != TokenTypeEof.data)
+    while (!CurTokenIs(p, TokenTypeEof))
     {
         Statement* stmt = ParseStatement(p);
         if (stmt != NULL)
