@@ -45,7 +45,11 @@ static TEST_FUNC(NextToken)
         {TokenTypeRbrace, STRING_SPAN("}")},    {TokenTypeElse, STRING_SPAN("else")},
         {TokenTypeLbrace, STRING_SPAN("{")},    {TokenTypeReturn, STRING_SPAN("return")},
         {TokenTypeFalse, STRING_SPAN("false")}, {TokenTypeSemicolon, STRING_SPAN(";")},
-        {TokenTypeRbrace, STRING_SPAN("}")},    {TokenTypeEof, STRING_SPAN("")},
+        {TokenTypeRbrace, STRING_SPAN("}")},    {TokenTypeInt, STRING_SPAN("10")},
+        {TokenTypeEq, STRING_SPAN("==")},       {TokenTypeInt, STRING_SPAN("10")},
+        {TokenTypeSemicolon, STRING_SPAN(";")}, {TokenTypeInt, STRING_SPAN("10")},
+        {TokenTypeNotEq, STRING_SPAN("!=")},    {TokenTypeInt, STRING_SPAN("9")},
+        {TokenTypeSemicolon, STRING_SPAN(";")}, {TokenTypeEof, STRING_SPAN("")},
     };
     Lexer l = LexerInit((StringSpan){.data = NextToken, .length = NextToken_LENGTH});
     for (size_t i = 0; i < sizeof tests / sizeof tests[0]; i += 1)

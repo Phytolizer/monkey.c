@@ -6,6 +6,7 @@
 #include <string.h>
 
 static void LexerReadChar(Lexer* l);
+static char LexerPeekChar(Lexer* l);
 static String LexerReadIdentifier(Lexer* l);
 static String LexerReadNumber(Lexer* l);
 static void LexerSkipWhitespace(Lexer* l);
@@ -36,13 +37,31 @@ Token LexerNextToken(Lexer* l)
     switch (l->ch)
     {
         case '=':
-            tok = NewToken(TokenTypeAssign, l->ch);
+            if (LexerPeekChar(l) == '=')
+            {
+                LexerReadChar(l);
+                tok.type = TokenTypeEq;
+                tok.literal = StringCopy("==", 2);
+            }
+            else
+            {
+                tok = NewToken(TokenTypeAssign, l->ch);
+            }
             break;
         case '+':
             tok = NewToken(TokenTypePlus, l->ch);
             break;
         case '!':
-            tok = NewToken(TokenTypeBang, l->ch);
+            if (LexerPeekChar(l) == '=')
+            {
+                LexerReadChar(l);
+                tok.type = TokenTypeNotEq;
+                tok.literal = StringCopy("!=", 2);
+            }
+            else
+            {
+                tok = NewToken(TokenTypeBang, l->ch);
+            }
             break;
         case '-':
             tok = NewToken(TokenTypeMinus, l->ch);
@@ -106,16 +125,18 @@ Token LexerNextToken(Lexer* l)
 
 void LexerReadChar(Lexer* l)
 {
-    if (l->readPosition >= l->input.length)
-    {
-        l->ch = '\0';
-    }
-    else
-    {
-        l->ch = l->input.data[l->readPosition];
-    }
+    l->ch = LexerPeekChar(l);
     l->position = l->readPosition;
     l->readPosition += 1;
+}
+
+char LexerPeekChar(Lexer* l)
+{
+    if (l->readPosition >= l->input.length)
+    {
+        return '\0';
+    }
+    return l->input.data[l->readPosition];
 }
 
 String LexerReadIdentifier(Lexer* l)

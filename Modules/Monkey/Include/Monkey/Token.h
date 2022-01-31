@@ -18,6 +18,8 @@
     X(Slash, "/")                                                                                                      \
     X(Lt, "<")                                                                                                         \
     X(Gt, ">")                                                                                                         \
+    X(Eq, "==")                                                                                                        \
+    X(NotEq, "!=")                                                                                                     \
     X(Comma, ",")                                                                                                      \
     X(Semicolon, ";")                                                                                                  \
     X(Lparen, "(")                                                                                                     \
