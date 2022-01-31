@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Monkey/Prelude.h"
+// The above always comes first!
+
 #include "Monkey/Token.h"
 
 #include <SimpleString/String.h>

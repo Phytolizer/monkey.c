@@ -1,3 +1,5 @@
+#include "MonkeyTest/Lexer.h"
+
 #include <Monkey/Lexer.h>
 #include <Monkey/Token.h>
 #include <MonkeyTest/Input/Lexer/NextToken.h>

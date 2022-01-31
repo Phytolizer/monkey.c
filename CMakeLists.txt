@@ -11,6 +11,7 @@ project(
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake")
 include(DeclareModule)
 
+declare_module(WindowsHelpers KIND interface)
 declare_module(
     Embed
     KIND executable
@@ -20,15 +21,15 @@ declare_module(
     SimpleString
     KIND library
     SOURCES String.c
+    DEPENDS WindowsHelpers
 )
 declare_module(
     Monkey
     KIND library
     SOURCES Lexer.c Token.c
-    DEPENDS SimpleString
+    DEPENDS SimpleString WindowsHelpers
 )
 
-declare_module(WindowsHelpers KIND interface)
 declare_module(TestFramework KIND interface)
 add_custom_command(
     OUTPUT "${PROJECT_BINARY_DIR}/Embedded/MonkeyTest/Input/Lexer/NextToken.h"

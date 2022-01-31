@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Monkey/Prelude.h"
+// The above always comes first!
+
 #include <SimpleString/String.h>
 
 #define TOKEN_TYPES_X                                                                                                  \

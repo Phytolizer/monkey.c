@@ -5,9 +5,13 @@
 
 int main(void)
 {
+    LEAK_SET_STDERR();
     TestState testState = {0};
     TEST_RUN_SUITE(Lexer, &testState);
 
-    LEAK_CHECK();
+    if (LEAK_CHECK())
+    {
+        return 1;
+    }
     return testState.numFailures;
 }

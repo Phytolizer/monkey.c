@@ -1,5 +1,8 @@
 #pragma once
 
+#include <WindowsHelpers/LeakCheck.h>
+// The above always comes first!
+
 #include <stdbool.h>
 
 typedef struct
