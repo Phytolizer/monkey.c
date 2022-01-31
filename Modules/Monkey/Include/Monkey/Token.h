@@ -32,3 +32,5 @@ typedef struct
     TokenType type;
     String literal;
 } Token;
+
+TokenType LookupIdent(StringSpan ident);

@@ -1,10 +1,17 @@
 #include "Monkey/Lexer.h"
 
+#include "Monkey/Token.h"
+
 #include <stdlib.h>
 #include <string.h>
 
 static void LexerReadChar(Lexer* l);
+static String LexerReadIdentifier(Lexer* l);
+static String LexerReadNumber(Lexer* l);
+static void LexerSkipWhitespace(Lexer* l);
 static Token NewToken(TokenType type, char ch);
+static bool IsLetter(char ch);
+static bool IsDigit(char ch);
 
 Lexer LexerInit(StringSpan input)
 {
@@ -23,6 +30,8 @@ Lexer LexerInit(StringSpan input)
 Token LexerNextToken(Lexer* l)
 {
     Token tok;
+
+    LexerSkipWhitespace(l);
 
     switch (l->ch)
     {
@@ -54,6 +63,22 @@ Token LexerNextToken(Lexer* l)
             tok.type = TokenTypeEof;
             tok.literal = StringCopy("", 0);
             break;
+        default:
+            if (IsLetter(l->ch))
+            {
+                tok.literal = LexerReadIdentifier(l);
+                tok.type = LookupIdent(STRING_AS_SPAN(tok.literal));
+                return tok;
+            }
+            if (IsDigit(l->ch))
+            {
+                tok.type = TokenTypeInt;
+                tok.literal = LexerReadNumber(l);
+                return tok;
+            }
+
+            tok = NewToken(TokenTypeIllegal, l->ch);
+            break;
     }
 
     LexerReadChar(l);
@@ -75,10 +100,48 @@ void LexerReadChar(Lexer* l)
     l->readPosition += 1;
 }
 
+String LexerReadIdentifier(Lexer* l)
+{
+    int position = l->position;
+    while (IsLetter(l->ch))
+    {
+        LexerReadChar(l);
+    }
+    return StringSubstring(l->input, position, l->position);
+}
+
+String LexerReadNumber(Lexer* l)
+{
+    int position = l->position;
+    while (IsDigit(l->ch))
+    {
+        LexerReadChar(l);
+    }
+    return StringSubstring(l->input, position, l->position);
+}
+
+void LexerSkipWhitespace(Lexer* l)
+{
+    while (l->ch == ' ' || l->ch == '\t' || l->ch == '\r' || l->ch == '\n')
+    {
+        LexerReadChar(l);
+    }
+}
+
 Token NewToken(TokenType type, char ch)
 {
     return (Token){
         .type = type,
         .literal = StringCopy(&ch, 1),
     };
+}
+
+bool IsLetter(char ch)
+{
+    return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_';
+}
+
+bool IsDigit(char ch)
+{
+    return ch >= '0' && ch <= '9';
 }

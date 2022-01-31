@@ -13,14 +13,24 @@ static TEST_FUNC(NextToken)
         TokenType expectedType;
         StringSpan expectedLiteral;
     } tests[] = {
-        {TokenTypeAssign, STRING_SPAN("=")},
-        {TokenTypePlus, STRING_SPAN("+")},
-        {TokenTypeLparen, STRING_SPAN("(")},
-        {TokenTypeRparen, STRING_SPAN(")")},
-        {TokenTypeLbrace, STRING_SPAN("{")},
-        {TokenTypeRbrace, STRING_SPAN("}")},
-        {TokenTypeComma, STRING_SPAN(",")},
-        {TokenTypeSemicolon, STRING_SPAN(";")},
+        {TokenTypeLet, STRING_SPAN("let")},     {TokenTypeIdent, STRING_SPAN("five")},
+        {TokenTypeAssign, STRING_SPAN("=")},    {TokenTypeInt, STRING_SPAN("5")},
+        {TokenTypeSemicolon, STRING_SPAN(";")}, {TokenTypeLet, STRING_SPAN("let")},
+        {TokenTypeIdent, STRING_SPAN("ten")},   {TokenTypeAssign, STRING_SPAN("=")},
+        {TokenTypeInt, STRING_SPAN("10")},      {TokenTypeSemicolon, STRING_SPAN(";")},
+        {TokenTypeLet, STRING_SPAN("let")},     {TokenTypeIdent, STRING_SPAN("add")},
+        {TokenTypeAssign, STRING_SPAN("=")},    {TokenTypeFunction, STRING_SPAN("fn")},
+        {TokenTypeLparen, STRING_SPAN("(")},    {TokenTypeIdent, STRING_SPAN("x")},
+        {TokenTypeComma, STRING_SPAN(",")},     {TokenTypeIdent, STRING_SPAN("y")},
+        {TokenTypeRparen, STRING_SPAN(")")},    {TokenTypeLbrace, STRING_SPAN("{")},
+        {TokenTypeIdent, STRING_SPAN("x")},     {TokenTypePlus, STRING_SPAN("+")},
+        {TokenTypeIdent, STRING_SPAN("y")},     {TokenTypeSemicolon, STRING_SPAN(";")},
+        {TokenTypeRbrace, STRING_SPAN("}")},    {TokenTypeSemicolon, STRING_SPAN(";")},
+        {TokenTypeLet, STRING_SPAN("let")},     {TokenTypeIdent, STRING_SPAN("result")},
+        {TokenTypeAssign, STRING_SPAN("=")},    {TokenTypeIdent, STRING_SPAN("add")},
+        {TokenTypeLparen, STRING_SPAN("(")},    {TokenTypeIdent, STRING_SPAN("five")},
+        {TokenTypeComma, STRING_SPAN(",")},     {TokenTypeIdent, STRING_SPAN("ten")},
+        {TokenTypeRparen, STRING_SPAN(")")},    {TokenTypeSemicolon, STRING_SPAN(";")},
         {TokenTypeEof, STRING_SPAN("")},
     };
     Lexer l = LexerInit((StringSpan){.data = NextToken, .length = NextToken_LENGTH});
