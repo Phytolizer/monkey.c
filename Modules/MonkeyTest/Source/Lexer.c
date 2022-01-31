@@ -41,6 +41,7 @@ static TEST_FUNC(NextToken)
                     tests[i].expectedLiteral.data,
                     t.literal.length,
                     t.literal.data);
+        free(t.literal.data);
     }
     TEST_PASS();
 }

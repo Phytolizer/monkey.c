@@ -28,6 +28,7 @@ declare_module(
     DEPENDS SimpleString
 )
 
+declare_module(WindowsHelpers KIND interface)
 declare_module(TestFramework KIND interface)
 add_custom_command(
     OUTPUT "${PROJECT_BINARY_DIR}/Embedded/MonkeyTest/Input/Lexer/NextToken.h"
@@ -48,5 +49,5 @@ declare_module(
         "${PROJECT_BINARY_DIR}/Embedded/MonkeyTest/Input/Lexer/NextToken.c"
     INCLUDES "${PROJECT_BINARY_DIR}/Embedded"
     SOURCES Main.c Lexer.c
-    DEPENDS Monkey TestFramework
+    DEPENDS Monkey TestFramework WindowsHelpers
 )
