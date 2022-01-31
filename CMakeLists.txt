@@ -29,6 +29,15 @@ declare_module(
     SOURCES Lexer.c Token.c
     DEPENDS SimpleString WindowsHelpers
 )
+declare_module(
+    MonkeyRepl
+    KIND executable
+    SOURCES Main.c WhoAmI.c
+    DEPENDS Monkey SimpleString
+)
+if(WIN32)
+    target_link_libraries(MonkeyRepl PRIVATE Secur32)
+endif()
 
 declare_module(TestFramework KIND interface)
 add_custom_command(
