@@ -26,20 +26,24 @@ typedef struct
 #define TEST_RUN_SUITE(Name, State)                                                                                    \
     do                                                                                                                 \
     {                                                                                                                  \
-        fprintf(stderr, "[SUITE] %s\n", #Name);                                                                        \
+        fputs("[SUITE] " #Name "\n", stderr);                                                                          \
         TestSuiteFunc##Name(State);                                                                                    \
     } while (0)
 
 #define TEST_RUN(Name)                                                                                                 \
     do                                                                                                                 \
     {                                                                                                                  \
-        fprintf(stderr, "[TEST] %s\n", #Name);                                                                         \
+        fputs("[TEST] " #Name "\n", stderr);                                                                           \
         TestResult result = TestFunc##Name(testState);                                                                 \
         if (!result.success)                                                                                           \
         {                                                                                                              \
             testState->numFailures += 1;                                                                               \
-            fprintf(stderr, "[FAIL] %.*s\n", result.messageLength, result.message);                                    \
+            fprintf(stderr, "[FAIL] " #Name ": %.*s\n", result.messageLength, result.message);                         \
             free(result.message);                                                                                      \
+        }                                                                                                              \
+        else                                                                                                           \
+        {                                                                                                              \
+            fputs("[PASS] " #Name "\n", stderr);                                                                       \
         }                                                                                                              \
         testState->numTests += 1;                                                                                      \
     } while (0)
@@ -73,4 +77,14 @@ typedef struct
             CleanupOnFailure;                                                                                          \
             return (TestResult){.success = false, .message = message, .messageLength = messageLength};                 \
         }                                                                                                              \
+    } while (0)
+
+#define TEST_SUMMARY(State)                                                                                            \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        fprintf(stderr,                                                                                                \
+                "[SUMMARY] %zu tests, %zu failures, %zu assertions\n",                                                 \
+                (State)->numTests,                                                                                     \
+                (State)->numFailures,                                                                                  \
+                (State)->numAssertions);                                                                               \
     } while (0)

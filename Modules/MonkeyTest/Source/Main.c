@@ -13,5 +13,6 @@ int main(void)
     {
         return 1;
     }
+    TEST_SUMMARY(&testState);
     return testState.numFailures;
 }
