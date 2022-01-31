@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-const StringSpan PROMPT = STRING_SPAN(">> ");
+const StringSpan Prompt = STRING_SPAN(">> ");
 
 static String ReadLine(FILE* in)
 {
@@ -48,7 +48,7 @@ void Start(FILE* in, FILE* out)
 {
     while (true)
     {
-        fprintf(out, "%.*s", PROMPT.length, PROMPT.data);
+        fprintf(out, "%.*s", Prompt.length, Prompt.data);
         fflush(out);
         String line = ReadLine(in);
         if (line.data == NULL)
