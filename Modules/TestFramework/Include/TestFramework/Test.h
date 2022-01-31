@@ -63,7 +63,7 @@ typedef struct
 #define TEST_RUN_SUBTEST(Name, CleanupOnFailure, ...)                                                                  \
     do                                                                                                                 \
     {                                                                                                                  \
-        TestResult result = TestSubtestFunc##Name(State, __VA_ARGS__);                                                 \
+        TestResult result = TestSubtestFunc##Name(testState, __VA_ARGS__);                                             \
         if (!result.success)                                                                                           \
         {                                                                                                              \
             CleanupOnFailure;                                                                                          \
