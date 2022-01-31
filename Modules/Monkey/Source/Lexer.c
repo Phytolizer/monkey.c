@@ -41,6 +41,24 @@ Token LexerNextToken(Lexer* l)
         case '+':
             tok = NewToken(TokenTypePlus, l->ch);
             break;
+        case '!':
+            tok = NewToken(TokenTypeBang, l->ch);
+            break;
+        case '-':
+            tok = NewToken(TokenTypeMinus, l->ch);
+            break;
+        case '/':
+            tok = NewToken(TokenTypeSlash, l->ch);
+            break;
+        case '*':
+            tok = NewToken(TokenTypeAsterisk, l->ch);
+            break;
+        case '<':
+            tok = NewToken(TokenTypeLt, l->ch);
+            break;
+        case '>':
+            tok = NewToken(TokenTypeGt, l->ch);
+            break;
         case '(':
             tok = NewToken(TokenTypeLparen, l->ch);
             break;

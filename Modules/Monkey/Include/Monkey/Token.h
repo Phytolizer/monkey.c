@@ -12,6 +12,12 @@
     X(Int, "INT")                                                                                                      \
     X(Assign, "=")                                                                                                     \
     X(Plus, "+")                                                                                                       \
+    X(Minus, "-")                                                                                                      \
+    X(Bang, "!")                                                                                                       \
+    X(Asterisk, "*")                                                                                                   \
+    X(Slash, "/")                                                                                                      \
+    X(Lt, "<")                                                                                                         \
+    X(Gt, ">")                                                                                                         \
     X(Comma, ",")                                                                                                      \
     X(Semicolon, ";")                                                                                                  \
     X(Lparen, "(")                                                                                                     \
