@@ -79,7 +79,7 @@ static Arguments ArgumentsInit(size_t argc, char** argv)
         .data = data,
         .dataAlloc = data,
     };
-    for (size_t i = 0; i < argc; ++i)
+    for (size_t i = 0; i < argc; i += 1)
     {
         args.data[i] = (StringSpan){
             .data = argv[i],
@@ -100,8 +100,8 @@ static void ArgumentsComplete(Arguments* args)
 static StringSpan NextArgument(Arguments* args)
 {
     StringSpan arg = args->data[0];
-    args->data++;
-    args->count--;
+    args->data += 1;
+    args->count -= 1;
     return arg;
 }
 
@@ -145,9 +145,9 @@ int main(int argc, char** argv)
     }
     else
     {
-        loser++;
+        loser += 1;
     }
-    fprintf(headerOutput, "#pragma once\nextern const char %s[];\n", loser);
+    fprintf(headerOutput, "#pragma once\nextern const char %s[];\nextern const size_t %s_LENGTH;\n", loser, loser);
     fclose(headerOutput);
 
     String sourceFile = StringFromSpan(outputBaseName);
@@ -159,7 +159,7 @@ int main(int argc, char** argv)
     char buffer[1024] = {0};
     while (fgets(buffer, sizeof buffer, input))
     {
-        for (size_t i = 0; buffer[i] != '\0'; ++i)
+        for (size_t i = 0; buffer[i] != '\0'; i += 1)
         {
             if (iscntrl(buffer[i]))
             {
@@ -175,7 +175,7 @@ int main(int argc, char** argv)
             }
         }
     }
-    fprintf(sourceOutput, "\";\n");
+    fprintf(sourceOutput, "\";\nconst size_t %s_LENGTH = sizeof %s - 1;\n", loser, loser);
     fclose(sourceOutput);
 
     fclose(input);
