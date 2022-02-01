@@ -44,7 +44,8 @@ function(declare_module NAME)
         -Werror=unused-parameter
         -Werror=unused-variable>
         $<$<C_COMPILER_ID:MSVC>:/W4
-        /WX>
+        /WX
+        /analyze>
     )
     if(WIN32)
         target_compile_definitions(

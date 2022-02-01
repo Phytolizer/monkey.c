@@ -28,6 +28,10 @@ static String StringFromSpan(StringSpan span)
         .capacity = span.length,
         .length = span.length,
     };
+    if (s.data == NULL)
+    {
+        return (String){0};
+    }
     memcpy(s.data, span.data, span.length);
     return s;
 }
@@ -40,8 +44,18 @@ static void StringAlloc(String* s)
         s->capacity = 8;
     }
     s->capacity *= 2;
-    s->data = realloc(s->data, s->capacity);
-    memset(s->data + oldCapacity, 0, s->capacity - oldCapacity);
+    char* newData = calloc(s->capacity, 1);
+    if (newData == NULL)
+    {
+        free(s->data);
+        s->data = NULL;
+        s->capacity = 0;
+        s->length = 0;
+        return;
+    }
+    memcpy(newData, s->data, oldCapacity);
+    free(s->data);
+    s->data = newData;
 }
 
 static void StringAppendC(String* s, const char* c)
