@@ -8,6 +8,7 @@
 static void ParserNextToken(Parser* p);
 static Statement* ParseStatement(Parser* p);
 static Statement* ParseLetStatement(Parser* p);
+static Statement* ParseReturnStatement(Parser* p);
 static bool CurTokenIs(Parser* p, TokenType type);
 static bool PeekTokenIs(Parser* p, TokenType type);
 static bool ExpectPeek(Parser* p, TokenType type);
@@ -71,9 +72,13 @@ void ParserNextToken(Parser* p)
 
 Statement* ParseStatement(Parser* p)
 {
-    if (p->curToken.type.data == TokenTypeLet.data)
+    if (CurTokenIs(p, TokenTypeLet))
     {
         return ParseLetStatement(p);
+    }
+    if (CurTokenIs(p, TokenTypeReturn))
+    {
+        return ParseReturnStatement(p);
     }
 
     return NULL;
@@ -116,6 +121,26 @@ Statement* ParseLetStatement(Parser* p)
     result->as.letStatement.token = token;
     result->as.letStatement.name = name;
     result->as.letStatement.value = NULL;
+    return result;
+}
+
+Statement* ParseReturnStatement(Parser* p)
+{
+    Token token = p->curToken;
+    p->curToken.literal.data = NULL;
+
+    ParserNextToken(p);
+
+    // TODO: Skip the expressions until we encounter a semicolon.
+    while (!CurTokenIs(p, TokenTypeSemicolon))
+    {
+        ParserNextToken(p);
+    }
+
+    Statement* result = calloc(sizeof(Statement), 1);
+    result->type = StatementTypeReturn;
+    result->as.returnStatement.token = token;
+    result->as.returnStatement.returnValue = NULL;
     return result;
 }
 

@@ -7,12 +7,14 @@
 #include <TestFramework/Test.h>
 
 static TEST_FUNC(LetStatements);
+static TEST_FUNC(ReturnStatements);
 static TEST_SUBTEST_FUNC(TestLetStatement, Statement* s, StringSpan name);
 static TEST_SUBTEST_FUNC(CheckParserErrors, Parser* p);
 
 TEST_SUITE_FUNC(Parser)
 {
     TEST_RUN(LetStatements);
+    TEST_RUN(ReturnStatements);
 }
 
 static TEST_FUNC(LetStatements)
@@ -62,6 +64,67 @@ static TEST_FUNC(LetStatements)
             },
             stmt,
             tests[i].expectedIdentifier);
+    }
+
+    ParserDeinit(&p);
+    ProgramDeinit(program);
+    free(program);
+    TEST_PASS();
+}
+
+static TEST_FUNC(ReturnStatements)
+{
+    const char input[] = "return 5;\nreturn 10;\nreturn 993322;";
+    Lexer l = LexerInit(STRING_SPAN(input));
+    Parser p = ParserInit(&l);
+    Program* program = ParseProgram(&p);
+    TEST_RUN_SUBTEST(
+        CheckParserErrors,
+        {
+            ParserDeinit(&p);
+            ProgramDeinit(program);
+            free(program);
+        },
+        &p);
+
+    TEST_ASSERT(
+        program->statementsLength == 3,
+        {
+            ParserDeinit(&p);
+            ProgramDeinit(program);
+            free(program);
+        },
+        "program->statementsLength != 3. got=%d",
+        program->statementsLength);
+
+    for (int i = 0; i < program->statementsLength; i += 1)
+    {
+        TEST_ASSERT(
+            program->statements[i]->type == StatementTypeReturn,
+            {
+                ParserDeinit(&p);
+                ProgramDeinit(program);
+                free(program);
+            },
+            "program->statements[%d]->type != StatementTypeReturn. got=%.*s",
+            i,
+            StatementTypeName(program->statements[i]->type).length,
+            StatementTypeName(program->statements[i]->type).data);
+        String tokenLiteral = StatementTokenLiteral(program->statements[i]);
+        TEST_ASSERT(
+            StringSpansEqual(STRING_AS_SPAN(tokenLiteral), STRING_SPAN("return")),
+            {
+                free(tokenLiteral.data);
+                ParserDeinit(&p);
+                ProgramDeinit(program);
+                free(program);
+            },
+            "program->statements[%d]->tokenLiteral != 'return'. got='%.*s'",
+            i,
+            tokenLiteral.length,
+            tokenLiteral.data);
+
+        free(tokenLiteral.data);
     }
 
     ParserDeinit(&p);
