@@ -34,8 +34,17 @@ typedef struct
         .data = s.data, .length = s.length                                                                             \
     }
 
+#ifdef _MSC_VER
+#include <sal.h>
+#define FORMAT_STRING(p) _Printf_format_string_ p
+#define ATTR_PRINTF(...)
+#else
+#define FORMAT_STRING(p) p
+#define ATTR_PRINTF(...) __attribute__((format(printf, __VA_ARGS__)))
+#endif
+
 String StringCopy(const char* data, int length);
 String StringDuplicate(StringSpan s);
 String StringSubstring(StringSpan str, int start, int end);
-String StringPrintf(const char* fmt, ...);
+String StringPrintf(FORMAT_STRING(const char* fmt), ...) ATTR_PRINTF(1, 2);
 bool StringSpansEqual(StringSpan a, StringSpan b);

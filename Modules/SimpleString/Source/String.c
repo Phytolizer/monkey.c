@@ -24,7 +24,7 @@ String StringSubstring(StringSpan str, int start, int end)
     return result;
 }
 
-String StringPrintf(const char* fmt, ...)
+String StringPrintf(FORMAT_STRING(const char* fmt), ...)
 {
     va_list args;
     va_start(args, fmt);
