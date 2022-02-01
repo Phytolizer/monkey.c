@@ -46,7 +46,7 @@ void BuildCFile(const char* file, const char* out, ...)
     const char** includeDirs = calloc(numIncludeDirs + 1, sizeof(char*));
     size_t i = 0;
     FOREACH_VARGS(out, arg, args, {
-        includeDirs[i] = CONCAT("/I", arg);
+        includeDirs[i] = CONCAT("-I", arg);
         i += 1;
     });
     ARRAY_CMD("1*1111*", "cc", cflagsArray, "-c", file, "-o", out, includeDirs);
@@ -61,7 +61,7 @@ void LinkCStaticLib(const char* const* inputs, const char* out)
 }
 #endif
 
-#define BUILD_C_FILE(file, out, ...) BuildCFile(file, out, __VA_ARGS__, NULL)
+#define BUILD_C_FILE(...) BuildCFile(__VA_ARGS__, NULL)
 
 const char* embedSources[] = {"Embed.c"};
 const char* stringSources[] = {"String.c"};

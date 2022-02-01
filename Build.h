@@ -222,6 +222,7 @@ const char* AbsPathImpl(int ignore, ...)
         fprintf(stderr, "Failed to get absolute path: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
+    return real;
 #endif
 }
 
@@ -462,6 +463,7 @@ void ArrayCmd(const char* const* args)
     printf("[CMD] %s\n", commandLine);
     Execute(commandLine);
 #else
+    printf("[CMD] %s\n", ArrayConcatSep(" ", args));
     pid_t cpid = fork();
     if (cpid == 0)
     {
