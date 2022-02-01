@@ -23,7 +23,6 @@ void BuildCFile(const char* file, const char* out, ...)
     ARRAY_CMD("1*111*", "cl.exe", cflagsArray, "/c", file, CONCAT("/Fo", out), includeDirs);
 }
 
-#define BUILD_C_FILE(file, out, ...) BuildCFile(file, out, __VA_ARGS__, NULL)
 void LinkCExecutable(const char* const* inputs, const char* out)
 {
     ARRAY_CMD("1*1*11", "cl.exe", cflagsArray, CONCAT("/Fe", out), inputs, "/link", "/SUBSYSTEM:CONSOLE");
@@ -38,9 +37,18 @@ void LinkCStaticLib(const char* const* inputs, const char* out)
 #define LIB_PREFIX "lib"
 #define LIB_SUFFIX ".a"
 #define CFLAGS "-Wall", "-Wextra", "-Wpedantic", "-std=c11", "-Werror", "-O2"
-void BuildCFile(const char* file, const char* out)
+void BuildCFile(const char* file, const char* out, ...)
 {
-    CMD("cc", CFLAGS, "-c", file, "-o", out);
+    size_t numIncludeDirs = 0;
+    va_list args;
+    FOREACH_VARGS(out, arg, args, { numIncludeDirs += 1; });
+    const char** includeDirs = calloc(numIncludeDirs + 1, sizeof(char*));
+    size_t i = 0;
+    FOREACH_VARGS(out, arg, args, {
+        includeDirs[i] = CONCAT("/I", arg);
+        i += 1;
+    });
+    ARRAY_CMD("1*1111*", "cc", cflagsArray, "-c", file, "-o", out, includeDirs);
 }
 void LinkCExecutable(const char* const* inputs, const char* out)
 {
@@ -51,6 +59,8 @@ void LinkCStaticLib(const char* const* inputs, const char* out)
     ARRAY_CMD("111*", "ar", "rcs", out, inputs);
 }
 #endif
+
+#define BUILD_C_FILE(file, out, ...) BuildCFile(file, out, __VA_ARGS__, NULL)
 
 const char* embedSources[] = {"Embed.c"};
 const char* stringSources[] = {"String.c"};
