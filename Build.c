@@ -46,6 +46,10 @@ void LinkCExecutable(const char* const* inputs, const char* out)
 {
     ARRAY_CMD("111*", "cc", "-o", out, inputs);
 }
+void LinkCStaticLib(const char* const* inputs, const char* out)
+{
+    ARRAY_CMD("111*", "ar", "rcs", out, inputs);
+}
 #endif
 
 const char* embedSources[] = {"Embed.c"};

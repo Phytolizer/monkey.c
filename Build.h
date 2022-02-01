@@ -570,7 +570,7 @@ const char* const* ConstructArgsArray(const char* format, ...)
                 result[cursor] = va_arg(args, const char*);
                 cursor += 1;
                 break;
-            case '*':
+            case '*': {
                 const char* const* array = va_arg(args, const char* const*);
                 for (size_t j = 0; array[j] != NULL; j += 1)
                 {
@@ -578,6 +578,7 @@ const char* const* ConstructArgsArray(const char* format, ...)
                     cursor += 1;
                 }
                 break;
+            }
         }
     }
 
