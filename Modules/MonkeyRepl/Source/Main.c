@@ -38,7 +38,7 @@ static String ReadLine(FILE* in)
             memcpy(newData, result.data, result.length);
             result.data = newData;
         }
-        result.data[result.length] = c;
+        result.data[result.length] = (char)c;
         result.length += 1;
     }
 

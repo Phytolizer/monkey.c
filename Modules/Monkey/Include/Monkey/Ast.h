@@ -20,7 +20,7 @@ typedef struct
     ExpressionType type;
     union {
         Identifier identifier;
-    };
+    } as;
 } Expression;
 
 typedef struct
@@ -55,7 +55,7 @@ typedef struct
     union {
         LetStatement letStatement;
         ReturnStatement returnStatement;
-    };
+    } as;
 } Statement;
 
 typedef struct
@@ -78,7 +78,7 @@ typedef struct
         Program program;
         Statement statement;
         Expression expression;
-    };
+    } as;
 } Node;
 
 Program* ProgramInit(Statement** statements, int statementsLength);

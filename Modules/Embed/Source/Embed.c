@@ -166,7 +166,7 @@ int main(int argc, char** argv)
         {
             if (iscntrl(buffer[i]))
             {
-                fprintf(sourceOutput, "\\%03o", buffer[i]);
+                fprintf(sourceOutput, "\" \"\\%03o\" \"", buffer[i]);
             }
             else if (buffer[i] == '"')
             {

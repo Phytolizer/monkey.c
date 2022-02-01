@@ -87,15 +87,15 @@ static TEST_SUBTEST_FUNC(TestLetStatement, Statement* s, StringSpan name)
                 actualType.length,
                 actualType.data);
 
-    TEST_ASSERT(StringSpansEqual(STRING_AS_SPAN(s->letStatement.name->value), name),
+    TEST_ASSERT(StringSpansEqual(STRING_AS_SPAN(s->as.letStatement.name->value), name),
                 TEST_CLEANUP_NONE,
                 "letStatement.name.value not '%.*s'. got='%.*s'",
                 name.length,
                 name.data,
-                s->letStatement.name->value.length,
-                s->letStatement.name->value.data);
+                s->as.letStatement.name->value.length,
+                s->as.letStatement.name->value.data);
 
-    tokenLiteral = s->letStatement.name->token.literal;
+    tokenLiteral = s->as.letStatement.name->token.literal;
     TEST_ASSERT(StringSpansEqual(STRING_AS_SPAN(tokenLiteral), name),
                 TEST_CLEANUP_NONE,
                 "letStatement.name not '%.*s'. got='%.*s'",

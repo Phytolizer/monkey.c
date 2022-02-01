@@ -51,7 +51,7 @@ static TEST_FUNC(NextToken)
         {TokenTypeNotEq, STRING_SPAN("!=")},    {TokenTypeInt, STRING_SPAN("9")},
         {TokenTypeSemicolon, STRING_SPAN(";")}, {TokenTypeEof, STRING_SPAN("")},
     };
-    Lexer l = LexerInit((StringSpan){.data = NextToken, .length = NextToken_LENGTH});
+    Lexer l = LexerInit((StringSpan){.data = NextToken, .length = (int)NextToken_LENGTH});
     for (size_t i = 0; i < sizeof tests / sizeof tests[0]; i += 1)
     {
         Token t = LexerNextToken(&l);

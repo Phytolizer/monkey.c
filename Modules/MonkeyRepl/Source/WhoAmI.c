@@ -35,10 +35,17 @@ String WhoAmI(void)
                 userName.length = 0;
                 return userName;
             case ERROR_NONE_MAPPED: {
-                DWORD nameSize = UNLEN + 1;
+                DWORD simpleNameSize = UNLEN + 1;
                 free(userName.data);
                 userName.data = calloc(nameSize, 1);
-                ret = GetUserName(userName.data, &nameSize);
+                BOOL simpleRet = GetUserName(userName.data, &simpleNameSize);
+                if (simpleRet == 0)
+                {
+                    free(userName.data);
+                    userName.data = NULL;
+                    userName.length = 0;
+                    return userName;
+                }
                 break;
             }
         }

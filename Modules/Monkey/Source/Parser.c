@@ -113,9 +113,9 @@ Statement* ParseLetStatement(Parser* p)
 
     Statement* result = calloc(sizeof(Statement), 1);
     result->type = StatementTypeLet;
-    result->letStatement.token = token;
-    result->letStatement.name = name;
-    result->letStatement.value = NULL;
+    result->as.letStatement.token = token;
+    result->as.letStatement.name = name;
+    result->as.letStatement.value = NULL;
     return result;
 }
 

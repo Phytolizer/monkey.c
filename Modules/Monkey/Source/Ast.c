@@ -42,22 +42,22 @@ void StatementDeinit(Statement* s)
     switch (s->type)
     {
         case StatementTypeLet:
-            free(s->letStatement.token.literal.data);
-            free(s->letStatement.name->token.literal.data);
-            free(s->letStatement.name->value.data);
-            free(s->letStatement.name);
-            if (s->letStatement.value != NULL)
+            free(s->as.letStatement.token.literal.data);
+            free(s->as.letStatement.name->token.literal.data);
+            free(s->as.letStatement.name->value.data);
+            free(s->as.letStatement.name);
+            if (s->as.letStatement.value != NULL)
             {
-                ExpressionDeinit(s->letStatement.value);
-                free(s->letStatement.value);
+                ExpressionDeinit(s->as.letStatement.value);
+                free(s->as.letStatement.value);
             }
             break;
         case StatementTypeReturn:
-            free(s->returnStatement.token.literal.data);
-            if (s->returnStatement.returnValue != NULL)
+            free(s->as.returnStatement.token.literal.data);
+            if (s->as.returnStatement.returnValue != NULL)
             {
-                ExpressionDeinit(s->returnStatement.returnValue);
-                free(s->returnStatement.returnValue);
+                ExpressionDeinit(s->as.returnStatement.returnValue);
+                free(s->as.returnStatement.returnValue);
             }
             break;
     }
@@ -68,8 +68,8 @@ void ExpressionDeinit(Expression* e)
     switch (e->type)
     {
         case ExpressionTypeIdentifier:
-            free(e->identifier.token.literal.data);
-            free(e->identifier.value.data);
+            free(e->as.identifier.token.literal.data);
+            free(e->as.identifier.value.data);
             break;
     }
 }
@@ -78,10 +78,10 @@ Node* LetStatementInit(Token token, Identifier* name, Expression* value)
 {
     Node* result = calloc(sizeof(Node), 1);
     result->type = NodeTypeStatement;
-    result->statement.type = StatementTypeLet;
-    result->statement.letStatement.token = token;
-    result->statement.letStatement.name = name;
-    result->statement.letStatement.value = value;
+    result->as.statement.type = StatementTypeLet;
+    result->as.statement.as.letStatement.token = token;
+    result->as.statement.as.letStatement.name = name;
+    result->as.statement.as.letStatement.value = value;
 
     return result;
 }
@@ -90,9 +90,9 @@ Node* IdentifierInit(Token token, String value)
 {
     Node* result = calloc(sizeof(Node), 1);
     result->type = NodeTypeExpression;
-    result->expression.type = ExpressionTypeIdentifier;
-    result->expression.identifier.token = token;
-    result->expression.identifier.value = value;
+    result->as.expression.type = ExpressionTypeIdentifier;
+    result->as.expression.as.identifier.token = token;
+    result->as.expression.as.identifier.value = value;
 
     return result;
 }
@@ -102,11 +102,11 @@ String NodeTokenLiteral(Node* n)
     switch (n->type)
     {
         case NodeTypeProgram:
-            return ProgramTokenLiteral(&n->program);
+            return ProgramTokenLiteral(&n->as.program);
         case NodeTypeStatement:
-            return StatementTokenLiteral(&n->statement);
+            return StatementTokenLiteral(&n->as.statement);
         case NodeTypeExpression:
-            return ExpressionTokenLiteral(&n->expression);
+            return ExpressionTokenLiteral(&n->as.expression);
     }
 
     return (String){0};
@@ -117,9 +117,9 @@ String StatementTokenLiteral(Statement* s)
     switch (s->type)
     {
         case StatementTypeLet:
-            return StringDuplicate(STRING_AS_SPAN(s->letStatement.token.literal));
+            return StringDuplicate(STRING_AS_SPAN(s->as.letStatement.token.literal));
         case StatementTypeReturn:
-            return StringDuplicate(STRING_AS_SPAN(s->returnStatement.token.literal));
+            return StringDuplicate(STRING_AS_SPAN(s->as.returnStatement.token.literal));
     }
 
     return (String){0};
@@ -130,7 +130,7 @@ String ExpressionTokenLiteral(Expression* e)
     switch (e->type)
     {
         case ExpressionTypeIdentifier:
-            return StringDuplicate(STRING_AS_SPAN(e->identifier.token.literal));
+            return StringDuplicate(STRING_AS_SPAN(e->as.identifier.token.literal));
     }
 
     return (String){0};
