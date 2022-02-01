@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-const StringSpan Prompt = STRING_SPAN(">> ");
+const StringSpan Prompt = STRING_SPAN_INIT(">> ");
 
 static String ReadLine(FILE* in)
 {

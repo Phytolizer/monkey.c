@@ -32,18 +32,25 @@ function(declare_module NAME)
         ${DM_TARGET_NAME} ${DM_PUBLICITY} ${DM_INCLUDES}
         "Modules/${NAME}/Include"
     )
-    target_compile_options(
-        ${DM_TARGET_NAME}
-        ${DM_PUBLICITY}
-        -Wall
-        -Wextra
-        -Werror=implicit-function-declaration
-        -Werror=incompatible-pointer-types
-        -Werror=return-type
-        -Werror=unused-function
-        -Werror=unused-parameter
-        -Werror=unused-variable
+    if(C_COMPILER_ID STREQUAL "GNU"
+       OR C_COMPILER_ID STREQUAL "Clang"
+       OR C_COMPILER_ID STREQUAL "AppleClang"
     )
+        target_compile_options(
+            ${DM_TARGET_NAME}
+            ${DM_PUBLICITY}
+            -Wall
+            -Wextra
+            -Werror=implicit-function-declaration
+            -Werror=incompatible-pointer-types
+            -Werror=return-type
+            -Werror=unused-function
+            -Werror=unused-parameter
+            -Werror=unused-variable
+        )
+    elseif(C_COMPILER_ID STREQUAL "MSVC")
+        target_compile_options(${DM_TARGET_NAME} ${DM_PUBLICITY} /W4)
+    endif()
     if(WIN32)
         target_compile_definitions(
             ${DM_TARGET_NAME} ${DM_PUBLICITY} _CRT_SECURE_NO_WARNINGS

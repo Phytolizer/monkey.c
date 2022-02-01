@@ -23,6 +23,11 @@ typedef struct
         .data = x, .length = sizeof x - 1                                                                              \
     }
 
+#define STRING_SPAN_INIT(x)                                                                                            \
+    {                                                                                                                  \
+        x, sizeof x - 1                                                                                                \
+    }
+
 #define STRING_AS_SPAN(s)                                                                                              \
     (StringSpan)                                                                                                       \
     {                                                                                                                  \
