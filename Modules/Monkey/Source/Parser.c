@@ -11,6 +11,7 @@ static Statement* ParseLetStatement(Parser* p);
 static bool CurTokenIs(Parser* p, TokenType type);
 static bool PeekTokenIs(Parser* p, TokenType type);
 static bool ExpectPeek(Parser* p, TokenType type);
+static void PeekError(Parser* p, TokenType type);
 
 Parser ParserInit(Lexer* l)
 {
@@ -24,6 +25,11 @@ Parser ParserInit(Lexer* l)
 
 void ParserDeinit(Parser* p)
 {
+    for (int i = 0; i < p->errors.length; i += 1)
+    {
+        free(p->errors.data[i].data);
+    }
+    free(p->errors.data);
     free(p->curToken.literal.data);
     free(p->peekToken.literal.data);
 }
@@ -129,5 +135,25 @@ bool ExpectPeek(Parser* p, TokenType type)
         return true;
     }
 
+    PeekError(p, type);
     return false;
+}
+
+void PeekError(Parser* p, TokenType type)
+{
+    String message = StringPrintf("expected next token to be %.*s, got %.*s instead",
+                                  type.length,
+                                  type.data,
+                                  p->peekToken.type.length,
+                                  p->peekToken.type.data);
+    if (p->errors.length + 1 > p->errorsCapacity)
+    {
+        p->errorsCapacity *= 2;
+        String* newErrors = calloc(p->errorsCapacity, sizeof(String));
+        memcpy(newErrors, p->errors.data, p->errors.length * sizeof(String));
+        free(p->errors.data);
+        p->errors.data = newErrors;
+    }
+    p->errors.data[p->errors.length] = message;
+    p->errors.length += 1;
 }

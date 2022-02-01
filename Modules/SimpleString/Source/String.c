@@ -1,5 +1,7 @@
 #include "SimpleString/String.h"
 
+#include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -19,6 +21,25 @@ String StringSubstring(StringSpan str, int start, int end)
 {
     String result = {.data = calloc(end - start + 1, 1), .length = end - start};
     memcpy(result.data, str.data + start, end - start);
+    return result;
+}
+
+String StringPrintf(const char* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    int length = vsnprintf(NULL, 0, fmt, args);
+    va_end(args);
+    if (length < 0)
+    {
+        return (String){0};
+    }
+
+    String result = {.data = calloc(length + 1, 1), .length = length};
+    va_start(args, fmt);
+    vsnprintf(result.data, length + 1, fmt, args);
+    va_end(args);
+
     return result;
 }
 

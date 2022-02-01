@@ -32,4 +32,5 @@ typedef struct
 String StringCopy(const char* data, int length);
 String StringDuplicate(StringSpan s);
 String StringSubstring(StringSpan str, int start, int end);
+String StringPrintf(const char* fmt, ...);
 bool StringSpansEqual(StringSpan a, StringSpan b);

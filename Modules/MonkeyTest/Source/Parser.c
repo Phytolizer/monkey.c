@@ -9,6 +9,7 @@
 
 static TEST_FUNC(LetStatements);
 static TEST_SUBTEST_FUNC(TestLetStatement, Statement* s, StringSpan name);
+static TEST_SUBTEST_FUNC(CheckParserErrors, Parser* p);
 
 TEST_SUITE_FUNC(Parser)
 {
@@ -22,6 +23,14 @@ static TEST_FUNC(LetStatements)
     Parser p = ParserInit(&l);
 
     Program* program = ParseProgram(&p);
+    TEST_RUN_SUBTEST(
+        CheckParserErrors,
+        {
+            ParserDeinit(&p);
+            ProgramDeinit(program);
+            free(program);
+        },
+        &p);
     TEST_ASSERT(program != NULL, ParserDeinit(&p), "ParseProgram returned NULL");
     TEST_ASSERT(program->statementsLength == 3,
                 ParserDeinit(&p),
@@ -92,4 +101,19 @@ static TEST_SUBTEST_FUNC(TestLetStatement, Statement* s, StringSpan name)
                 tokenLiteral.data);
 
     TEST_PASS();
+}
+
+static TEST_SUBTEST_FUNC(CheckParserErrors, Parser* p)
+{
+    if (p->errors.length == 0)
+    {
+        TEST_PASS();
+    }
+
+    for (int i = 0; i < p->errors.length; i += 1)
+    {
+        fprintf(stderr, "parser error: '%.*s'\n", p->errors.data[i].length, p->errors.data[i].data);
+    }
+
+    TEST_ASSERT(false, TEST_CLEANUP_NONE, "parser has %d errors", p->errors.length);
 }
