@@ -30,7 +30,15 @@ typedef struct
     Expression* value;
 } LetStatement;
 
-#define STATEMENT_TYPES_X X(Let)
+typedef struct
+{
+    Token token;
+    Expression* returnValue;
+} ReturnStatement;
+
+#define STATEMENT_TYPES_X                                                                                              \
+    X(Let)                                                                                                             \
+    X(Return)
 
 typedef enum
 {
@@ -46,6 +54,7 @@ typedef struct
     StatementType type;
     union {
         LetStatement letStatement;
+        ReturnStatement returnStatement;
     };
 } Statement;
 

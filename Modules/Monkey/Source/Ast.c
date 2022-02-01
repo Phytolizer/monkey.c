@@ -52,6 +52,14 @@ void StatementDeinit(Statement* s)
                 free(s->letStatement.value);
             }
             break;
+        case StatementTypeReturn:
+            free(s->returnStatement.token.literal.data);
+            if (s->returnStatement.returnValue != NULL)
+            {
+                ExpressionDeinit(s->returnStatement.returnValue);
+                free(s->returnStatement.returnValue);
+            }
+            break;
     }
 }
 
@@ -110,6 +118,8 @@ String StatementTokenLiteral(Statement* s)
     {
         case StatementTypeLet:
             return StringDuplicate(STRING_AS_SPAN(s->letStatement.token.literal));
+        case StatementTypeReturn:
+            return StringDuplicate(STRING_AS_SPAN(s->returnStatement.token.literal));
     }
 
     return (String){0};
