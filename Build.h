@@ -216,6 +216,12 @@ const char* AbsPathImpl(int ignore, ...)
     }
     return fullPathNameBuffer;
 #else
+    char* real = realpath(result, NULL);
+    if (real == NULL)
+    {
+        fprintf(stderr, "Failed to get absolute path: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
 #endif
 }
 
