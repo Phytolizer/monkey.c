@@ -86,6 +86,7 @@ Statement* ParseLetStatement(Parser* p)
 
     if (!ExpectPeek(p, TokenTypeIdent))
     {
+        free(token.literal.data);
         return NULL;
     }
 
@@ -97,6 +98,7 @@ Statement* ParseLetStatement(Parser* p)
 
     if (!ExpectPeek(p, TokenTypeAssign))
     {
+        free(token.literal.data);
         free(name->token.literal.data);
         free(name->value.data);
         free(name);
@@ -148,7 +150,7 @@ void PeekError(Parser* p, TokenType type)
                                   p->peekToken.type.data);
     if (p->errors.length + 1 > p->errorsCapacity)
     {
-        p->errorsCapacity *= 2;
+        p->errorsCapacity = p->errorsCapacity * 2 + 1;
         String* newErrors = calloc(p->errorsCapacity, sizeof(String));
         memcpy(newErrors, p->errors.data, p->errors.length * sizeof(String));
         free(p->errors.data);

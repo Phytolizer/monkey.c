@@ -1,10 +1,9 @@
 #include "MonkeyTest/Parser.h"
 
-#include "Monkey/Ast.h"
-#include "SimpleString/String.h"
-
+#include <Monkey/Ast.h>
 #include <Monkey/Lexer.h>
 #include <Monkey/Parser.h>
+#include <SimpleString/String.h>
 #include <TestFramework/Test.h>
 
 static TEST_FUNC(LetStatements);
@@ -32,10 +31,15 @@ static TEST_FUNC(LetStatements)
         },
         &p);
     TEST_ASSERT(program != NULL, ParserDeinit(&p), "ParseProgram returned NULL");
-    TEST_ASSERT(program->statementsLength == 3,
-                ParserDeinit(&p),
-                "program->statementsLength != 3. got=%d",
-                program->statementsLength);
+    TEST_ASSERT(
+        program->statementsLength == 3,
+        {
+            ParserDeinit(&p);
+            ProgramDeinit(program);
+            free(program);
+        },
+        "program->statementsLength != 3. got=%d",
+        program->statementsLength);
 
     struct
     {
