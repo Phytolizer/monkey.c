@@ -21,6 +21,10 @@ StringSpan StatementTypeName(StatementType type)
 Program* ProgramInit(Statement** statements, int statementsLength)
 {
     Program* result = calloc(sizeof(Program), 1);
+    if (result == NULL)
+    {
+        return NULL;
+    }
     result->statements = statements;
     result->statementsLength = statementsLength;
 
@@ -77,6 +81,10 @@ void ExpressionDeinit(Expression* e)
 Node* LetStatementInit(Token token, Identifier* name, Expression* value)
 {
     Node* result = calloc(sizeof(Node), 1);
+    if (result == NULL)
+    {
+        return NULL;
+    }
     result->type = NodeTypeStatement;
     result->as.statement.type = StatementTypeLet;
     result->as.statement.as.letStatement.token = token;
@@ -89,6 +97,10 @@ Node* LetStatementInit(Token token, Identifier* name, Expression* value)
 Node* IdentifierInit(Token token, String value)
 {
     Node* result = calloc(sizeof(Node), 1);
+    if (result == NULL)
+    {
+        return NULL;
+    }
     result->type = NodeTypeExpression;
     result->as.expression.type = ExpressionTypeIdentifier;
     result->as.expression.as.identifier.token = token;

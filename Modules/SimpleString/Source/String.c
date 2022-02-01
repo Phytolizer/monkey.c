@@ -8,6 +8,10 @@
 String StringCopy(const char* data, int length)
 {
     String result = {.data = calloc(length + 1, 1), .length = length};
+    if (result.data == NULL)
+    {
+        return (String){0};
+    }
     memcpy(result.data, data, length);
     return result;
 }
@@ -20,6 +24,10 @@ String StringDuplicate(StringSpan s)
 String StringSubstring(StringSpan str, int start, int end)
 {
     String result = {.data = calloc(end - start + 1, 1), .length = end - start};
+    if (result.data == NULL)
+    {
+        return (String){0};
+    }
     memcpy(result.data, str.data + start, end - start);
     return result;
 }
@@ -36,6 +44,10 @@ String StringPrintf(FORMAT_STRING(const char* fmt), ...)
     }
 
     String result = {.data = calloc(length + 1, 1), .length = length};
+    if (result.data == NULL)
+    {
+        return (String){0};
+    }
     va_start(args, fmt);
     vsnprintf(result.data, length + 1, fmt, args);
     va_end(args);

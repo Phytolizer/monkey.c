@@ -2,6 +2,7 @@
 
 #include "Monkey/Token.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -39,6 +40,10 @@ Program* ParseProgram(Parser* p)
 {
     int statementsCapacity = 1;
     Statement** statements = calloc(statementsCapacity, sizeof(Statement*));
+    if (statements == NULL)
+    {
+        return NULL;
+    }
     int statementsLength = 0;
 
     while (!CurTokenIs(p, TokenTypeEof))
@@ -50,6 +55,11 @@ Program* ParseProgram(Parser* p)
             {
                 statementsCapacity *= 2;
                 Statement** newStatements = calloc(sizeof(Statement*), statementsCapacity);
+                if (newStatements == NULL)
+                {
+                    free(statements);
+                    return NULL;
+                }
                 memcpy(newStatements, statements, statementsLength * sizeof(Statement*));
                 free(statements);
                 statements = newStatements;
@@ -96,6 +106,11 @@ Statement* ParseLetStatement(Parser* p)
     }
 
     Identifier* name = calloc(sizeof(Identifier), 1);
+    if (name == NULL)
+    {
+        free(token.literal.data);
+        return NULL;
+    }
     name->token = p->curToken;
     name->value = StringDuplicate(STRING_AS_SPAN(p->curToken.literal));
     // prevent double free
@@ -117,6 +132,10 @@ Statement* ParseLetStatement(Parser* p)
     }
 
     Statement* result = calloc(sizeof(Statement), 1);
+    if (result == NULL)
+    {
+        return NULL;
+    }
     result->type = StatementTypeLet;
     result->as.letStatement.token = token;
     result->as.letStatement.name = name;
@@ -138,6 +157,11 @@ Statement* ParseReturnStatement(Parser* p)
     }
 
     Statement* result = calloc(sizeof(Statement), 1);
+    if (result == NULL)
+    {
+        free(token.literal.data);
+        return NULL;
+    }
     result->type = StatementTypeReturn;
     result->as.returnStatement.token = token;
     result->as.returnStatement.returnValue = NULL;
@@ -177,7 +201,17 @@ void PeekError(Parser* p, TokenType type)
     {
         p->errorsCapacity = p->errorsCapacity * 2 + 1;
         String* newErrors = calloc(p->errorsCapacity, sizeof(String));
-        memcpy(newErrors, p->errors.data, p->errors.length * sizeof(String));
+        if (newErrors == NULL)
+        {
+            free(p->errors.data);
+            free(message.data);
+            fprintf(stderr, "[FATAL] Out of memory\n");
+            exit(1);
+        }
+        if (p->errors.length > 0)
+        {
+            memcpy(newErrors, p->errors.data, p->errors.length * sizeof(String));
+        }
         free(p->errors.data);
         p->errors.data = newErrors;
     }
