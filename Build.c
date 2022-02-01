@@ -132,7 +132,9 @@ int main(void)
     LinkCStaticLib(monkeyObjects, PATH(outDir, "Monkey", LIB_PREFIX "Monkey" LIB_SUFFIX));
 
     MKDIRS(outDir, "Embedded", "MonkeyTest", "Input", "Lexer");
-    const char* nextTokenTestBase = PATH(outDir, "Embedded", "MonkeyTest", "Input", "Lexer", "NextToken");
-    CMD(embedExe, PATH("Modules", "MonkeyTest", "Input", "Lexer", "NextToken.txt"), ABS_PATH(nextTokenTestBase));
-    const char* nextTokenTestSource = CONCAT(nextTokenTestBase, ".c");
+    const char* nextTokenTestBase = PATH(outDir, "Embedded", "MonkeyTest", "Input", "Lexer");
+    CMD(embedExe,
+        PATH("Modules", "MonkeyTest", "Input", "Lexer", "NextToken.txt"),
+        PATH(ABS_PATH(nextTokenTestBase), "NextToken"));
+    const char* nextTokenTestSource = PATH(nextTokenTestBase, "NextToken.c");
 }
