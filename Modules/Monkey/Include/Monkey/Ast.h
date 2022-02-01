@@ -4,19 +4,6 @@
 
 #include <SimpleString/String.h>
 
-// Debugging is more convenient with a union representation of the AST.
-// However, struct inheritance uses less memory.
-// To solve this, use a compile-time switch to determine the memory layout of the AST.
-//
-// NOTE: This means that both Debug and Release profiles should be tested!
-#ifdef DEBUG
-#define AST_NODE_REPR_UNION 1
-#else
-#define AST_NODE_REPR_UNION 0
-#endif
-
-#if AST_NODE_REPR_UNION
-
 typedef struct
 {
     Token token;
@@ -95,6 +82,3 @@ Node* IdentifierInit(Token token, String value);
 String NodeTokenLiteral(Node* n);
 String StatementTokenLiteral(Statement* s);
 String ExpressionTokenLiteral(Expression* e);
-
-#else
-#endif

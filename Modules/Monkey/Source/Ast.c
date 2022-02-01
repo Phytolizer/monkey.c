@@ -2,8 +2,6 @@
 
 #include <stdlib.h>
 
-#if AST_NODE_REPR_UNION
-
 static String ProgramTokenLiteral(Program* p);
 
 StringSpan StatementTypeName(StatementType type)
@@ -136,6 +134,3 @@ String ProgramTokenLiteral(Program* p)
     }
     return (String){0};
 }
-
-#else
-#endif
