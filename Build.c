@@ -36,7 +36,7 @@ void LinkCStaticLib(const char* const* inputs, const char* out)
 #define EXE_SUFFIX ""
 #define LIB_PREFIX "lib"
 #define LIB_SUFFIX ".a"
-#define CFLAGS "-Wall", "-Wextra", "-Wpedantic", "-std=c11", "-Werror", "-O2"
+#define CFLAGS "-Wall", "-Wextra", "-Wpedantic", "-std=c11", "-Werror", "-ggdb"
 const char* cflagsArray[] = {CFLAGS, NULL};
 void BuildCFile(const char* file, const char* out, ...)
 {
