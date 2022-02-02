@@ -7,7 +7,9 @@
 #define EXE_SUFFIX ".exe"
 #define LIB_PREFIX ""
 #define LIB_SUFFIX ".lib"
-#define CFLAGS "/W4", "/WX", "/analyze", "/std:c11", "/diagnostics:caret", "/nologo", "/D_CRT_SECURE_NO_WARNINGS"
+#define CFLAGS                                                                                                         \
+    "/W4", "/WX", "/std:c11", "/diagnostics:caret", "/nologo", "/D_CRT_SECURE_NO_WARNINGS", "/external:W0",            \
+        "/external:anglebrackets"
 const char* cflagsArray[] = {CFLAGS, NULL};
 void BuildCFile(const char* file, const char* out, ...)
 {
@@ -23,9 +25,9 @@ void BuildCFile(const char* file, const char* out, ...)
     ARRAY_CMD("1*111*", "cl.exe", cflagsArray, "/c", file, CONCAT("/Fo", out), includeDirs);
 }
 
-void LinkCExecutable(const char* const* inputs, const char* out)
+void LinkCExecutable(const char* const* inputs, const char* out, const char* const* libs)
 {
-    ARRAY_CMD("1*1*11", "cl.exe", cflagsArray, CONCAT("/Fe", out), inputs, "/link", "/SUBSYSTEM:CONSOLE");
+    ARRAY_CMD("1*1*11*", "cl.exe", cflagsArray, CONCAT("/Fe", out), inputs, "/link", "/SUBSYSTEM:CONSOLE", libs);
 }
 void LinkCStaticLib(const char* const* inputs, const char* out)
 {
@@ -51,9 +53,9 @@ void BuildCFile(const char* file, const char* out, ...)
     });
     ARRAY_CMD("1*1111*", "cc", cflagsArray, "-c", file, "-o", out, includeDirs);
 }
-void LinkCExecutable(const char* const* inputs, const char* out)
+void LinkCExecutable(const char* const* inputs, const char* out, const char* const* libs)
 {
-    ARRAY_CMD("111*", "cc", "-o", out, inputs);
+    ARRAY_CMD("111**", "cc", "-o", out, inputs, libs);
 }
 void LinkCStaticLib(const char* const* inputs, const char* out)
 {
@@ -66,6 +68,8 @@ void LinkCStaticLib(const char* const* inputs, const char* out)
 const char* embedSources[] = {"Embed.c"};
 const char* stringSources[] = {"String.c"};
 const char* monkeySources[] = {"Ast.c", "Lexer.c", "Parser.c", "Token.c"};
+const char* monkeyReplSources[] = {"Main.c", "WhoAmI.c"};
+const char* monkeyTestSources[] = {"Main.c", "Lexer.c", "Parser.c"};
 
 int main(void)
 {
@@ -88,7 +92,7 @@ int main(void)
     });
 
     const char* embedExe = PATH(outDir, "Embed", "Embed" EXE_SUFFIX);
-    LinkCExecutable(embedObjects, embedExe);
+    LinkCExecutable(embedObjects, embedExe, EMPTY_ARRAY());
 
     const char** stringObjects = calloc((sizeof stringSources / sizeof stringSources[0]) + 1, sizeof(char*));
     if (stringObjects == NULL)
@@ -108,7 +112,8 @@ int main(void)
         stringObjects[i] = stringObject;
     });
 
-    LinkCStaticLib(stringObjects, PATH(outDir, "SimpleString", LIB_PREFIX "String" LIB_SUFFIX));
+    const char* simpleStringLib = PATH(outDir, "SimpleString", LIB_PREFIX "SimpleString" LIB_SUFFIX);
+    LinkCStaticLib(stringObjects, simpleStringLib);
 
     const char** monkeyObjects = calloc((sizeof monkeySources / sizeof monkeySources[0]) + 1, sizeof(char*));
     if (monkeyObjects == NULL)
@@ -129,7 +134,34 @@ int main(void)
         monkeyObjects[i] = monkeyObject;
     });
 
-    LinkCStaticLib(monkeyObjects, PATH(outDir, "Monkey", LIB_PREFIX "Monkey" LIB_SUFFIX));
+    const char* monkeyLib = PATH(outDir, "Monkey", LIB_PREFIX "Monkey" LIB_SUFFIX);
+    LinkCStaticLib(monkeyObjects, monkeyLib);
+
+    const char** monkeyReplObjects =
+        calloc((sizeof monkeyReplSources / sizeof monkeyReplSources[0]) + 1, sizeof(char*));
+    if (monkeyReplObjects == NULL)
+    {
+        fprintf(stderr, "Failed to allocate memory for MonkeyRepl objects\n");
+        return 1;
+    }
+
+    const char* monkeyReplDir = PATH("Modules", "MonkeyRepl", "Source");
+    MKDIRS(outDir, "MonkeyRepl");
+    FOREACH_ARRAY(const char*, monkeyReplSource, monkeyReplSources, {
+        const char* monkeyReplObject =
+            PATH(outDir, "MonkeyRepl", CONCAT(RemoveExtension(monkeyReplSource), OBJ_SUFFIX));
+        BUILD_C_FILE(PATH(monkeyReplDir, monkeyReplSource),
+                     monkeyReplObject,
+                     PATH("Modules", "Monkey", "Include"),
+                     PATH("Modules", "MonkeyRepl", "Include"),
+                     PATH("Modules", "SimpleString", "Include"),
+                     PATH("Modules", "WindowsHelpers", "Include"));
+        monkeyReplObjects[i] = monkeyReplObject;
+    });
+
+    LinkCExecutable(monkeyReplObjects,
+                    PATH(outDir, "MonkeyRepl", "MonkeyRepl" EXE_SUFFIX),
+                    NEW_ARRAY(monkeyLib, simpleStringLib, WINDOWS("Secur32.lib"), WINDOWS("Advapi32.lib")));
 
     MKDIRS(outDir, "Embedded", "MonkeyTest", "Input", "Lexer");
     const char* nextTokenTestBase = PATH(outDir, "Embedded", "MonkeyTest", "Input", "Lexer");
@@ -137,4 +169,27 @@ int main(void)
         PATH("Modules", "MonkeyTest", "Input", "Lexer", "NextToken.txt"),
         PATH(ABS_PATH(nextTokenTestBase), "NextToken"));
     const char* nextTokenTestSource = PATH(nextTokenTestBase, "NextToken.c");
+
+    const char** monkeyTestObjects =
+        calloc((sizeof monkeyTestSources / sizeof monkeyTestSources[0]) + 2, sizeof(char*));
+    monkeyTestObjects[0] = PATH(nextTokenTestBase, "NextToken" OBJ_SUFFIX);
+    BUILD_C_FILE(nextTokenTestSource, monkeyTestObjects[0], nextTokenTestBase);
+    const char* monkeyTestDir = PATH("Modules", "MonkeyTest", "Source");
+    MKDIRS(outDir, "MonkeyTest");
+    FOREACH_ARRAY(const char*, monkeyTestSource, monkeyTestSources, {
+        const char* monkeyTestObject =
+            PATH(outDir, "MonkeyTest", CONCAT(RemoveExtension(monkeyTestSource), OBJ_SUFFIX));
+        BUILD_C_FILE(PATH(monkeyTestDir, monkeyTestSource),
+                     monkeyTestObject,
+                     PATH("Modules", "MonkeyTest", "Include"),
+                     PATH("Modules", "Monkey", "Include"),
+                     PATH("Modules", "SimpleString", "Include"),
+                     PATH("Modules", "TestFramework", "Include"),
+                     PATH("Modules", "WindowsHelpers", "Include"),
+                     PATH(outDir, "Embedded"));
+        monkeyTestObjects[i + 1] = monkeyTestObject;
+    });
+
+    LinkCExecutable(
+        monkeyTestObjects, PATH(outDir, "MonkeyTest", "MonkeyTest" EXE_SUFFIX), NEW_ARRAY(monkeyLib, simpleStringLib));
 }

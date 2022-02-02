@@ -14,6 +14,10 @@ static String ReadLine(FILE* in)
 {
     int capacity = 16;
     String result = {calloc(capacity, 1), 0};
+    if (result.data == NULL)
+    {
+        return result;
+    }
     while (true)
     {
         int c = fgetc(in);

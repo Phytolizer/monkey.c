@@ -594,3 +594,38 @@ const char* const* ConstructArgsArray(const char* format, ...)
 }
 
 #define ARRAY_CMD(format, ...) ArrayCmd(ConstructArgsArray(format, __VA_ARGS__))
+
+const char* const* ConstructArray(int ignore, ...)
+{
+    va_list args;
+    size_t count = 0;
+    FOREACH_VARGS(ignore, arg, args, { count += 1; });
+    const char** result = calloc(count + 1, sizeof(const char*));
+    size_t i = 0;
+    FOREACH_VARGS(ignore, arg, args, {
+        result[i] = arg;
+        i += 1;
+    });
+    return result;
+}
+
+const char* const* NullTerminateArray(const char* const* array, size_t n)
+{
+    const char** result = calloc(n + 1, sizeof(const char*));
+    for (size_t i = 0; i < n; i += 1)
+    {
+        result[i] = array[i];
+    }
+    return result;
+}
+
+#define NEW_ARRAY(...) ConstructArray(69, __VA_ARGS__, NULL)
+#define EMPTY_ARRAY() ConstructArray(69, NULL)
+
+#ifdef _WIN32
+#define WINDOWS(arg) arg
+#define UNIX(arg) ""
+#else
+#define WINDOWS(arg) ""
+#define UNIX(arg) arg
+#endif

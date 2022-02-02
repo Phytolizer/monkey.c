@@ -27,10 +27,14 @@ Parser ParserInit(Lexer* l)
 
 void ParserDeinit(Parser* p)
 {
+    // This is not uninitialized.
+#pragma warning(push)
+#pragma warning(disable : 6001)
     for (int i = 0; i < p->errors.length; i += 1)
     {
         free(p->errors.data[i].data);
     }
+#pragma warning(pop)
     free(p->errors.data);
     free(p->curToken.literal.data);
     free(p->peekToken.literal.data);
