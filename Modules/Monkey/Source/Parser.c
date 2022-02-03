@@ -1,5 +1,4 @@
 #include "Monkey/Parser.h"
-
 #include "Monkey/Token.h"
 
 #include <stdio.h>
@@ -28,13 +27,17 @@ Parser ParserInit(Lexer* l)
 void ParserDeinit(Parser* p)
 {
     // This is not uninitialized.
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 6001)
+#endif
     for (int i = 0; i < p->errors.length; i += 1)
     {
         free(p->errors.data[i].data);
     }
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
     free(p->errors.data);
     free(p->curToken.literal.data);
     free(p->peekToken.literal.data);

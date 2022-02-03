@@ -621,11 +621,3 @@ const char* const* NullTerminateArray(const char* const* array, size_t n)
 
 #define NEW_ARRAY(...) ConstructArray(69, __VA_ARGS__, NULL)
 #define EMPTY_ARRAY() ConstructArray(69, NULL)
-
-#ifdef _WIN32
-#define WINDOWS(arg) arg
-#define UNIX(arg) ""
-#else
-#define WINDOWS(arg) ""
-#define UNIX(arg) arg
-#endif

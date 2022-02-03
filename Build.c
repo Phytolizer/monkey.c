@@ -38,7 +38,7 @@ void LinkCStaticLib(const char* const* inputs, const char* out)
 #define EXE_SUFFIX ""
 #define LIB_PREFIX "lib"
 #define LIB_SUFFIX ".a"
-#define CFLAGS "-Wall", "-Wextra", "-Wpedantic", "-std=c11", "-Werror", "-ggdb"
+#define CFLAGS "-Wall", "-Wextra", "-Wpedantic", "-std=gnu11", "-Werror", "-ggdb"
 const char* cflagsArray[] = {CFLAGS, NULL};
 void BuildCFile(const char* file, const char* out, ...)
 {
@@ -159,9 +159,14 @@ int main(void)
         monkeyReplObjects[i] = monkeyReplObject;
     });
 
-    LinkCExecutable(monkeyReplObjects,
-                    PATH(outDir, "MonkeyRepl", "MonkeyRepl" EXE_SUFFIX),
-                    NEW_ARRAY(monkeyLib, simpleStringLib, WINDOWS("Secur32.lib"), WINDOWS("Advapi32.lib")));
+#ifdef _WIN32
+#define MONKEY_REPL_LIBS monkeyLib, simpleStringLib, "Secur32.lib", "Advapi32.lib"
+#else
+#define MONKEY_REPL_LIBS monkeyLib, simpleStringLib
+#endif
+
+    LinkCExecutable(
+        monkeyReplObjects, PATH(outDir, "MonkeyRepl", "MonkeyRepl" EXE_SUFFIX), NEW_ARRAY(MONKEY_REPL_LIBS));
 
     MKDIRS(outDir, "Embedded", "MonkeyTest", "Input", "Lexer");
     const char* nextTokenTestBase = PATH(outDir, "Embedded", "MonkeyTest", "Input", "Lexer");
